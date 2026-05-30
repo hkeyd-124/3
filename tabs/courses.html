@@ -1,0 +1,189 @@
+<div class="courses-page">
+
+<style>
+
+.courses-page{
+  padding:20px;
+}
+
+.courses-container{
+  max-width:900px;
+  margin:auto;
+}
+
+.courses-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.courses-title{
+  font-size:28px;
+  font-weight:bold;
+}
+
+.back-btn{
+  padding:10px 18px;
+  background:#111;
+  color:white;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+/* TOPIC */
+
+.course-topic{
+  border:2px solid #333;
+  padding:16px;
+  border-radius:14px;
+  margin-bottom:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  background:white;
+}
+
+/* LESSON */
+
+.course-lesson{
+  margin-left:30px;
+  margin-top:12px;
+  border:2px solid #333;
+  padding:14px;
+  border-radius:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  background:white;
+  transition:0.2s;
+}
+
+.course-lesson:hover{
+  transform:translateX(5px);
+  background:#f1f5f9;
+}
+
+/* PROGRESS */
+
+.percent-circle{
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  background:#ccc;
+  color:white;
+}
+
+</style>
+
+<div class="courses-container">
+
+  <div class="courses-header">
+
+    <div class="courses-title">
+      📚 Khám phá khóa học
+    </div>
+
+    <div class="back-btn" onclick="loadHome()">
+      ← Home
+    </div>
+
+  </div>
+
+  <!-- TOPIC -->
+
+  <div class="course-topic" onclick="toggleCourse('course_t1')">
+
+    <div>
+      🧬 Chủ đề 1: Hữu cơ & Hydrocarbon
+    </div>
+
+    <div class="percent-circle" id="topicPercent">
+      0%
+    </div>
+
+  </div>
+
+  <div id="course_t1">
+
+    <div class="course-lesson lesson-btn"
+     data-lesson="organic_1"
+     data-name="Hợp chất hữu cơ">
+
+      <div>
+        Bài 1: Hợp chất hữu cơ
+      </div>
+
+      <div class="percent-circle" id="lesson1Percent">
+        0%
+      </div>
+
+    </div>
+
+    <div class="course-lesson lesson-btn"
+     data-lesson="organic_2"
+     data-name="Alkane">
+
+      <div>
+        Bài 2: Alkane
+      </div>
+
+      <div class="percent-circle" id="lesson2Percent">
+        0%
+      </div>
+
+    </div>
+
+    <div class="course-lesson lesson-btn"
+     data-lesson="organic_3"
+     data-name="Alkene">
+
+      <div>
+        Bài 3: Alkene
+      </div>
+
+      <div class="percent-circle" id="lesson3Percent">
+        0%
+      </div>
+
+    </div>
+
+    <div class="course-lesson lesson-btn"
+     data-lesson="organic_4"
+     data-name="Nhiên liệu">
+
+      <div>
+        Bài 4: Nhiên liệu
+      </div>
+
+      <div class="percent-circle" id="lesson4Percent">
+        0%
+      </div>
+
+    </div>
+
+    <div class="course-lesson"
+         onclick="openBossLesson()">
+
+      <div>
+        🔥 Hydrocarbon Master
+      </div>
+
+      <div class="percent-circle"
+           id="bossStatus">
+        LOCK
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>

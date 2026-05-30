@@ -1,0 +1,129 @@
+<div class="resources-page">
+
+  <style>
+
+  .resources-page{
+    padding:20px;
+  }
+
+  .resources-container{
+    max-width:900px;
+    margin:auto;
+  }
+
+  .resources-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+  }
+
+  .resources-title{
+    font-size:28px;
+    font-weight:bold;
+  }
+
+  .back-btn{
+    padding:10px 18px;
+    background:#111;
+    color:white;
+    border-radius:12px;
+    cursor:pointer;
+  }
+
+  /* TOPIC */
+
+  .topic{
+    border:2px solid #333;
+    padding:18px;
+    border-radius:14px;
+    margin-bottom:14px;
+    cursor:pointer;
+    font-weight:bold;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:white;
+    transition:0.2s;
+  }
+
+  .topic:hover{
+    transform:translateY(-2px);
+  }
+
+  /* LESSON LIST */
+
+  .lesson-list{
+    display:none;
+    margin-left:20px;
+    margin-bottom:20px;
+  }
+
+  /* LESSON */
+
+  .lesson{
+    border:2px solid #333;
+    padding:14px;
+    border-radius:12px;
+    margin-top:12px;
+    cursor:pointer;
+    background:white;
+    transition:0.2s;
+  }
+
+  .lesson:hover{
+    background:#f1f5f9;
+    transform:translateX(5px);
+  }
+
+  </style>
+
+  <div class="resources-container">
+
+    <div class="resources-header">
+
+      <div class="resources-title">
+        📚 Tài nguyên học tập
+      </div>
+
+      <div class="back-btn" onclick="loadHome()">
+        ← Home
+      </div>
+
+    </div>
+
+    <!-- TOPIC 1 -->
+
+    <div class="topic" onclick="toggleTopic('t1')">
+
+      <span>
+        🧪 Chủ đề 1: Hydrocarbon (hiđrocacbon) và nguồn nhiên liệu
+      </span>
+
+      <span>▼</span>
+
+    </div>
+
+    <div id="t1" class="lesson-list">
+
+      <div class="lesson" onclick="openLessonSPA('organic_1')">
+        Bài 1: Hợp chất hữu cơ
+      </div>
+
+      <div class="lesson" onclick="openLessonSPA('organic_2')">
+        Bài 2: Alkane
+      </div>
+
+      <div class="lesson" onclick="openLessonSPA('organic_3')">
+        Bài 3: Alkene
+      </div>
+
+      <div class="lesson" onclick="openLessonSPA('organic_4')">
+        Bài 4: Nhiên liệu
+      </div>
+
+    </div>
+
+  </div>
+
+</div>

@@ -1,0 +1,335 @@
+<div class="leaderboard-page">
+
+<style>
+
+.leaderboard-page{
+  padding:20px;
+}
+
+.lb-container{
+  max-width:1100px;
+  margin:auto;
+}
+
+.lb-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
+}
+
+.lb-title{
+  font-size:32px;
+  font-weight:bold;
+}
+
+.lb-home{
+  padding:10px 18px;
+  background:#111;
+  color:white;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.lb-card{
+
+  background:#d6c2ae;
+
+  border-radius:28px;
+
+  padding:25px;
+
+  overflow:auto;
+}
+
+/* =========================
+   TABLE HEADER
+========================= */
+
+.lb-table-header{
+
+  display:grid;
+
+  grid-template-columns:
+    80px
+    1.5fr
+    120px
+    140px
+    150px
+    120px;
+
+  align-items:center;
+
+  font-weight:bold;
+
+  color:red;
+
+  margin-bottom:8px;
+
+  padding:0 20px;
+}
+
+/* =========================
+   FILTERS
+========================= */
+
+.lb-filters{
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+}
+
+.lb-select{
+
+  padding:6px 10px;
+
+  border-radius:8px;
+
+  border:1px solid #999;
+
+  background:white;
+
+  cursor:pointer;
+}
+
+/* =========================
+   ROW
+========================= */
+
+.lb-row{
+
+  display:grid;
+
+  grid-template-columns:
+    80px
+    1fr
+    120px
+    120px;
+
+  align-items:center;
+
+  padding:10px 20px;
+
+  margin-bottom:6px;
+
+  border-radius:18px;
+
+  border:
+    1px solid #777;
+
+  background:#d9c7b3;
+
+  transition:0.2s;
+}
+  .lb-row:hover{
+
+  transform:translateY(-2px);
+
+  box-shadow:
+    0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* ======================
+   TOP 1
+====================== */
+
+.lb-gold{
+
+  background:
+    linear-gradient(
+      135deg,
+      #FFD700,
+      #FFECB3
+    );
+
+  border:
+    2px solid #ffcc00;
+}
+
+/* ======================
+   TOP 2
+====================== */
+
+.lb-silver{
+
+  background:
+    linear-gradient(
+      135deg,
+      #d9d9d9,
+      #f5f5f5
+    );
+
+  border:
+    2px solid #c0c0c0;
+}
+
+/* ======================
+   TOP 3
+====================== */
+
+.lb-bronze{
+
+  background:
+    linear-gradient(
+      135deg,
+      #cd7f32,
+      #e6b17e
+    );
+
+  border:
+    2px solid #b87333;
+}
+
+/* ======================
+   CURRENT USER
+====================== */
+
+.lb-me{
+
+  box-shadow:
+    0 0 0 2px gold;
+}
+
+/* ======================
+   SEPARATOR
+====================== */
+
+.lb-separator{
+
+  text-align:center;
+
+  padding:6px;
+
+  font-size:22px;
+
+  opacity:0.6;
+}
+
+.lb-rank{
+  font-size:34px;
+  text-align:center;
+}
+
+.lb-name{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.lb-score{
+  font-size:22px;
+  font-weight:bold;
+}
+
+.lb-badge{
+
+  display:inline-flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  padding:8px 14px;
+
+  border-radius:12px;
+
+  background:#111;
+
+  color:white;
+
+  font-weight:bold;
+}
+
+.lb-loading{
+  text-align:center;
+  padding:40px;
+  font-size:18px;
+}
+
+@media(max-width:1000px){
+
+  .lb-table-header,
+  .lb-row{
+
+    min-width:900px;
+  }
+}
+
+</style>
+
+<div class="lb-container">
+
+  <!-- HEADER -->
+
+  <div class="lb-header">
+
+    <div class="lb-title">
+      🏆 Leaderboard
+    </div>
+
+    <div class="lb-home"
+         onclick="loadHome()">
+
+      ← Home
+
+    </div>
+
+  </div>
+
+  <!-- CARD -->
+
+  <div class="lb-card">
+
+    <!-- TABLE HEADER -->
+
+    <div class="lb-table-header">
+
+      <div>Hạng</div>
+
+      <div>Tên</div>
+
+      <div>Điểm</div>
+
+      <div>Huy hiệu</div>
+
+      <div>
+
+        <select id="topicFilter"
+                class="lb-select"
+                onchange="loadLessons()">
+
+          <option value="topic1">
+            Chủ đề 1
+          </option>
+
+        </select>
+
+      </div>
+
+      <div>
+
+        <select id="lessonFilter"
+                class="lb-select"
+                onchange="loadLeaderboard()">
+
+        </select>
+
+      </div>
+
+    </div>
+
+    <!-- LIST -->
+
+    <div id="leaderboardList">
+
+      <div class="lb-loading">
+        ⏳ Loading leaderboard...
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
