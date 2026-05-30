@@ -1,0 +1,1008 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+ <link
+  rel="icon"
+  type="image/png"
+  href="assets/images/favicon.png"
+/>
+<meta charset="UTF-8">
+<title>HackChem</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- FONT -->
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+ #nameModal {
+  display: none;
+  position: fixed;
+  inset: 0;
+
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(8px);
+
+  justify-content: center;
+  align-items: center;
+
+  z-index: 999;
+
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-box {
+  background: rgba(255,255,255,0.9);
+  backdrop-filter: blur(12px);
+
+  padding: 30px;
+  border-radius: 20px;
+
+  width: 90%;
+  max-width: 420px;
+
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.2),
+    inset 0 1px 1px rgba(255,255,255,0.6);
+
+  text-align: center;
+
+  animation: scaleIn 0.25s ease;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+  .modal-box input {
+  width: 100%;
+  padding: 14px;
+  margin-top: 15px;
+
+  border-radius: 12px;
+  border: none;
+
+  background: #111;
+  color: white;
+
+  font-size: 16px;
+}
+
+.modal-box input::placeholder {
+  color: #aaa;
+}
+
+.modal-box button {
+  margin-top: 15px;
+  width: 100%;
+  padding: 12px;
+
+  border: none;
+  border-radius: 12px;
+
+  background: #facc15;
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.modal-box button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  min-height: 100vh;
+  overflow-x: hidden; 
+  position: relative;
+}
+
+/* BACKGROUND FULL */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url("assets/images/background.png") center/cover no-repeat;
+  z-index: 0;
+}
+
+/* MAIN LAYOUT */
+.container {
+  display: flex;
+  height: 100vh;
+  position: relative;
+  z-index: 2;
+}
+.login-card {
+  align-self: center;
+  margin-top: 20px;
+}
+/* LEFT */
+.left {
+  width: 50%;
+  padding: 60px 80px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;   
+  text-align: left;          
+  position: relative;        
+}
+
+/* LOGO */
+.logo img {
+  height: 40px;
+  margin-bottom: 30px;
+  display: block;
+}
+
+/* TITLE */
+h1 {
+  font-size: 52px;
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 20px;
+}
+.contact {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.subtitle {
+  font-size: 26px;  
+  line-height: 1.5;
+  margin-bottom: 40px;
+  max-width: 520px; 
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* INPUT */
+.input-box {
+  display: flex;
+  width: 100%;
+  background: black;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.input-box input {
+  flex: 1;
+  padding: 16px;
+  border: none;
+  color: white;
+  background: transparent;
+  font-size: 16px;
+}
+
+.input-box button {
+  background: #facc15;
+  border: none;
+  padding: 0 20px;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+/* DIVIDER */
+.divider {
+  width: 420px;
+  text-align: center;
+  margin: 30px 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 40%;
+  height: 1px;
+  background: #aaa;
+}
+
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+.divider span {
+  background: transparent;
+  padding: 0 10px;
+  color: #555;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 80px;
+  font-size: 14px;
+}
+
+/* RIGHT */
+.right {
+  width: 50%;
+  position: relative;
+}
+
+/* ATOM */
+.atom {
+  position: absolute;
+  right: -160px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 900px;
+  z-index: 2;
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));
+}
+  .wallet {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 14px 18px;
+  margin-top: 15px;
+
+  background: rgba(255,255,255,0.7);
+  border-radius: 14px;
+
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.wallet:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
+
+.wallet-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.login-card {
+  width: 460px;
+  padding: 30px;
+  background: linear-gradient(145deg, #f3f3f3, #e6e6e6);
+  border-radius: 20px;
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.1),
+    inset 0 1px 1px rgba(255,255,255,0.6);
+  margin-top: 10px;
+}
+  /* CONTACT */
+.contact {
+  position: absolute;
+  bottom: 40px;
+  left: 80px;
+}
+
+.contact-title {
+  font-weight: 700;
+  font-size: 14px;
+  margin-bottom: 12px;
+}
+
+.contact-icons {
+  display: flex;
+  gap: 16px;
+}
+
+.contact-icons img {
+  width: 28px;
+  height: 28px;
+
+  cursor: pointer;
+
+  opacity: 0.7;
+  transition: 0.25s;
+}
+
+.contact-icons img:hover {
+  transform: scale(1.2);
+  opacity: 1;
+}
+  @media (max-width: 768px) {
+
+  /* 1. CHUYỂN LAYOUT DỌC */
+  .container {
+    flex-direction: column;
+    height: auto;
+  }
+
+  /* 2. LEFT FULL WIDTH */
+  .left {
+  width: 100%;   
+  position: relative;
+  z-index: 2;
+  padding: 30px 20px;
+}
+
+  /* 3. TEXT NHỎ LẠI */
+  h1 {
+    font-size: 36px;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-size: 18px;
+    max-width: 100%;
+  }
+
+  /* 4. LOGIN FULL WIDTH */
+  .login-card {
+    width: 100%;
+  }
+
+  .input-box,
+  .divider {
+    width: 100%;
+  }
+
+  /* 5. RIGHT → KHÔNG ĐÈ */
+  .right {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+  /* 6. ATOM NHỎ LẠI */
+ .atom {
+  position: absolute;
+  width: 350px;
+
+  top: 55%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  z-index: 0;
+  opacity: 0.35;
+
+  filter: blur(0.3px); /* subtle */
+}
+
+  /* 7. CONTACT KHÔNG FIXED */
+  .contact {
+  position: relative;
+  margin-top: 60px;
+  align-items: flex-start;
+}
+    .subtitle {
+  word-break: keep-all;
+}
+    .login-card {
+  backdrop-filter: blur(10px);
+}
+
+}
+ .spinner {
+  width:40px;
+  height:40px;
+  border:4px solid rgba(255,255,255,0.3);
+  border-top:4px solid white;
+  border-radius:50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <!-- LEFT -->
+  <div class="left">
+
+    <div class="logo">
+      <img src="assets/images/logohackchem.png">
+    </div>
+
+    <h1>Welcome to HackChem</h1>
+
+    <div class="subtitle">
+      Kết nối bằng Email hoặc ví Web3<br>
+      của bạn để bắt đầu học
+    </div>
+<div class="login-card">
+    <div class="input-box">
+  <input id="email" placeholder="Email">
+</div>
+
+<div class="input-box" style="margin-top:10px; position:relative;">
+
+  <input id="password" type="password" placeholder="Password"
+    style="padding-right:35px;">
+
+  <!-- 👁 SVG ICON -->
+  <span onclick="togglePassword()" id="eyeIcon" style="
+    position:absolute;
+    right:14px;
+    top:50%;
+    transform:translateY(-50%);
+    cursor:pointer;
+    width:22px;
+    height:22px;
+  ">
+
+    <!-- 👁 MẮT nhắm -->
+    <svg id="eyeClosed" xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round" width="22" height="22">
+      <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+
+    <!-- 🙈 MẮT mở -->
+    <svg id="eyeOpen" xmlns="http://www.w3.org/2000/svg" 
+      viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"
+      stroke-linecap="round" stroke-linejoin="round" width="22" height="22"
+      style="display:none;">
+      <path d="M17.94 17.94A10.94 10.94 0 0112 20C5 20 1 12 1 12
+               a21.77 21.77 0 015.06-6.94"/>
+      <path d="M9.9 4.24A10.94 10.94 0 0112 4c7 0 11 8 11 8
+               a21.77 21.77 0 01-2.16 3.19"/>
+      <line x1="1" y1="1" x2="23" y2="23"/>
+      <circle cx="12" cy="12" r="3"/>
+    </svg>
+
+  </span>
+
+</div>
+
+<button onclick="loginEmail()" style="margin-top:15px; width:100%; padding:12px; border:none; border-radius:12px; background:#facc15; cursor:pointer;">
+  Login with Email
+</button>
+ <p style="margin-top:10px; font-size:14px; cursor:pointer; color:#555;"
+   onclick="showResetBox()">
+  Quên mật khẩu?
+</p>
+
+<div id="resetBox" style="display:none; margin-top:10px;">
+  <input id="resetEmail" placeholder="Nhập email"
+    style="width:100%; padding:10px; margin-bottom:8px; border-radius:10px;">
+  
+  <button onclick="resetPassword()" style="
+    width:100%;
+    padding:10px;
+    border:none;
+    border-radius:10px;
+    background:#111;
+    color:white;
+    cursor:pointer;
+  ">
+    Gửi link reset
+  </button>
+</div>
+<div id="resendBox" style="display:none; margin-top:10px;">
+  <p style="color:orange;">Email chưa xác thực</p>
+  <button onclick="resendVerify()">📩 Gửi lại email</button>
+</div>
+    <div class="divider">
+      <span>Or</span>
+    </div>
+
+    <div class="wallet" onclick="connectWallet()">
+  <div class="wallet-left">
+    <!-- ICON -->
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+  <rect x="3" y="6" width="14" height="12" rx="3" stroke="#555" stroke-width="1.5"/>
+  <path d="M17 9h3a2 2 0 012 2v2a2 2 0 01-2 2h-3" stroke="#555" stroke-width="1.5"/>
+  <circle cx="18.5" cy="13" r="1" fill="#555"/>
+</svg>
+
+    <span>Login with Wallet</span>
+  </div>
+
+  <span>→</span>
+</div>
+</div>
+    <div class="contact">
+
+  <div class="contact-title">TÌM HIỂU THÊM</div>
+
+  <div class="contact-icons">
+
+    <!-- MAIL -->
+    <a href="mailto:vanvuonghh12@gmail.com">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/gmail.svg">
+    </a>
+
+    <!-- DISCORD -->
+    <a href="https://discord.gg/VnGhSe68" target="_blank">
+      <img src="https://cdn.jsdelivr.net/gh/simple-icons/simple-icons/icons/discord.svg">
+    </a>
+
+  </div>
+
+</div>
+
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right">
+    <img src="assets/images/atomcrack.png" class="atom">
+  </div>
+
+</div>
+
+<!-- POPUP GIỮ NGUYÊN -->
+<div id="nameModal">
+  <div class="modal-box">
+  <h2 style="font-size:22px; font-weight:700;">
+    👋 Welcome to HackChem
+  </h2>
+
+  <p style="margin-top:8px; color:#555;">
+    Chúng tôi có thể gọi bạn là gì?
+  </p>
+
+  <input id="usernameInput" placeholder="Your name...">
+
+  <button onclick="saveName()">
+    Continue →
+  </button>
+</div>
+</div>
+
+<!-- FIREBASE -->
+<script type="module">
+import { createAppKit } from 'https://esm.sh/@reown/appkit'
+import { EthersAdapter } from 'https://esm.sh/@reown/appkit-adapter-ethers'
+import { sepolia } from 'https://esm.sh/@reown/appkit/networks'
+import { BrowserProvider } from 'https://esm.sh/ethers'
+ import { 
+  getAuth, 
+  sendEmailVerification,
+  sendPasswordResetEmail
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+const auth = getAuth();
+  import { getUserByWallet, createUser } from "./userService.js";
+  import { loginWithEmail } from "./authEmail.js";
+
+window.loginWithEmail = loginWithEmail;
+  window.getUserByWallet = getUserByWallet;
+window.createUser = createUser;
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import { getFirestore, setDoc, doc, getDoc, updateDoc } 
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBSteBiC3fkkZfbXqOkNkbqrPMl_AWvJbU",
+  authDomain: "hack-chem-v1.firebaseapp.com",
+  projectId: "hack-chem-v1",
+  storageBucket: "hack-chem-v1.firebasestorage.app",
+  messagingSenderId: "387273003535",
+  appId: "1:387273003535:web:75bf103ed9612d6c18097a"
+  };
+
+  const app = initializeApp(firebaseConfig);
+ /* =========================
+   REOWN APPKIT
+========================= */
+const projectId = "a9297c8ae834401d3652a5fe0b85060d";
+
+const metadata = {
+  name: "HackChem",
+  description: "HackChem Web3 Learning",
+  url: window.location.origin,
+  icons: [`${window.location.origin}/assets/images/favicon.png`]
+};
+
+const modal = createAppKit({
+  adapters: [new EthersAdapter()],
+  networks: [sepolia],
+  metadata,
+  projectId,
+ enableReconnect: false,
+  features: {
+    analytics: true
+  }
+});
+ 
+ window.modal = modal;
+ 
+  const db = getFirestore(app);
+  window.db = db;
+  window.doc = doc;
+  window.getDoc = getDoc;
+  window.updateDoc = updateDoc;
+ 
+  window.saveUser = async function(uid) {
+  await setDoc(doc(db, "users", uid), {
+    updatedAt: new Date().toISOString()
+  }, { merge: true });
+}
+  
+let walletAddress = "";
+
+// CONNECT WALLET (MetaMask chuẩn)
+window.connectWallet = async function () {
+
+  try {
+
+  await modal.open();
+
+showLoading();
+
+// =========================
+// WAIT PROVIDER READY
+// =========================
+
+await modal.open();
+
+showLoading();
+
+// =========================
+// WAIT USER CONNECT
+// =========================
+
+await new Promise(resolve => {
+
+  const check = setInterval(()=>{
+
+    const provider =
+      modal.getWalletProvider();
+
+    if(provider){
+
+      clearInterval(check);
+
+      resolve();
+    }
+
+  }, 500);
+
+});
+
+const provider =
+  modal.getWalletProvider();
+
+    // ETHERS PROVIDER
+    const ethersProvider = new BrowserProvider(provider);
+
+    const signer = await ethersProvider.getSigner();
+
+    // WALLET ADDRESS
+    walletAddress = (await signer.getAddress()).toLowerCase();
+
+    const wallet = walletAddress;
+
+    /* ============================
+       LOGIN WITH WALLET ONLY
+    ============================ */
+
+    let uid = await getUserByWallet(wallet);
+
+    /* ============================
+       WALLET CHƯA TỒN TẠI
+    ============================ */
+
+    if (!uid) {
+
+      uid = await createUser({
+        wallet
+      });
+
+      /* SAVE WALLET INDEX */
+
+      await setDoc(
+        doc(db, "wallet_index", wallet),
+        {
+          uid: uid
+        }
+      );
+    }
+
+    // CHECK NETWORK
+    const network = await ethersProvider.getNetwork();
+
+if(network.chainId !== 11155111n){
+
+  try{
+
+    await provider.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0xaa36a7" }]
+    });
+
+  }catch(err){
+
+    // chain chưa có
+    if(err.code === 4902){
+
+      await provider.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: "0xaa36a7",
+          chainName: "Sepolia",
+          rpcUrls: ["https://rpc.sepolia.org"],
+          nativeCurrency: {
+            name: "ETH",
+            symbol: "ETH",
+            decimals: 18
+          },
+          blockExplorerUrls: [
+            "https://sepolia.etherscan.io"
+          ]
+        }]
+      });
+
+    }else{
+
+      hideLoading();
+
+      return;
+    }
+
+  }
+
+}
+
+
+    // RESET OLD UID
+    const oldWallet = localStorage.getItem("wallet");
+
+if(
+  oldWallet &&
+  oldWallet.toLowerCase() !== walletAddress
+){
+  localStorage.removeItem("uid");
+}
+
+    // SAVE STORAGE
+    localStorage.setItem("wallet", walletAddress);
+    localStorage.setItem("uid", uid);
+
+    // SAVE USER
+    await window.saveUser(uid);
+
+    // CHECK FIRST TIME
+    const isFirst = await checkFirstTime();
+
+    if (!isFirst) {
+      window.location.href = "home.html";
+    }
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert("Kết nối ví thất bại");
+
+    hideLoading();
+  }
+}
+
+
+ 
+
+// CHECK FIRST
+async function checkFirstTime() {
+
+  const uid = localStorage.getItem("uid");
+
+  const ref = window.doc(window.db, "users", uid);
+  const snapshot = await window.getDoc(ref);
+
+  if (snapshot.exists()) {
+    const data = snapshot.data();
+
+   if (!data.name || data.name.trim() === "") {
+    hideLoading();
+      document.getElementById("nameModal").style.display = "flex";
+      return true;
+    }
+  }
+
+  return false;
+}
+
+// SAVE NAME
+window.saveName = async function() {
+
+  const name = document.getElementById("usernameInput").value;
+
+  if (!name) {
+    alert("Nhập tên đi!");
+    return;
+  }
+
+  const uid = localStorage.getItem("uid");
+const ref = window.doc(window.db, "users", uid);
+
+  await window.updateDoc(ref, {
+    name: name
+  });
+
+  document.getElementById("nameModal").style.display = "none";
+
+  window.location.href = "home.html";
+}
+  // ============================
+// 🔥 LOGIN EMAIL
+// ============================
+window.loginEmail = async function(){
+
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  if(!email || !password){
+    alert("Nhập email và password!");
+    return;
+  }
+
+  try{
+
+localStorage.removeItem("uid");
+
+    let result = await loginWithEmail(email, password);
+
+    // ❌ EMAIL CHƯA VERIFY → KHÔNG LOADING
+    if(result === "NOT_VERIFIED"){
+      showResendUI();
+      return;
+    }
+
+    if(!result){
+      return;
+    }
+
+    // ✅ TỪ ĐÂY MỚI BẮT ĐẦU LOADING
+    showLoading(); // 🔥 CHUYỂN XUỐNG ĐÂY
+
+    let uid = result;
+
+    localStorage.setItem("uid", uid);
+
+    const isFirst = await checkFirstTime();
+
+    if (!isFirst) {
+      window.location.href = "home.html";
+    } else {
+      hideLoading();
+    }
+
+  }catch(err){
+    console.error(err);
+    alert("Login email failed");
+    hideLoading();
+  }
+}
+ window.showResendUI = function(){
+  document.getElementById("resendBox").style.display = "block";
+}
+ window.resendVerify = async function(){
+
+  const email = localStorage.getItem("pending_verify_email");
+
+  if(!email){
+    alert("Không tìm thấy email!");
+    return;
+  }
+
+  const user = auth.currentUser;
+
+  if(!user){
+    alert("Phiên đăng nhập hết hạn, login lại!");
+    return;
+  }
+
+  // 🔥 cooldown
+  const last = localStorage.getItem("last_resend_time");
+  const now = Date.now();
+
+  if(last && now - last < 60000){
+    alert("⏳ Vui lòng chờ 60s trước khi gửi lại!");
+    return;
+  }
+
+  await sendEmailVerification(user);
+
+  localStorage.setItem("last_resend_time", now);
+
+  alert("📩 Đã gửi lại email!");
+}
+ window.showResetBox = function(){
+  document.getElementById("resetBox").style.display = "block";
+}
+ window.resetPassword = async function(){
+
+  const email = document.getElementById("resetEmail").value.trim().toLowerCase();
+
+  if(!email){
+    alert("Nhập email!");
+    return;
+  }
+
+  try{
+
+    await sendPasswordResetEmail(auth, email);
+
+    alert("📩 Đã gửi link đặt lại mật khẩu! Kiểm tra email.");
+
+  }catch(err){
+    console.error(err);
+
+    if(err.code === "auth/user-not-found"){
+      alert("Email chưa đăng ký!");
+    }else{
+      alert("Có lỗi xảy ra!");
+    }
+  }
+}
+ window.togglePassword = function(){
+  const input = document.getElementById("password");
+  const openIcon = document.getElementById("eyeOpen");
+  const closedIcon = document.getElementById("eyeClosed");
+  if(input.type === "password"){
+    input.type = "text";
+    openIcon.style.display = "none";
+    closedIcon.style.display = "block";
+  }else{
+    input.type = "password";
+    openIcon.style.display = "block";
+    closedIcon.style.display = "none";
+  }
+}
+ function showLoading(){
+  document.getElementById("loadingOverlay").style.display = "flex";
+}
+
+function hideLoading(){
+  document.getElementById("loadingOverlay").style.display = "none";
+}
+
+ 
+</script>
+ <div id="loadingOverlay" style="
+  display:none;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background:rgba(0,0,0,0.4);
+  backdrop-filter: blur(3px);
+  z-index:9999;
+  justify-content:center;
+  align-items:center;
+">
+
+  <div style="
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:white;
+">
+    
+    <div class="spinner"></div>
+
+    <p style="margin-top:10px;">Đang đăng nhập...</p>
+
+  </div>
+
+</div>
+</body>
+</html>

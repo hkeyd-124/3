@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Admin Panel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Arial;
+  background: #f5f5f5;
+  padding: 20px;
+}
+
+/* LOGIN BOX */
+#loginBox {
+  max-width: 400px;
+  margin: auto;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+}
+
+button {
+  margin-top: 10px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  background: black;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* DASHBOARD */
+#adminBox {
+  display: none;
+}
+
+.user-card {
+  background: white;
+  padding: 15px;
+  margin: 10px 0;
+  border-radius: 10px;
+}
+
+.banned {
+  background: #ffe5e5;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔐 LOGIN -->
+<div id="loginBox">
+  <h2>🔐 Admin Login</h2>
+
+  <input id="email" placeholder="Admin Email">
+  <input id="password" type="password" placeholder="Password">
+
+  <button onclick="adminLogin()">Login</button>
+
+  <p id="error" style="color:red;"></p>
+</div>
+
+<!-- 👑 DASHBOARD -->
+<div id="adminBox">
+
+  <div class="top-bar">
+    <h2>👑 Admin Dashboard</h2>
+    <button onclick="logout()">Logout</button>
+  </div>
+
+  <input id="search" placeholder="🔍 Tìm user..." oninput="filterUsers()">
+
+  <div id="userList"></div>
+
+</div>
+
+<script type="module">
+
+import { getAuth, signInWithEmailAndPassword } 
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import { 
+  doc, getDoc, collection, getDocs, updateDoc 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+import { app, db } from "./firebase.js";
+
+const auth = getAuth(app);
+
+let allUsers = [];
+
+// =========================
+// 🔥 CHECK ADMIN KHI LOAD
+// =========================
+async function checkAdmin(){
+
+  const uid = localStorage.getItem("uid");
+
+  if(!uid){
+    showLogin();
+    return;
+  }
+
+  const snap = await getDoc(doc(db, "users", uid));
+
+  if(!snap.exists() || snap.data().system?.role !== "admin"){
+    localStorage.clear();
+    showLogin();
+    return;
+  }
+
+  showDashboard();
+  loadUsers();
+}
+
+// =========================
+// UI CONTROL
+// =========================
+function showLogin(){
+  document.getElementById("loginBox").style.display = "block";
+  document.getElementById("adminBox").style.display = "none";
+}
+
+function showDashboard(){
+  document.getElementById("loginBox").style.display = "none";
+  document.getElementById("adminBox").style.display = "block";
+}
+
+// =========================
+// 🔥 LOGIN ADMIN
+// =========================
+window.adminLogin = async function(){
+
+  const email = document.getElementById("email").value.trim().toLowerCase();
+  const password = document.getElementById("password").value;
+
+  const errorEl = document.getElementById("error");
+  errorEl.innerText = "";
+
+  try{
+
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+    const emailSnap = await getDoc(doc(db, "email_index", email));
+
+    if(!emailSnap.exists()){
+      errorEl.innerText = "Không tìm thấy user!";
+      return;
+    }
+
+    const uid = emailSnap.data().uid;
+
+    const userSnap = await getDoc(doc(db, "users", uid));
+
+    if(!userSnap.exists()){
+      errorEl.innerText = "User không tồn tại!";
+      return;
+    }
+
+    const userData = userSnap.data();
+
+    if(userData.system?.status === "banned"){
+      errorEl.innerText = "🚫 Tài khoản bị khóa!";
+      return;
+    }
+
+    if(userData.system?.role !== "admin"){
+      errorEl.innerText = "❌ Không phải admin!";
+      return;
+    }
+
+    localStorage.setItem("uid", uid);
+
+    document.getElementById("email").value = "";
+    document.getElementById("password").value = "";
+
+    showDashboard();
+    loadUsers();
+
+  }catch(err){
+    console.error(err);
+    errorEl.innerText = "Sai email hoặc password!";
+  }
+
+}
+
+// =========================
+// 🔥 LOAD USERS
+// =========================
+async function loadUsers(){
+
+  const snapshot = await getDocs(collection(db, "users"));
+
+  allUsers = [];
+
+  snapshot.forEach(docSnap => {
+    allUsers.push(docSnap.data());
+  });
+
+  renderUsers(allUsers);
+}
+
+// =========================
+// 🔥 RENDER USERS
+// =========================
+function renderUsers(users){
+
+  const container = document.getElementById("userList");
+  container.innerHTML = "";
+
+  users.forEach(user => {
+
+    const div = document.createElement("div");
+
+    div.className = "user-card " + (user.system?.status === "banned" ? "banned" : "");
+
+    div.innerHTML = `
+      <b>${user.name || "No name"}</b><br>
+      UID: ${user.uid}<br>
+      Email: ${user.email || ""}<br>
+      Points: ${user.points || 0}<br>
+      Status: ${user.system?.status || "active"}<br>
+
+      <button onclick="banUser('${user.uid}')">🚫 Ban</button>
+      <button onclick="unbanUser('${user.uid}')">✅ Unban</button>
+    `;
+
+    container.appendChild(div);
+  });
+}
+
+// =========================
+// 🔍 SEARCH
+// =========================
+window.filterUsers = function(){
+
+  const keyword = document.getElementById("search").value.toLowerCase();
+
+  const filtered = allUsers.filter(u =>
+    (u.name || "").toLowerCase().includes(keyword) ||
+    (u.email || "").toLowerCase().includes(keyword)
+  );
+
+  renderUsers(filtered);
+}
+
+// =========================
+// 🔥 BAN
+// =========================
+window.banUser = async function(uid){
+  await updateDoc(doc(db, "users", uid), {
+    "system.status": "banned"
+  });
+  loadUsers();
+}
+
+// =========================
+// 🔥 UNBAN
+// =========================
+window.unbanUser = async function(uid){
+  await updateDoc(doc(db, "users", uid), {
+    "system.status": "active"
+  });
+  loadUsers();
+}
+
+// =========================
+// 🔥 LOGOUT
+// =========================
+window.logout = function(){
+  localStorage.clear();
+  showLogin();
+}
+
+// =========================
+window.addEventListener("load", checkAdmin);
+
+</script>
+
+</body>
+</html>

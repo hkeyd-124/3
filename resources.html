@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Tài nguyên học tập</title>
+
+<style>
+body{
+  font-family:Arial;
+  background:#f5f5f5;
+  padding:30px;
+}
+
+.container{
+  max-width:700px;
+  margin:auto;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:20px;
+}
+
+.title{
+  font-size:24px;
+  font-weight:bold;
+}
+
+.back{
+  padding:8px 15px;
+  background:#333;
+  color:white;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* TOPIC */
+.topic{
+  border:2px solid #333;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:10px;
+  cursor:pointer;
+  font-weight:bold;
+  display:flex;
+  justify-content:space-between;
+}
+
+/* LESSON LIST */
+.lesson-list{
+  display:none;
+  margin-left:20px;
+}
+
+/* LESSON */
+.lesson{
+  border:2px solid #333;
+  padding:12px;
+  border-radius:8px;
+  margin-top:10px;
+  cursor:pointer;
+}
+
+.lesson:hover{
+  background:#e0e0e0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <div class="title">📚 Tài nguyên học tập</div>
+    <div class="back" onclick="goHome()">← Home</div>
+  </div>
+
+  <!-- TOPIC 1 -->
+  <div class="topic" onclick="toggle('t1')">
+    🧪 Chủ đề 1: Hydrocarbon (hiđrocacbon) và nguồn nhiên liệu
+    <span>▼</span>
+  </div>
+
+  <div id="t1" class="lesson-list">
+
+    <div class="lesson" onclick="openLesson('organic_1')">
+      Bài 1: Hợp chất hữu cơ
+    </div>
+
+    <div class="lesson" onclick="openLesson('organic_2')">
+      Bài 2: Alkane
+    </div>
+
+    <div class="lesson" onclick="openLesson('organic_3')">
+      Bài 3: Alkene
+    </div>
+
+    <div class="lesson" onclick="openLesson('organic_4')">
+      Bài 4: Nhiên liệu
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+function goHome(){
+  window.location.href = "home.html"
+}
+
+/* toggle mở/đóng */
+function toggle(id){
+  const el = document.getElementById(id)
+  el.style.display = el.style.display === "block" ? "none" : "block"
+}
+
+/* mở bài */
+function openLesson(id){
+
+  if(id === "organic_2"){
+    window.location.href = "alkane.html"
+    return
+  }
+  // các bài khác giữ nguyên
+  window.location.href = "lesson/lesson1.html?lesson=" + id
+}
+
+</script>
+
+</body>
+</html>

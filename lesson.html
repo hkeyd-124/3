@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width,initial-scale=1.0">
+
+<title>Lesson</title>
+
+<style>
+
+body{
+  margin:0;
+  font-family:Arial;
+  background:#f5f5f5;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.header-bar{
+
+  position:fixed;
+  top:0;
+  left:0;
+
+  width:100%;
+  height:60px;
+
+  background:#b7d7e0;
+
+  display:flex;
+  align-items:center;
+
+  padding:0 15px;
+
+  z-index:1000;
+}
+
+.score-group{
+
+  margin-left:auto;
+
+  display:flex;
+
+  gap:14px;
+
+  padding-right:30px;
+}
+
+.score-box,
+.best-box,
+.rank-box{
+
+  background:white;
+
+  padding:6px 12px;
+
+  border-radius:8px;
+
+  min-width:110px;
+
+  text-align:center;
+}
+
+#scoreValue{
+  color:red;
+}
+
+/* =========================
+   MAIN
+========================= */
+
+.container{
+
+  display:flex;
+
+  height:100vh;
+
+  margin-top:60px;
+}
+
+/* =========================
+   LEFT PANEL
+========================= */
+
+.left-panel{
+
+  width:50%;
+
+  background:white;
+
+  border-right:
+    1px solid #ddd;
+
+  display:flex;
+
+  flex-direction:column;
+}
+
+/* TOOL BAR */
+
+.tool-bar{
+
+  display:flex;
+
+  gap:10px;
+
+  padding:10px;
+
+  border-bottom:
+    1px solid #ddd;
+
+  background:#fafafa;
+}
+
+.tool-btn{
+
+  padding:8px 12px;
+
+  border:none;
+
+  background:#eee;
+
+  border-radius:6px;
+
+  cursor:pointer;
+}
+
+.tool-btn.active{
+  background:#4CAF50;
+  color:white;
+}
+
+/* CONTENT */
+
+#leftContent{
+
+  flex:1;
+
+  overflow:auto;
+}
+
+/* =========================
+   RIGHT PANEL
+========================= */
+
+.right-panel{
+
+  width:50%;
+
+  padding:20px;
+
+  overflow:auto;
+}
+
+/* NAV */
+
+#navBar{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:6px;
+}
+
+.nav-item{
+
+  padding:6px 10px;
+
+  border:1px solid #ccc;
+
+  cursor:pointer;
+
+  background:white;
+}
+
+/* XP */
+
+.xp-bar{
+
+  height:8px;
+
+  background:#ddd;
+
+  margin:10px 0;
+
+  border-radius:5px;
+
+  position:relative;
+}
+
+.xp-fill{
+
+  height:100%;
+
+  width:0%;
+
+  background:#4CAF50;
+
+  border-radius:5px;
+}
+
+/* OPTIONS */
+
+.options{
+
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:10px;
+}
+
+.options button{
+
+  padding:12px;
+
+  border:1px solid #ccc;
+
+  cursor:pointer;
+}
+
+.selected{
+  background:#fff3cd;
+}
+
+.correct{
+  background:#4CAF50;
+  color:white;
+}
+
+.wrong{
+  background:red;
+  color:white;
+}
+
+/* BOTTOM */
+
+.bottom-bar{
+
+  position:fixed;
+
+  bottom:20px;
+
+  left:calc(50% + 20px);
+
+  right:20px;
+
+  display:flex;
+
+  justify-content:space-between;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- =========================
+     HEADER
+========================= -->
+
+<div class="header-bar">
+
+  <button onclick="goBack()">
+    📤 Nộp bài
+  </button>
+ 
+<div class="score-group">
+  <div class="best-box">
+    Thành tích:
+    <span id="bestScoreValue">
+      0
+    </span>
+  </div>
+<div class="rank-box">
+
+  Rank:
+  <span id="rankValue">
+    C
+  </span>
+
+</div>
+  <div class="score-box">
+    Điểm:
+    <span id="scoreValue">
+      150
+    </span>
+  </div>
+</div>
+</div>
+
+<!-- =========================
+     MAIN
+========================= -->
+
+<div class="container">
+
+  <!-- LEFT -->
+
+  <div class="left-panel">
+
+    <div id="toolBar"
+      class="tool-bar">
+    </div>
+
+    <div id="leftContent">
+    </div>
+
+  </div>
+
+  <!-- RIGHT -->
+
+  <div class="right-panel">
+
+   <div
+  style="
+    display:flex;
+    align-items:center;
+    gap:10px;
+  "
+>
+
+  <div id="navBar"></div>
+
+  <button
+    id="retryBtn"
+    onclick="retryLesson()"
+    style="display:none;height:40px;"
+  >
+    🔄 Làm lại
+  </button>
+<button
+  id="certificateBtn"
+  style="display:none;height:40px;"
+>
+  🎓 Lấy chứng chỉ
+</button>
+</div>
+
+    <div class="xp-bar">
+
+      <div id="xpFill"
+        class="xp-fill">
+      </div>
+
+    </div>
+
+    <h2 id="questionText"></h2>
+
+    <div id="options"
+      class="options">
+    </div>
+
+  </div>
+
+</div>
+
+<!-- =========================
+     BOTTOM
+========================= -->
+
+  
+<!-- CERTIFICATE MODAL -->
+<div
+  id="certificateModal"
+
+  onclick="
+    this.style.display='none'
+  "
+  style="
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.75);
+    z-index:99999;
+    justify-content:center;
+    align-items:center;
+  "
+>
+
+  <div
+    id="certificateContent"
+    style="
+      max-width:90vw;
+      max-height:90vh;
+      overflow:auto;
+    "
+  >
+  </div>
+</div>
+
+  
+<div class="bottom-bar">
+
+  <button onclick="showHint()">
+    Gợi ý
+  </button>
+
+  <button onclick="checkAnswer()">
+    Kiểm tra
+  </button>
+
+</div>
+
+<!-- =========================
+     ENGINE
+========================= -->
+<script type="module">
+
+import {
+  db
+}
+from "./firebase.js";
+
+import {
+
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp
+
+}
+
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+window.db = db;
+
+window.doc = doc;
+
+window.getDoc = getDoc;
+
+window.setDoc = setDoc;
+
+window.serverTimestamp =
+  serverTimestamp;
+
+</script>
+
+<script src="./js/toast.js"></script>
+<script src="./js/rankConfig.js"></script>
+<script src="./js/certificateLayout.js"></script>
+<script src="./js/certificateTemplates.js"></script>
+<script src="./js/certificateEngine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
+<script src="./js/lessonHash.js"></script>
+<script type="module"src="./js/profile.js"></script>
+<script src="./js/lessonEngine.js"></script>
+
+<script>
+
+window.addEventListener(
+  "DOMContentLoaded",
+  ()=>{
+    lessonEngine.start();
+  }
+);
+
+</script>
+
+</body>
+</html>
