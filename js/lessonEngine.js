@@ -422,7 +422,29 @@ showMintCertificateModal:async function(){
 
   const canvas =
     await generateCertificatePreview({
-      ...
+
+      name:
+        window.currentUserData?.name
+        || "Unknown",
+
+      avatar:
+        window.currentUserData?.avatar
+        || null,
+
+      lesson:
+        lessonConfig.title,
+
+      score:
+        this.bestScore,
+
+      maxScore:
+        lessonConfig.maxScore,
+
+      tier:
+        getTier(
+          this.bestScore
+        )
+
     });
 
   canvas.style.width =
