@@ -1743,40 +1743,12 @@ singleHint:function(q){
 
   
   /* =========================
-     RANK + SCORE
+    SCORE
   ========================= */
-getRank:function(score){
 
-  if(score >= 450){
-    return "SSS";
-  }
-
-  if(score >= 400){
-    return "SS";
-  }
-
-  if(score >= 350){
-    return "S";
-  }
-
-  if(score >= 300){
-    return "A";
-  }
-
-  if(score >= 250){
-    return "B";
-  }
-
-  return "C";
-},
-
-  
   updateScore:function(){
 
-  this.rank =
-    this.getRank(
-      this.bestScore
-    );
+   this.rank = getTier(this.bestScore);
 
   scoreValue.innerText =
     this.score;
