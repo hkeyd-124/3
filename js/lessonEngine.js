@@ -19,6 +19,12 @@ window.lessonEngine = {
   firstScore:null,
   completed:false,
   rank:"C",
+  certificateMinted:false,
+  mintedScore:null,
+  mintedRank:null,
+  mintedAt:null,
+  mintedTokenId:null,
+  metadataURI:null,
   config:null,
   content:null,
   
@@ -323,7 +329,7 @@ btn.onclick = ()=>{
     ){
 
       btn.innerText =
-        "👁 Xem chứng chỉ";
+        "🏆 Xem thành tích";
 
     }else{
 
@@ -341,31 +347,38 @@ btn.onclick = ()=>{
 
   showCertificateModal:async function(){
 
-  const canvas =
+  const displayScore =
+  this.certificateMinted
+  ? this.mintedScore
+  : this.bestScore;
 
-    await generateCertificatePreview({
+const displayTier =
+  this.certificateMinted
+  ? this.mintedRank
+  : getTier(this.bestScore);
 
-       name:
-        window.currentUserData?.name || "Unknown",
+const canvas =
+  await generateCertificatePreview({
 
-      avatar:
-    window.currentUserData?.avatar || null,
+    name:
+      window.currentUserData?.name || "Unknown",
 
-      lesson:
-        lessonConfig.title,
+    avatar:
+      window.currentUserData?.avatar || null,
 
-      score:
-        this.bestScore,
+    lesson:
+      lessonConfig.title,
 
-      maxScore:
-        lessonConfig.maxScore,
+    score:
+      displayScore,
 
-      tier:
-        getTier(
-          this.bestScore
-        )
+    maxScore:
+      lessonConfig.maxScore,
 
-    });
+    tier:
+      displayTier
+
+  });
     
 canvas.style.width =
   "500px";
@@ -1332,6 +1345,23 @@ this.firstScore =
 
 this.completed =
   data.completed || false;
+    this.certificateMinted =
+ data.certificateMinted || false;
+
+this.mintedScore =
+ data.mintedScore || null;
+
+this.mintedRank =
+ data.mintedRank || null;
+
+this.mintedAt =
+ data.mintedAt || null;
+
+this.mintedTokenId =
+ data.mintedTokenId || null;
+
+this.metadataURI =
+ data.metadataURI || null;
     this.cloudLoaded = true;
 
   }catch(err){
@@ -1368,28 +1398,37 @@ this.completed =
         data.score
         || this.score;
 
-      this.answers =
-        data.answers || {};
-      this.selectedAnswers =
+this.answers =
+  data.answers || {};
+this.selectedAnswers =
   data.selectedAnswers || {};
-      this.hints =
+this.hints =
   data.hints || {};
-      this.hiddenOptions =
+this.hiddenOptions =
   data.hiddenOptions || {};
-      this.trueFalseStates =
+this.trueFalseStates =
   data.trueFalseStates || {};
-      this.trueFalseScored =
+this.trueFalseScored =
   data.trueFalseScored || {};
 this.bestScore =
   data.bestScore || this.score;;
-
 this.firstScore =
   data.firstScore || null;
-
 this.completed =
   data.completed || false;
+this.certificateMinted =
+ data.certificateMinted || false;
+this.mintedScore =
+ data.mintedScore || null;
+this.mintedRank =
+ data.mintedRank || null;
+this.mintedAt =
+ data.mintedAt || null;
+this.mintedTokenId =
+ data.mintedTokenId || null;
+this.metadataURI =
+ data.metadataURI || null;
     }catch(err){
-
       console.error(
         "LOAD PROGRESS ERROR",
         err
@@ -1400,8 +1439,7 @@ this.completed =
    SAVE CLOUD
 ========================= */
 
-saveCloudProgress:
-async function(){
+saveCloudProgress:async function(){
 
   try{
 
@@ -1449,14 +1487,25 @@ async function(){
         trueFalseStates:
           this.trueFalseStates,
         trueFalseScored:
-  this.trueFalseScored,
+          this.trueFalseScored,
         bestScore:
           this.bestScore,
         firstScore:
           this.firstScore,
-
-completed:
-  this.completed,
+        completed:
+          this.completed,
+certificateMinted:
+  this.certificateMinted,
+mintedScore:
+ this.mintedScore,
+mintedRank:
+ this.mintedRank,
+mintedAt:
+ this.mintedAt,
+mintedTokenId:
+ this.mintedTokenId,
+metadataURI:
+ this.metadataURI,
         updatedAt:
           serverTimestamp()
 
@@ -1530,29 +1579,40 @@ async function(data){
       this.saveKey,
 
       JSON.stringify({
-
         current:
-          this.current,
+   this.current,
         score:
-          this.score,
+  this.score,
         answers:
-          this.answers,
+  this.answers,
         selectedAnswers:
-          this.selectedAnswers,
+  this.selectedAnswers,
         hints:
-          this.hints,
+  this.hints,
         hiddenOptions:
-          this.hiddenOptions,
+  this.hiddenOptions,
         trueFalseStates:
-          this.trueFalseStates,
+  this.trueFalseStates,
         trueFalseScored:
-  this.trueFalseScored,
+   this.trueFalseScored,
         bestScore:
-          this.bestScore,
+  this.bestScore,
         firstScore:
-          this.firstScore,
+   this.firstScore,
         completed:
-           this.completed,
+  this.completed,
+        certificateMinted:
+  this.certificateMinted,
+        mintedScore:
+  this.mintedScore,
+        mintedRank:
+  this.mintedRank,
+        mintedAt:
+ this.mintedAt,
+        mintedTokenId:
+ this.mintedTokenId,
+        metadataURI:
+ this.metadataURI,
       })
 
     );
