@@ -320,7 +320,17 @@ renderCertificateButton:async function(){
       "inline-block";
 btn.onclick = ()=>{
 
-  this.showCertificateModal();
+  if(
+    data.certificateMinted
+  ){
+
+    this.showCertificateModal();
+
+  }else{
+
+    this.showMintCertificateModal();
+
+  }
 
 };
     if(
@@ -406,6 +416,63 @@ content.appendChild(
 modal.style.display =
   "flex";
 },
+
+
+showMintCertificateModal:async function(){
+
+  const canvas =
+    await generateCertificatePreview({
+      ...
+    });
+
+  canvas.style.width =
+    "500px";
+
+  canvas.style.height =
+    "auto";
+
+  const preview =
+    document.getElementById(
+      "mintCertificatePreview"
+    );
+
+  preview.innerHTML = "";
+
+  preview.appendChild(
+    canvas
+  );
+
+  const modal =
+    document.getElementById(
+      "mintCertificateModal"
+    );
+
+  // NÚT CẢI THIỆN THÊM
+  document.getElementById(
+    "improveBtn"
+  ).onclick = ()=>{
+
+    modal.style.display =
+      "none";
+
+  };
+
+  // NÚT NHẬN LUÔN
+  document.getElementById(
+    "mintNowBtn"
+  ).onclick = ()=>{
+
+    showToast(
+      "NFT Mint sẽ được kích hoạt ở Phase 4+"
+    );
+
+  };
+
+  modal.style.display =
+    "flex";
+
+},
+  
 /* =========================
 SINGLE RENDER
 ========================= */
