@@ -418,6 +418,39 @@ modal.style.display =
 },
 
 
+verifyWallet:async function(){
+  const learningWallet =
+  window.currentUser
+  ?.wallet
+  ?.toLowerCase();
+  if(!window.ethereum){
+  showToast(
+    "❌ Chưa cài Metamask"
+  );
+  return false;
+}
+
+  const accounts =
+ await ethereum.request({
+   method:"eth_requestAccounts"
+ });
+
+const connectedWallet =
+ accounts[0]
+ ?.toLowerCase();
+  if(
+ learningWallet
+ !==
+ connectedWallet
+){
+ showToast(
+   "❌ Ví Metamask không khớp với tài khoản đang học"
+ );
+ return false;
+}
+  return true;
+},
+  
 showMintCertificateModal:async function(){
 
   const canvas =
@@ -481,14 +514,21 @@ showMintCertificateModal:async function(){
 
   // NÚT NHẬN LUÔN
   document.getElementById(
-    "mintNowBtn"
-  ).onclick = ()=>{
+  "mintNowBtn"
+).onclick = async ()=>{
 
-    showToast(
-      "NFT Mint sẽ được kích hoạt ở Phase 4+"
-    );
+  const ok =
+    await this.verifyWallet();
 
-  };
+  if(!ok){
+    return;
+  }
+
+  showToast(
+    "✅ Xác minh ví thành công"
+  );
+
+};
 
   modal.style.display =
     "flex";
