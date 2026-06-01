@@ -503,7 +503,67 @@ uploadCertificateImage:async function(canvas){
 },
 
 
+uploadMetadata:async function(imageCid){
 
+  const metadata = {
+
+    name:
+      `${lessonConfig.title} Certificate`,
+
+    description:
+      "HackChem NFT Certificate",
+
+    image:
+      `ipfs://${imageCid}`,
+
+    attributes:[
+
+      {
+        trait_type:"Lesson",
+        value:
+          lessonConfig.title
+      },
+
+      {
+        trait_type:"Score",
+        value:
+          this.bestScore
+      },
+
+      {
+        trait_type:"Rank",
+        value:
+          getTier(
+            this.bestScore
+          )
+      }
+
+    ]
+
+  };
+
+  const response =
+    await fetch(
+      "/api/uploadMetadata",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify(
+            metadata
+          )
+      }
+    );
+
+  return await response.json();
+
+},
+  
   
 showMintCertificateModal:async function(){
   const canvas =
@@ -597,7 +657,15 @@ showMintCertificateModal:async function(){
       await this.uploadCertificateImage(
         canvas
       );
+const metadataResult =
+ await this.uploadMetadata(
+  result.cid
+ );
 
+console.log(
+ "METADATA",
+ metadataResult
+);
     console.log(
       "STEP 3 PASS",
       result
