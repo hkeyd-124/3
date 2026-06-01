@@ -566,29 +566,51 @@ showMintCertificateModal:async function(){
   };
 
   // NÚT NHẬN LUÔN
-  document.getElementById(
+ document.getElementById(
   "mintNowBtn"
 ).onclick = async ()=>{
 
-  const ok =
-    await this.verifyWallet();
+  try{
 
-  if(!ok){
-    return;
-  }
+    const ok =
+      await this.verifyWallet();
 
-  const canvas =
-    document
-    .querySelector(
-      "#mintCertificatePreview canvas"
+    if(!ok){
+      return;
+    }
+
+    console.log(
+      "STEP 1 PASS"
     );
 
-  const result =
-    await this.uploadCertificateImage(
+    const canvas =
+      document.querySelector(
+        "#mintCertificatePreview canvas"
+      );
+
+    console.log(
+      "STEP 2 PASS",
       canvas
     );
 
-  console.log(result);
+    const result =
+      await this.uploadCertificateImage(
+        canvas
+      );
+
+    console.log(
+      "STEP 3 PASS",
+      result
+    );
+
+  }catch(err){
+
+    console.error(
+      "UPLOAD ERROR",
+      err
+    );
+
+  }
 
 };
 
