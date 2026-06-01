@@ -2,7 +2,7 @@ window.lessonConfig = {
 
   id:"organic_2",
 
-  title:"Hợp chất hữu cơ 2",
+  title:"Alkane",
   
   maxScore:450,
   
