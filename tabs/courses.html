@@ -38,6 +38,7 @@
   padding:16px;
   border-radius:14px;
   margin-bottom:14px;
+  
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -46,7 +47,9 @@
 }
 
 /* LESSON */
-
+.course-topic{
+  margin:24px 0 14px;
+}
 .course-lesson{
   margin-left:30px;
   margin-top:12px;
@@ -96,7 +99,7 @@
 
   </div>
 
-  <!-- TOPIC -->
+  <!-- TOPIC   1 -->
 
   <div class="course-topic" onclick="toggleCourse('course_t1')">
 
@@ -104,7 +107,7 @@
       🧬 Chủ đề 1: Hữu cơ & Hydrocarbon
     </div>
 
-    <div class="percent-circle" id="topicPercent">
+    <div class="percent-circle" id="topic1Percent">
       0%
     </div>
 
@@ -192,13 +195,13 @@
       🧬 Chủ đề 2: Kim loại
     </div>
 
-    <div class="percent-circle" id="topicPercent">
+    <div class="percent-circle" id="topic2Percent">
       0%
     </div>
 
   </div>
 
-  <div id="course_t1">
+  <div id="course_t2">
 
     <div class="course-lesson lesson-btn"
      data-lesson="kim_loai1"
