@@ -6,7 +6,7 @@ window.lessonContent = {
       id:"pdf",
       type:"pdf",
       title:"PDF",
-      src:"./lessons/organic_1/lesson.pdf",
+      src:"./lessons/organic_2/lesson.pdf",
       penalty:0
     }
 
