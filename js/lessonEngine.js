@@ -356,7 +356,6 @@ btn.onclick = ()=>{
 },
 
   showCertificateModal:async function(){
-
   const displayScore =
   this.certificateMinted
   ? this.mintedScore
@@ -418,6 +417,8 @@ modal.style.display =
 },
 
 
+
+  
 verifyWallet:async function(){
   const learningWallet =
   window.currentUser
@@ -450,9 +451,61 @@ const connectedWallet =
 }
   return true;
 },
+
+
+uploadCertificateImage:async function(canvas){
+  const dataUrl =
+    canvas.toDataURL(
+      "image/png"
+    );
+
+  const imageBase64 =
+    dataUrl.replace(
+      "data:image/png;base64,",
+      ""
+    );
+
+  const uid =
+    localStorage.getItem(
+      "uid"
+    );
+
+  const fileName =
+    `certificate_${this.lessonId}_${uid}.png`;
+
+  const response =
+    await fetch(
+      "/api/uploadCertificate",
+      {
+        method:"POST",
+
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+
+        body:
+          JSON.stringify({
+
+            imageBase64,
+
+            fileName
+
+          })
+      }
+    );
+
+  const result =
+    await response.json();
+
+  return result;
+
+},
+
+
+
   
 showMintCertificateModal:async function(){
-
   const canvas =
     await generateCertificatePreview({
 
@@ -524,9 +577,18 @@ showMintCertificateModal:async function(){
     return;
   }
 
-  showToast(
-    "✅ Xác minh ví thành công"
-  );
+  const canvas =
+    document
+    .querySelector(
+      "#mintCertificatePreview canvas"
+    );
+
+  const result =
+    await this.uploadCertificateImage(
+      canvas
+    );
+
+  console.log(result);
 
 };
 
