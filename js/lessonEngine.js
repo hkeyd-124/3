@@ -566,195 +566,173 @@ uploadMetadata:async function(imageCid){
   
   
 showMintCertificateModal:async function(){
+const canvas =
+await generateCertificatePreview({
+  name:
+    window.currentUserData?.name
+    || "Unknown",
+  avatar:
+    window.currentUserData?.avatar
+    || null,
+  lesson:
+    lessonConfig.title,
+  score:
+    this.bestScore,
+  maxScore:
+    lessonConfig.maxScore,
+  tier:
+    getTier(
+      this.bestScore
+    )
+});
+canvas.style.width =
+"500px";
+canvas.style.height =
+"auto";
+const preview =
+document.getElementById(
+"mintCertificatePreview"
+);
+preview.innerHTML = "";
+preview.appendChild(
+canvas
+);
+const modal =
+document.getElementById(
+"mintCertificateModal"
+);
+const improveBtn =
+document.getElementById(
+"improveBtn"
+);
+const mintBtn =
+document.getElementById(
+"mintNowBtn"
+);
+// RESET UI
+improveBtn.style.display =
+"inline-block";
+mintBtn.disabled =
+false;
+mintBtn.innerText =
+"🎓 Nhận luôn";
+// NÚT CẢI THIỆN
+improveBtn.onclick = ()=>{
+modal.style.display =
+  "none";
+};
+// NÚT NHẬN LUÔN
+mintBtn.onclick = async ()=>{
+try{
+  // LOADING UI
+  mintBtn.disabled =
+    true;
+  improveBtn.style.display =
+    "none";
+  mintBtn.innerText =
+    "⏳ Đang tạo chứng chỉ...";
+  const ok =
+    await this.verifyWallet();
+  if(!ok){
+    mintBtn.disabled =
+      false;
+    improveBtn.style.display =
+      "inline-block";
+    mintBtn.innerText =
+      "🎓 Nhận luôn";
+    return;
+  }
   const canvas =
-    await generateCertificatePreview({
-
-      name:
-        window.currentUserData?.name
-        || "Unknown",
-
-      avatar:
-        window.currentUserData?.avatar
-        || null,
-
-      lesson:
-        lessonConfig.title,
-
-      score:
-        this.bestScore,
-
-      maxScore:
-        lessonConfig.maxScore,
-
-      tier:
-        getTier(
-          this.bestScore
-        )
-
-    });
-
-  canvas.style.width =
-    "500px";
-
-  canvas.style.height =
-    "auto";
-
-  const preview =
-    document.getElementById(
-      "mintCertificatePreview"
+    document.querySelector(
+      "#mintCertificatePreview canvas"
     );
-
-  preview.innerHTML = "";
-
-  preview.appendChild(
-    canvas
-  );
-
-  const modal =
-    document.getElementById(
-      "mintCertificateModal"
-    );
-
-  // NÚT CẢI THIỆN THÊM
-  document.getElementById(
-    "improveBtn"
-  ).onclick = ()=>{
-
-    modal.style.display =
-      "none";
-
-  };
-
-  // NÚT NHẬN LUÔN
- document.getElementById(
-  "mintNowBtn"
-).onclick = async ()=>{
-
-  try{
-
-    const ok =
-      await this.verifyWallet();
-
-    if(!ok){
-      return;
-    }
-
-    console.log(
-      "STEP 1 PASS"
-    );
-
-    const canvas =
-      document.querySelector(
-        "#mintCertificatePreview canvas"
-      );
-
-    console.log(
-      "STEP 2 PASS",
+  const result =
+    await this.uploadCertificateImage(
       canvas
     );
-
-    const result =
-      await this.uploadCertificateImage(
-        canvas
-      );
-const metadataResult =
- await this.uploadMetadata(
-  result.cid
- );
-
-console.log(
- "METADATA",
- metadataResult
-);
-    console.log(
-      "STEP 3 PASS",
-      result
+  const metadataResult =
+    await this.uploadMetadata(
+      result.cid
     );
-const mintResponse =
-  await fetch(
-    "/api/mintCertificate",
-    {
-      method:"POST",
-      headers:{
-        "Content-Type":
-          "application/json"
-      },
-      body:JSON.stringify({
+  const mintResponse =
+    await fetch(
+      "/api/mintCertificate",
+      {
+        method:"POST",
+        headers:{
+          "Content-Type":
+            "application/json"
+        },
+        body:JSON.stringify({
+          uid:
+            localStorage.getItem(
+              "uid"
+            ),
+          lessonId:
+            this.lessonId,
+          wallet:
+            window.currentUser
+            ?.wallet,
+          metadataURI:
+            metadataResult.metadataURI
+        })
 
-        uid:
-          localStorage.getItem(
-            "uid"
-          ),
-
-        lessonId:
-          this.lessonId,
-
-        wallet:
-          window.currentUser
-          ?.wallet,
-
-        metadataURI:
-          metadataResult.metadataURI
-
-      })
-    }
-  );
-
-const mintResult =
-  await mintResponse.json();
-
-console.log(
-  "MINT RESULT",
-  mintResult
-);
-
-if(
-  !mintResult.success
-){
-  throw new Error(
-    mintResult.error
-    ||
-    "Mint failed"
-  );
-}
-    this.certificateMinted =
-  true;
-
-this.mintedScore =
-  this.bestScore;
-
-this.mintedRank =
-  getTier(
-    this.bestScore
-  );
-
-this.mintedAt =
-  new Date()
-  .toISOString();
-
-this.mintedTokenId =
-  mintResult.tokenId;
-
-this.metadataURI =
-  metadataResult.metadataURI;
-    this.saveProgress();
-
-await this.saveCloudProgress();
-    await this.renderCertificateButton();
-  }catch(err){
-
-    console.error(
-      "UPLOAD ERROR",
-      err
+      }
     );
-
+  const mintResult =
+    await mintResponse.json();
+  if(
+    !mintResult.success
+  ){
+    throw new Error(
+      mintResult.error
+      ||
+      "Mint failed"
+    );
   }
-
+  // FREEZE DATA
+  this.certificateMinted =
+    true;
+  this.mintedScore =
+    this.bestScore;
+  this.mintedRank =
+    getTier(
+      this.bestScore
+    );
+  this.mintedAt =
+    new Date()
+    .toISOString();
+  this.mintedTokenId =
+    mintResult.tokenId;
+  this.metadataURI =
+    metadataResult.metadataURI;
+  this.saveProgress();
+  await this.saveCloudProgress();
+  await this.renderCertificateButton();
+  // SUCCESS UI
+  mintBtn.disabled =
+    false;
+  mintBtn.innerText =
+    "✅ Đã mint thành công - Đóng";
+  mintBtn.onclick = ()=>{
+    modal.style.display =
+      "none";
+  };
+}catch(err){
+  console.error(
+    "MINT ERROR",
+    err
+  );
+  mintBtn.disabled =
+    false;
+  improveBtn.style.display =
+    "inline-block";
+  mintBtn.innerText =
+    "❌ Thử lại";
+}
 };
-
-  modal.style.display =
-    "flex";
-
+modal.style.display =
+"flex";
 },
   
 /* =========================
