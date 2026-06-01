@@ -1,8 +1,8 @@
 window.lessonConfig = {
 
-  id:"organic_2",
+  id:"organic_1",
 
-  title:"Hợp chất hữu cơ 2",
+  title:"Hợp chất hữu cơ",
   
   maxScore:450,
   
