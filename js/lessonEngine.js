@@ -670,7 +670,77 @@ console.log(
       "STEP 3 PASS",
       result
     );
+const mintResponse =
+  await fetch(
+    "/api/mintCertificate",
+    {
+      method:"POST",
+      headers:{
+        "Content-Type":
+          "application/json"
+      },
+      body:JSON.stringify({
 
+        uid:
+          localStorage.getItem(
+            "uid"
+          ),
+
+        lessonId:
+          this.lessonId,
+
+        wallet:
+          window.currentUser
+          ?.wallet,
+
+        metadataURI:
+          metadataResult.metadataURI
+
+      })
+    }
+  );
+
+const mintResult =
+  await mintResponse.json();
+
+console.log(
+  "MINT RESULT",
+  mintResult
+);
+
+if(
+  !mintResult.success
+){
+  throw new Error(
+    mintResult.error
+    ||
+    "Mint failed"
+  );
+}
+    this.certificateMinted =
+  true;
+
+this.mintedScore =
+  this.bestScore;
+
+this.mintedRank =
+  getTier(
+    this.bestScore
+  );
+
+this.mintedAt =
+  new Date()
+  .toISOString();
+
+this.mintedTokenId =
+  mintResult.tokenId;
+
+this.metadataURI =
+  metadataResult.metadataURI;
+    this.saveProgress();
+
+await this.saveCloudProgress();
+    await this.renderCertificateButton();
   }catch(err){
 
     console.error(
