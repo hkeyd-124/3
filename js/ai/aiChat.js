@@ -17,17 +17,20 @@ window.openAITutor = function(){
   ){
 
     AI_STATE.messages.push({
+
       role:"assistant",
+
       content:
-`Xin chào! Tôi là AI Tutor của HackChem.
+`Xin chào!
 
 Tôi có thể giúp bạn:
-📘 Giải thích lý thuyết hóa học
-🧪 Viết và cân bằng phương trình phản ứng
-📊 Giải bài tập hóa học
-🎯 Ôn tập và kiểm tra kiến thức
 
-Hãy đặt câu hỏi bên dưới.`
+📘 Giải thích lý thuyết hóa học
+🧪 Viết phương trình phản ứng
+📊 Giải bài tập
+⚡ Điện hóa
+🧬 Hóa hữu cơ
+🎯 Ôn tập kiểm tra`
 
     });
 
@@ -73,66 +76,35 @@ function renderMessages(){
         document.createElement(
           "div"
         );
-div.style.display =
-  "inline-block";
-
-div.style.width =
-  "fit-content";
-
-div.style.maxWidth =
-  "80%";
-      const label =
-
-        msg.role === "user"
-
-        ? "🧑 You"
-
-        : "🤖 AI Tutor";
-
-      const time =
-
-        msg.time
-
-        ? new Date(
-            msg.time
-          ).toLocaleTimeString(
-            [],
-            {
-              hour:"2-digit",
-              minute:"2-digit"
-            }
-          )
-
-        : "";
 
       div.style.margin =
-        "6px 0";
+        "12px 0";
 
       div.style.padding =
-        "8px 12px";
+        "12px";
 
       div.style.borderRadius =
         "14px";
 
       if(msg.role==="user"){
 
-  div.style.background =
-    "#111";
+        div.style.background =
+          "#111";
 
-  div.style.color =
-    "white";
+        div.style.color =
+          "white";
 
-  div.style.marginLeft =
-    "auto";
+        div.style.marginLeft =
+          "80px";
 
-}else{
+      }else{
 
-  div.style.background =
-    "#f1f5f9";
+        div.style.background =
+          "#f1f5f9";
 
-  div.style.marginRight =
-    "auto";
-}
+        div.style.marginRight =
+          "80px";
+      }
 
       div.innerHTML = `
 
@@ -146,21 +118,16 @@ div.style.maxWidth =
 
   </div>
 
-  <div
-  style="
-  margin-top:2px;
-  line-height:1.5;
-  white-space:pre-line;
-  ">
+  <div>
 
-  ${msg.content}
+    ${msg.content}
 
-</div>
+  </div>
 
   <div
-  style="
-  margin-top:2px;
-  font-size:11px;
+    style="
+    margin-top:8px;
+    font-size:12px;
     opacity:.7;
     ">
 
@@ -171,16 +138,34 @@ div.style.maxWidth =
 `;
 
       box.appendChild(div);
-
     }
+    const label =
+
+  msg.role === "user"
+
+  ? "🧑 You"
+
+  : "🤖 AI Tutor";
   );
 
   box.scrollTop =
     box.scrollHeight;
+  const time =
+
+  msg.time
+
+  ? new Date(
+      msg.time
+    ).toLocaleTimeString(
+      [],
+      {
+        hour:"2-digit",
+        minute:"2-digit"
+      }
+    )
+
+  : "";
 }
-
-
-
 
 function sendMessage(){
 
