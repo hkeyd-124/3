@@ -73,7 +73,14 @@ function renderMessages(){
         document.createElement(
           "div"
         );
+div.style.display =
+  "inline-block";
 
+div.style.width =
+  "fit-content";
+
+div.style.maxWidth =
+  "80%";
       const label =
 
         msg.role === "user"
@@ -109,23 +116,23 @@ function renderMessages(){
 
       if(msg.role==="user"){
 
-        div.style.background =
-          "#111";
+  div.style.background =
+    "#111";
 
-        div.style.color =
-          "white";
+  div.style.color =
+    "white";
 
-        div.style.marginLeft =
-          "120px";
+  div.style.marginLeft =
+    "auto";
 
-      }else{
+}else{
 
-        div.style.background =
-          "#f1f5f9";
+  div.style.background =
+    "#f1f5f9";
 
-        div.style.marginRight =
-          "120px";
-      }
+  div.style.marginRight =
+    "auto";
+}
 
       div.innerHTML = `
 
