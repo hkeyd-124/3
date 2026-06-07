@@ -453,8 +453,12 @@ function(){
       html += `
 
       <div
-        class="course-lesson"
-      >
+  class="course-lesson boss-btn"
+
+  data-topic="${topic.id}"
+
+  data-boss="${topic.bossLesson}"
+>
 
         <div>
           🔥 Boss
@@ -481,4 +485,54 @@ function(){
   );
 
   container.innerHTML = html;
+}
+window.bindBossEvents =
+function(){
+
+  const bosses =
+
+    document.querySelectorAll(
+      ".boss-btn"
+    );
+
+  bosses.forEach(boss=>{
+
+    boss.onclick = ()=>{
+
+      const lessonId =
+
+        boss.dataset.boss;
+
+      const statusEl =
+
+        boss.querySelector(
+          ".percent-circle"
+        );
+
+      if(
+        !statusEl
+      ) return;
+
+      if(
+        statusEl.innerText !==
+        "GO"
+      ){
+
+        alert(
+          "🔒 Hoàn thành tất cả lesson ≥ 75% để mở khóa Boss."
+        );
+
+        return;
+      }
+
+      window.location.href =
+
+        "lesson.html?id=" +
+
+        lessonId;
+
+    };
+
+  });
+
 }
