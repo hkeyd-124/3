@@ -10,7 +10,39 @@ window.openAITutor = function(){
     "aiTutorView"
   ).style.display = "block";
 
+  /* WELCOME MESSAGE */
+
+  if(
+    AI_STATE.messages.length === 0
+  ){
+
+    AI_STATE.messages.push({
+
+      role:"assistant",
+
+      content:
+`Xin chào!
+
+Tôi có thể giúp bạn:
+
+📘 Giải thích lý thuyết hóa học
+🧪 Viết phương trình phản ứng
+📊 Giải bài tập
+⚡ Điện hóa
+🧬 Hóa hữu cơ
+🎯 Ôn tập kiểm tra`
+
+    });
+
+  }
+
   renderMessages();
+
+  document
+    .getElementById(
+      "aiInput"
+    )
+    ?.focus();
 };
 
 window.backToAIHome = function(){
@@ -74,15 +106,65 @@ function renderMessages(){
           "80px";
       }
 
-      div.innerText =
-        msg.content;
+      div.innerHTML = `
+
+  <div
+    style="
+    font-weight:bold;
+    margin-bottom:6px;
+    ">
+
+    ${label}
+
+  </div>
+
+  <div>
+
+    ${msg.content}
+
+  </div>
+
+  <div
+    style="
+    margin-top:8px;
+    font-size:12px;
+    opacity:.7;
+    ">
+
+    ${time}
+
+  </div>
+
+`;
 
       box.appendChild(div);
     }
+    const label =
+
+  msg.role === "user"
+
+  ? "🧑 You"
+
+  : "🤖 AI Tutor";
   );
 
   box.scrollTop =
     box.scrollHeight;
+  const time =
+
+  msg.time
+
+  ? new Date(
+      msg.time
+    ).toLocaleTimeString(
+      [],
+      {
+        hour:"2-digit",
+        minute:"2-digit"
+      }
+    )
+
+  : "";
 }
 
 function sendMessage(){
@@ -101,11 +183,22 @@ function sendMessage(){
 
   AI_STATE.messages.push({
 
-    role:"user",
+  role:"user",
 
-    content:text
+  content:text,
 
-  });
+  time: Date.now()
+
+});
+  AI_STATE.messages.push({
+
+  role:"assistant",
+
+  content:"⏳ Thinking...",
+
+  time: Date.now()
+
+});
 
   renderMessages();
 
