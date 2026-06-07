@@ -99,10 +99,10 @@ function renderMessages(){
         : "";
 
       div.style.margin =
-        "12px 0";
+        "8px 0";
 
       div.style.padding =
-        "12px";
+        "10px 14px";
 
       div.style.borderRadius =
         "14px";
@@ -116,7 +116,7 @@ function renderMessages(){
           "white";
 
         div.style.marginLeft =
-          "80px";
+          "120px";
 
       }else{
 
@@ -124,7 +124,7 @@ function renderMessages(){
           "#f1f5f9";
 
         div.style.marginRight =
-          "80px";
+          "120px";
       }
 
       div.innerHTML = `
@@ -140,19 +140,20 @@ function renderMessages(){
   </div>
 
   <div
-    style="
-    white-space:pre-line;
-    line-height:1.7;
-    ">
+  style="
+  margin-top:4px;
+  line-height:1.5;
+  white-space:pre-line;
+  ">
 
-    ${msg.content}
+  ${msg.content}
 
-  </div>
+</div>
 
   <div
-    style="
-    margin-top:8px;
-    font-size:12px;
+  style="
+  margin-top:4px;
+  font-size:11px;
     opacity:.7;
     ">
 
