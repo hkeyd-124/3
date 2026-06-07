@@ -251,79 +251,105 @@ function(){
 window.applyCourseProgress =
 function(){
 
-  const p1 =
-    getCoursePercent(
-      "organic_1"
-    );
+  COURSE_CONFIG.forEach(topic=>{
 
-  const p2 =
-    getCoursePercent(
-      "organic_2"
-    );
+    let totalPercent = 0;
 
-  const p3 =
-    getCoursePercent(
-      "organic_3"
-    );
+    let lessonCount = 0;
 
-  const p4 =
-    getCoursePercent(
-      "organic_4"
-    );
+    let bossUnlocked = true;
 
-  const el1 =
-    document.getElementById(
-      "lesson1Percent"
-    );
+    topic.lessons.forEach(lesson=>{
 
-  const el2 =
-    document.getElementById(
-      "lesson2Percent"
-    );
+      const percent =
 
-  const el3 =
-    document.getElementById(
-      "lesson3Percent"
-    );
+        getCoursePercent(
+          lesson.id
+        );
 
-  const el4 =
-    document.getElementById(
-      "lesson4Percent"
-    );
+      const lessonEl =
 
-  const topicEl =
-    document.getElementById(
-      "topicPercent"
-    );
+        document.getElementById(
+          `lessonPercent_${lesson.id}`
+        );
 
-  if(!el1) return;
+      if(lessonEl){
 
-  el1.innerText = p1 + "%";
-  el2.innerText = p2 + "%";
-  el3.innerText = p3 + "%";
-  el4.innerText = p4 + "%";
+        lessonEl.innerText =
+          percent + "%";
 
-  setCourseColor(el1,p1);
-  setCourseColor(el2,p2);
-  setCourseColor(el3,p3);
-  setCourseColor(el4,p4);
+        setCourseColor(
+          lessonEl,
+          percent
+        );
+      }
 
-  const avg =
-    Math.round(
-      (p1+p2+p3+p4)/4
-    );
+      totalPercent += percent;
 
-  topicEl.innerText =
-    avg + "%";
+      lessonCount++;
 
-  setCourseColor(
-    topicEl,
-    avg
-  );
+      if(percent < 75){
 
-  checkBossUnlockCourse(
-    p1,p2,p3,p4
-  );
+        bossUnlocked = false;
+      }
+
+    });
+
+    const avg =
+
+      lessonCount
+
+      ? Math.round(
+          totalPercent /
+          lessonCount
+        )
+
+      : 0;
+
+    const topicEl =
+
+      document.getElementById(
+        `topicPercent_${topic.id}`
+      );
+
+    if(topicEl){
+
+      topicEl.innerText =
+        avg + "%";
+
+      setCourseColor(
+        topicEl,
+        avg
+      );
+    }
+
+    const bossEl =
+
+      document.getElementById(
+        `boss_${topic.id}`
+      );
+
+    if(bossEl){
+
+      bossEl.innerText =
+
+        bossUnlocked
+
+          ? "GO"
+
+          : "LOCK";
+
+      bossEl.style.background =
+
+        bossUnlocked
+
+          ? "#4CAF50"
+
+          : "#999";
+    }
+
+  });
+
 }
 
 
