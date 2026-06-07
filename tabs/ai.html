@@ -1,0 +1,143 @@
+<div class="ai-page">
+
+<style>
+
+.ai-page{
+  padding:20px;
+}
+
+.ai-container{
+  max-width:1000px;
+  margin:auto;
+}
+
+.ai-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:25px;
+}
+
+.ai-title{
+  font-size:32px;
+  font-weight:bold;
+}
+
+.ai-home{
+  padding:10px 18px;
+  background:#111;
+  color:white;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.ai-grid{
+  display:grid;
+  grid-template-columns:
+    repeat(auto-fit,minmax(320px,1fr));
+  gap:20px;
+}
+
+.ai-card{
+  background:white;
+  border-radius:24px;
+  padding:30px;
+  cursor:pointer;
+  transition:.2s;
+  box-shadow:
+    0 5px 20px rgba(0,0,0,.05);
+}
+
+.ai-card:hover{
+  transform:translateY(-5px);
+}
+
+.ai-icon{
+  font-size:42px;
+  margin-bottom:15px;
+}
+
+.ai-card-title{
+  font-size:24px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.ai-card-desc{
+  color:#666;
+  line-height:1.6;
+}
+
+</style>
+
+<div class="ai-container">
+
+  <div class="ai-header">
+
+    <div class="ai-title">
+      🤖 AI Assistant
+    </div>
+
+    <div
+      class="ai-home"
+      onclick="loadHome()">
+
+      ← Home
+
+    </div>
+
+  </div>
+
+  <div class="ai-grid">
+
+    <div
+      class="ai-card"
+      onclick="openAITutor()">
+
+      <div class="ai-icon">
+        🤖
+      </div>
+
+      <div class="ai-card-title">
+        AI Tutor
+      </div>
+
+      <div class="ai-card-desc">
+
+        Hỏi đáp hóa học,
+        giải thích lý thuyết,
+        phản ứng hóa học,
+        bài tập và công thức.
+
+      </div>
+
+    </div>
+
+    <div
+      class="ai-card"
+      onclick="openAIQuiz()">
+
+      <div class="ai-icon">
+        🎯
+      </div>
+
+      <div class="ai-card-title">
+        AI Quiz
+      </div>
+
+      <div class="ai-card-desc">
+
+        Sinh câu hỏi hóa học
+        theo chủ đề và
+        kiểm tra kiến thức.
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+</div>
