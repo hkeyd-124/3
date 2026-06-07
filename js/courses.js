@@ -2,14 +2,19 @@
    COURSES
 ========================= */
 
-const totals = {
+const totals = {};
 
-  organic_1:15,
-  organic_2:15,
-  organic_3:15,
-  organic_4:15
+COURSE_CONFIG.forEach(topic=>{
 
-};
+    topic.lessons.forEach(lesson=>{
+
+        totals[
+            lesson.id
+        ] = lesson.total;
+
+    });
+
+});
 
 /* =========================
    TOGGLE COURSE
