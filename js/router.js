@@ -173,10 +173,12 @@ async function(
 
     if(tab === "courses"){
 
-      bindCourseEvents();
+  renderCourses();
 
-      applyCourseProgress();
-    }
+  bindCourseEvents();
+
+  applyCourseProgress();
+}
 
     if(tab === "leaderboard"){
 
