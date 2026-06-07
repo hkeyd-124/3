@@ -304,3 +304,130 @@ function(){
     p1,p2,p3,p4
   );
 }
+
+
+/* =========================
+   RENDER COURSES
+========================= */
+
+window.renderCourses =
+function(){
+
+  const container =
+    document.getElementById(
+      "coursesList"
+    );
+
+  if(!container) return;
+
+  let html = "";
+
+  COURSE_CONFIG.forEach(
+
+    (topic,index)=>{
+
+      html += `
+
+      <div
+        class="course-topic"
+        onclick="
+          toggleCourse(
+            'topic_${index}'
+          )
+        "
+      >
+
+        <div>
+          ${topic.title}
+        </div>
+
+        <div
+          class="percent-circle"
+          id="topicPercent_${topic.id}"
+        >
+          0%
+        </div>
+
+      </div>
+
+      <div
+        id="topic_${index}"
+      >
+
+      `;
+
+      topic.lessons.forEach(
+
+        (lesson,lessonIndex)=>{
+
+          html += `
+
+          <div
+            class="course-lesson lesson-btn"
+
+            data-lesson="${lesson.id}"
+
+            data-name="${lesson.name}"
+          >
+
+            <div>
+
+              Bài ${
+                lessonIndex + 1
+              }:
+
+              ${lesson.name}
+
+            </div>
+
+            <div
+
+              class="percent-circle"
+
+              id="lessonPercent_${lesson.id}"
+
+            >
+
+              0%
+
+            </div>
+
+          </div>
+
+          `;
+
+        }
+      );
+
+      html += `
+
+      <div
+        class="course-lesson"
+      >
+
+        <div>
+          🔥 Boss
+        </div>
+
+        <div
+
+          class="percent-circle"
+
+          id="boss_${topic.id}"
+
+        >
+
+          LOCK
+
+        </div>
+
+      </div>
+
+      `;
+
+      html += `</div>`;
+    }
+  );
+
+  container.innerHTML = html;
+}
