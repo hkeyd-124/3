@@ -99,10 +99,10 @@ function renderMessages(){
         : "";
 
       div.style.margin =
-        "8px 0";
+        "6px 0";
 
       div.style.padding =
-        "10px 14px";
+        "8px 12px";
 
       div.style.borderRadius =
         "14px";
@@ -141,7 +141,7 @@ function renderMessages(){
 
   <div
   style="
-  margin-top:4px;
+  margin-top:2px;
   line-height:1.5;
   white-space:pre-line;
   ">
@@ -152,7 +152,7 @@ function renderMessages(){
 
   <div
   style="
-  margin-top:4px;
+  margin-top:2px;
   font-size:11px;
     opacity:.7;
     ">
