@@ -177,6 +177,8 @@ async function(
 
   bindCourseEvents();
 
+  bindBossEvents();
+
   applyCourseProgress();
 }
 
