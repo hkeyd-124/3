@@ -77,6 +77,30 @@ function renderMessages(){
           "div"
         );
 
+      const label =
+
+        msg.role === "user"
+
+        ? "🧑 You"
+
+        : "🤖 AI Tutor";
+
+      const time =
+
+        msg.time
+
+        ? new Date(
+            msg.time
+          ).toLocaleTimeString(
+            [],
+            {
+              hour:"2-digit",
+              minute:"2-digit"
+            }
+          )
+
+        : "";
+
       div.style.margin =
         "12px 0";
 
@@ -108,64 +132,46 @@ function renderMessages(){
 
       div.innerHTML = `
 
-  <div
-    style="
-    font-weight:bold;
-    margin-bottom:6px;
-    ">
+        <div
+          style="
+          font-weight:bold;
+          margin-bottom:6px;
+          ">
 
-    ${label}
+          ${label}
 
-  </div>
+        </div>
 
-  <div>
+        <div>
 
-    ${msg.content}
+          ${msg.content}
 
-  </div>
+        </div>
 
-  <div
-    style="
-    margin-top:8px;
-    font-size:12px;
-    opacity:.7;
-    ">
+        <div
+          style="
+          margin-top:8px;
+          font-size:12px;
+          opacity:.7;
+          ">
 
-    ${time}
+          ${time}
 
-  </div>
+        </div>
 
-`;
+      `;
 
       box.appendChild(div);
+
     }
-    const label =
-
-  msg.role === "user"
-
-  ? "🧑 You"
-
-  : "🤖 AI Tutor";
   );
 
   box.scrollTop =
     box.scrollHeight;
-  const time =
-
-  msg.time
-
-  ? new Date(
-      msg.time
-    ).toLocaleTimeString(
-      [],
-      {
-        hour:"2-digit",
-        minute:"2-digit"
-      }
-    )
-
-  : "";
 }
+
+
+
 
 function sendMessage(){
 
