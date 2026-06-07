@@ -518,7 +518,7 @@ function(){
         "GO"
       ){
 
-        alert(
+       showToast(
           "🔒 Hoàn thành tất cả lesson ≥ 75% để mở khóa Boss."
         );
 
