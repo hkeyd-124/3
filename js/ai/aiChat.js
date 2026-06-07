@@ -23,14 +23,19 @@ window.openAITutor = function(){
       content:
 `Xin chào!
 
+Tôi là AI Tutor của HackChem.
+
 Tôi có thể giúp bạn:
 
 📘 Giải thích lý thuyết hóa học
-🧪 Viết phương trình phản ứng
-📊 Giải bài tập
-⚡ Điện hóa
-🧬 Hóa hữu cơ
-🎯 Ôn tập kiểm tra`
+
+🧪 Viết và cân bằng phương trình phản ứng
+
+📊 Giải bài tập hóa học
+
+🎯 Ôn tập và kiểm tra kiến thức
+
+Hãy đặt câu hỏi bên dưới.`
 
     });
 
@@ -132,34 +137,38 @@ function renderMessages(){
 
       div.innerHTML = `
 
-        <div
-          style="
-          font-weight:bold;
-          margin-bottom:6px;
-          ">
+  <div
+    style="
+    font-weight:bold;
+    margin-bottom:6px;
+    ">
 
-          ${label}
+    ${label}
 
-        </div>
+  </div>
 
-        <div>
+  <div
+    style="
+    white-space:pre-line;
+    line-height:1.7;
+    ">
 
-          ${msg.content}
+    ${msg.content}
 
-        </div>
+  </div>
 
-        <div
-          style="
-          margin-top:8px;
-          font-size:12px;
-          opacity:.7;
-          ">
+  <div
+    style="
+    margin-top:8px;
+    font-size:12px;
+    opacity:.7;
+    ">
 
-          ${time}
+    ${time}
 
-        </div>
+  </div>
 
-      `;
+`;
 
       box.appendChild(div);
 
