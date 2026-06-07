@@ -73,71 +73,176 @@
 
 <div class="ai-container">
 
-  <div class="ai-header">
+  <!-- =========================
+       AI HOME
+  ========================= -->
 
-    <div class="ai-title">
-      🤖 AI Assistant
+  <div id="aiHomeView">
+
+<div class="ai-header">
+
+  <div class="ai-title">
+    🤖 AI Assistant
+  </div>
+
+  <div
+    class="ai-home"
+    onclick="loadHome()">
+
+    ← Home
+
+  </div>
+
+</div>
+
+<div class="ai-grid">
+
+  <div
+    class="ai-card"
+    onclick="openAITutor()">
+
+    <div class="ai-icon">
+      🤖
     </div>
 
-    <div
-      class="ai-home"
-      onclick="loadHome()">
+    <div class="ai-card-title">
+      AI Tutor
+    </div>
 
-      ← Home
+    <div class="ai-card-desc">
+
+      Hỏi đáp hóa học,
+      giải thích lý thuyết,
+      phản ứng hóa học,
+      bài tập và công thức.
 
     </div>
 
   </div>
 
-  <div class="ai-grid">
+  <div
+    class="ai-card"
+    onclick="openAIQuiz()">
 
-    <div
-      class="ai-card"
-      onclick="openAITutor()">
-
-      <div class="ai-icon">
-        🤖
-      </div>
-
-      <div class="ai-card-title">
-        AI Tutor
-      </div>
-
-      <div class="ai-card-desc">
-
-        Hỏi đáp hóa học,
-        giải thích lý thuyết,
-        phản ứng hóa học,
-        bài tập và công thức.
-
-      </div>
-
+    <div class="ai-icon">
+      🎯
     </div>
 
-    <div
-      class="ai-card"
-      onclick="openAIQuiz()">
+    <div class="ai-card-title">
+      AI Quiz
+    </div>
 
-      <div class="ai-icon">
-        🎯
-      </div>
+    <div class="ai-card-desc">
 
-      <div class="ai-card-title">
-        AI Quiz
-      </div>
-
-      <div class="ai-card-desc">
-
-        Sinh câu hỏi hóa học
-        theo chủ đề và
-        kiểm tra kiến thức.
-
-      </div>
+      Sinh câu hỏi hóa học
+      theo chủ đề và
+      kiểm tra kiến thức.
 
     </div>
 
   </div>
 
 </div>
+    
+  </div>
+
+  <!-- =========================
+       AI TUTOR VIEW
+  ========================= -->
+
+  <div
+    id="aiTutorView"
+    style="display:none;">
+
+<div class="ai-header">
+
+  <div class="ai-title">
+    🤖 Chemistry AI Tutor
+  </div>
+
+  <div
+    class="ai-home"
+    onclick="backToAIHome()">
+
+    ← AI Assistant
+
+  </div>
+
+</div>
+
+<div
+  style="
+  background:white;
+  border-radius:24px;
+  padding:20px;
+  box-shadow:0 5px 20px rgba(0,0,0,.05);
+  ">
+
+  <div
+    style="
+    margin-bottom:15px;
+    color:#666;
+    ">
+
+    💬 Ask anything about chemistry
+
+  </div>
+
+  <div
+    id="aiMessages"
+
+    style="
+    height:450px;
+    overflow-y:auto;
+    border:1px solid #eee;
+    border-radius:16px;
+    padding:15px;
+    margin-bottom:15px;
+    background:#fafafa;
+    ">
+
+  </div>
+
+  <div
+    style="
+    display:flex;
+    gap:10px;
+    ">
+
+    <input
+
+      id="aiInput"
+
+      placeholder="Ask chemistry questions..."
+
+      style="
+      flex:1;
+      padding:14px;
+      border-radius:14px;
+      border:1px solid #ddd;
+      ">
+
+    <button
+
+      id="aiSendBtn"
+
+      style="
+      padding:14px 24px;
+      border:none;
+      border-radius:14px;
+      background:#111;
+      color:white;
+      cursor:pointer;
+      ">
+
+      Send
+
+    </button>
+
+  </div>
+
+</div>
+
+  </div>
 
 </div>
