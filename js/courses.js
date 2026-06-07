@@ -181,68 +181,6 @@ function(el,percent){
   }
 }
 
-/* =========================
-   BOSS UNLOCK
-========================= */
-
-window.checkBossUnlockCourse =
-function(p1,p2,p3,p4){
-
-  const boss =
-    document.getElementById(
-      "bossStatus"
-    );
-
-  if(!boss) return;
-
-  if(
-    p1>=75 &&
-    p2>=75 &&
-    p3>=75 &&
-    p4>=75
-  ){
-
-    boss.innerText = "GO";
-
-    boss.style.background =
-      "#4CAF50";
-
-  }else{
-
-    boss.innerText = "LOCK";
-
-    boss.style.background =
-      "#999";
-  }
-}
-
-/* =========================
-   OPEN BOSS
-========================= */
-
-window.openBossLesson =
-function(){
-
-  const boss =
-    document.getElementById(
-      "bossStatus"
-    );
-
-  if(
-    boss &&
-    boss.innerText === "LOCK"
-  ){
-
-    alert(
-      "🔒 Hoàn thành tất cả bài ≥ 75% để mở khóa!"
-    );
-
-    return;
-  }
-
-  window.location.href =
-    "lesson/boss.html";
-}
 
 /* =========================
    APPLY PROGRESS
@@ -486,6 +424,10 @@ function(){
 
   container.innerHTML = html;
 }
+
+
+
+
 window.bindBossEvents =
 function(){
 
@@ -525,11 +467,14 @@ function(){
         return;
       }
 
-      window.location.href =
+      localStorage.setItem(
+  "currentLessonName",
+  lessonId
+);
 
-        "lesson.html?id=" +
-
-        lessonId;
+window.location.href =
+  "lesson.html?id=" +
+  lessonId;
 
     };
 
