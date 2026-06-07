@@ -20,16 +20,37 @@ COURSE_CONFIG.forEach(topic=>{
    TOGGLE COURSE
 ========================= */
 
-window.toggleCourse = function(id){
+window.toggleCourse =
+function(id){
 
   const el =
     document.getElementById(id);
 
   if(!el) return;
 
+  const topics =
+
+    document.querySelectorAll(
+      "[id^='topic_']"
+    );
+
+  topics.forEach(topic=>{
+
+    if(topic.id !== id){
+
+      topic.style.display =
+        "none";
+
+    }
+
+  });
+
   el.style.display =
+
     el.style.display === "none"
+
       ? "block"
+
       : "none";
 }
 
@@ -329,13 +350,16 @@ function(){
       html += `
 
       <div
-        class="course-topic"
-        onclick="
-          toggleCourse(
-            'topic_${index}'
-          )
-        "
-      >
+ class="course-topic"
+ onclick="
+   toggleCourse(
+     'topic_${index}'
+   )
+ "
+ style="
+   margin-top:24px;
+ "
+>
 
         <div>
           ${topic.title}
@@ -350,9 +374,10 @@ function(){
 
       </div>
 
-      <div
-        id="topic_${index}"
-      >
+     <div
+  id="topic_${index}"
+  style="display:none;"
+>
 
       `;
 
