@@ -21,16 +21,13 @@ window.openAITutor = function(){
       role:"assistant",
 
       content:
-`Xin chào!
-
-Tôi có thể giúp bạn:
-
-📘 Giải thích lý thuyết hóa học
-🧪 Viết phương trình phản ứng
-📊 Giải bài tập
-⚡ Điện hóa
-🧬 Hóa hữu cơ
-🎯 Ôn tập kiểm tra`
+`Xin chào! Tôi là AI Tutor của HackChem.<br><br>
+Tôi có thể giúp bạn:<br>
+📘 Giải thích lý thuyết hóa học<br>
+🧪 Viết và cân bằng phương trình phản ứng<br>
+📊 Giải bài tập hóa học<br>
+🎯 Ôn tập và kiểm tra kiến thức<br><br>
+Hãy đặt câu hỏi bên dưới.`
 
     });
 
