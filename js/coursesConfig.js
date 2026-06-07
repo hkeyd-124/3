@@ -40,8 +40,6 @@ window.COURSE_CONFIG = [
         ]
     },
 
-
-
     /* =========================
        TOPIC 2
     ========================= */
@@ -80,6 +78,29 @@ window.COURSE_CONFIG = [
             }
 
         ]
-    }
+    },
+
+    
+    /* =========================
+       TOPIC 3
+    ========================= */
+    
+    {
+    id:"ester",
+
+    title:"🧪 Ester",
+
+    bossLesson:"ester_master",
+
+    lessons:[
+
+        {
+            id:"ester_1",
+            name:"Khái niệm Ester",
+            total:15
+        }
+
+    ]
+}
 
 ];
