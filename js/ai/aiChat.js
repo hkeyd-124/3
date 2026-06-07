@@ -17,22 +17,14 @@ window.openAITutor = function(){
   ){
 
     AI_STATE.messages.push({
-
       role:"assistant",
-
       content:
-`Xin chào!
-
-Tôi là AI Tutor của HackChem.
+`Xin chào! Tôi là AI Tutor của HackChem.
 
 Tôi có thể giúp bạn:
-
 📘 Giải thích lý thuyết hóa học
-
 🧪 Viết và cân bằng phương trình phản ứng
-
 📊 Giải bài tập hóa học
-
 🎯 Ôn tập và kiểm tra kiến thức
 
 Hãy đặt câu hỏi bên dưới.`
