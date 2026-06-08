@@ -280,11 +280,23 @@
     box-shadow:0 5px 20px rgba(0,0,0,.05);
     ">
 
+   <div
+  style="
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-bottom:20px;
+  ">
+
+  <!-- Topic -->
+
+  <div>
+
     <div
       style="
       font-size:20px;
       font-weight:bold;
-      margin-bottom:20px;
+      margin-bottom:10px;
       ">
 
       Select Topic
@@ -298,7 +310,6 @@
       width:100%;
       padding:14px;
       border-radius:12px;
-      margin-bottom:20px;
       ">
 
       <option value="organic">
@@ -318,41 +329,51 @@
       </option>
 
     </select>
-<div
-  style="
-  font-size:20px;
-  font-weight:bold;
-  margin-bottom:20px;
-  margin-top:20px;
-  ">
 
-  Select Difficulty
+  </div>
 
-</div>
+  <!-- Difficulty -->
 
-<select
-  id="quizDifficulty"
+  <div>
 
-  style="
-  width:100%;
-  padding:14px;
-  border-radius:12px;
-  margin-bottom:20px;
-  ">
+    <div
+      style="
+      font-size:20px;
+      font-weight:bold;
+      margin-bottom:10px;
+      ">
 
-  <option value="easy">
-    Easy
-  </option>
+      Select Difficulty
 
-  <option value="normal" selected>
-    Normal
-  </option>
+    </div>
 
-  <option value="hard">
-    Hard
-  </option>
+    <select
+      id="quizDifficulty"
 
-</select>
+      style="
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      ">
+
+      <option value="easy">
+        Easy
+      </option>
+
+      <option value="normal" selected>
+        Normal
+      </option>
+
+      <option value="hard">
+        Hard
+      </option>
+
+    </select>
+
+  </div>
+
+</div> 
+  
     <button
 
       id="generateQuizBtn"
