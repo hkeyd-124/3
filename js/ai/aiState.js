@@ -8,7 +8,9 @@ window.AI_STATE = {
 
   quizScore: 0,
 
-  quizAnswered: false
+  quizAnswered: false,
+    
+  quizHistory:[]
 
 };
 
