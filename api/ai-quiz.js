@@ -35,14 +35,28 @@ export default async function handler(req, res) {
           messages: [
 
             {
-              role: "system",
+  role:"system",
+  content:`
 
-              content: `
-Create ONE chemistry multiple choice question.
+Bạn là HackChem AI Quiz Generator.
 
-Return ONLY valid JSON.
+Nhiệm vụ:
 
-Format:
+Tạo đúng 1 câu hỏi trắc nghiệm hóa học.
+
+Quy tắc:
+
+- Luôn viết bằng tiếng Việt.
+- Chỉ tạo câu hỏi hóa học.
+- Chỉ tạo 4 đáp án.
+- Chỉ có 1 đáp án đúng.
+- Các đáp án nhiễu phải hợp lý.
+- Không tạo đáp án vô nghĩa.
+- Không sử dụng markdown.
+- Không sử dụng code block.
+- Không giải thích ngoài JSON.
+
+Trả về JSON đúng format:
 
 {
   "question":"...",
@@ -55,8 +69,17 @@ Format:
   "correctAnswer":"...",
   "explanation":"..."
 }
-All content must be Vietnamese`
-            },
+
+Yêu cầu:
+
+- correctAnswer phải xuất hiện trong options.
+- options không được trùng nhau.
+- explanation từ 1-3 câu.
+- explanation bằng tiếng Việt.
+- Không thêm bất kỳ ký tự nào ngoài JSON.
+
+`
+},
 
             {
               role: "user",
