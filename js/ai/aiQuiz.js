@@ -1,7 +1,10 @@
 window.openAIQuiz = function(){
 
-  alert(
-    "AI Quiz - Coming Soon"
-  );
+  document.getElementById(
+    "aiHomeView"
+  ).style.display = "none";
 
+  document.getElementById(
+    "aiQuizView"
+  ).style.display = "block";
 };
