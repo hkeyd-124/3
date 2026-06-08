@@ -40,6 +40,37 @@ document.addEventListener(
       e.target.id ===
       "nextQuizBtn"
     ){
+      document.getElementById(
+  "quizResult"
+).style.display =
+  "block";
+
+document.getElementById(
+  "quizQuestion"
+).innerHTML =
+  `<div
+  style="
+  text-align:center;
+  padding:20px;
+  color:#666;
+  ">
+  ⏳ Đang tạo câu hỏi...
+</div>
+`;
+
+document.getElementById(
+  "quizAnswers"
+).innerHTML = "";
+
+document.getElementById(
+  "quizFeedback"
+).style.display =
+  "none";
+
+document.getElementById(
+  "nextQuizBtn"
+).style.display =
+  "none";
     AI_STATE.quizAnswered =
     false;
       document.getElementById(
