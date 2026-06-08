@@ -100,6 +100,21 @@ hard:
 - cân bằng phản ứng phức tạp
 - điện hóa
 - hóa hữu cơ
+
+Đặc biệt quan trọng:
+Tên chất hóa học bắt buộc sử dụng danh pháp tiếng Anh theo đúng chuẩn IUPAC.
+Ví dụ:
+Sulfuric acid
+Hydrochloric acid
+Nitric acid
+Sodium chloride
+Iron (III) sulfate
+Copper (II) oxide
+
+- Không dùng tên tiếng Việt như:
+Axit sulfuric
+Natri clorua
+Sắt (III) sunfat
 `
 },
 
