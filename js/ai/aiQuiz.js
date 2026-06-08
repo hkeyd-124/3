@@ -37,7 +37,8 @@ document.addEventListener(
       e.target.id ===
       "generateQuizBtn"
     ){
-
+    AI_STATE.quizAnswered =
+    false;
       document.getElementById(
         "quizResult"
       ).style.display =
@@ -121,6 +122,14 @@ document.addEventListener(
 </div>
 <div
   id="quizFeedback"
+
+  style="
+  display:none;
+  margin-top:15px;
+  font-weight:bold;
+  ">
+</div>
+
 <button
 
   id="nextQuizBtn"
