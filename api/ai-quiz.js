@@ -45,7 +45,13 @@ Nhiệm vụ:
 Tạo đúng 1 câu hỏi trắc nghiệm hóa học.
 
 Quy tắc:
-
+- Nếu có công thức hóa học hoặc toán học:
+Sử dụng LaTeX.
+Ví dụ:
+$H_2SO_4$
+$Ca(OH)_2$
+$Fe^{3+}$
+$PV=nRT$
 - Luôn viết bằng tiếng Việt.
 - Chỉ tạo câu hỏi hóa học.
 - Chỉ tạo 4 đáp án.
