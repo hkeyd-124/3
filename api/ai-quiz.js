@@ -55,7 +55,7 @@ Format:
   "correctAnswer":"...",
   "explanation":"..."
 }
-`
+All content must be Vietnamese`
             },
 
             {
