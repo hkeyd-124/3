@@ -127,39 +127,80 @@ function renderMessages(){
           "80px";
       }
 
-      div.innerHTML = `
+      const contentId =
 
-        <div
-          style="
-          font-weight:bold;
-          margin-bottom:6px;
-          ">
+  "msg_" +
+  Math.random()
+    .toString(36)
+    .slice(2);
 
-          ${label}
+div.innerHTML = `
 
-        </div>
+  <div
+    style="
+    font-weight:bold;
+    margin-bottom:6px;
+    ">
 
-        <div>
+    ${label}
 
-          ${msg.content}
+  </div>
 
-        </div>
+  <div id="${contentId}">
 
-        <div
-          style="
-          margin-top:8px;
-          font-size:12px;
-          opacity:.7;
-          ">
+    ${msg.content}
 
-          ${time}
+  </div>
 
-        </div>
+  <div
+    style="
+    margin-top:8px;
+    font-size:12px;
+    opacity:.7;
+    ">
 
-      `;
+    ${time}
+
+  </div>
+
+`;
 
       box.appendChild(div);
+if(
 
+  window.renderMathInElement
+
+){
+
+  renderMathInElement(
+
+    document.getElementById(
+      contentId
+    ),
+
+    {
+
+      delimiters:[
+
+        {
+          left:"$$",
+          right:"$$",
+          display:true
+        },
+
+        {
+          left:"$",
+          right:"$",
+          display:false
+        }
+
+      ]
+
+    }
+
+  );
+
+}
     }
   );
 
