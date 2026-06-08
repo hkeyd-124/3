@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   try {
 
-    const {topic, history = [] } = req.body;
+    const {topic, difficulty = "normal", history = [] } = req.body;
 
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
@@ -78,6 +78,22 @@ Yêu cầu:
 - explanation bằng tiếng Việt.
 - Không thêm bất kỳ ký tự nào ngoài JSON.
 
+Difficulty Rules
+easy:
+- kiến thức cơ bản
+- công thức đơn giản
+- nhận biết chất
+- nhận biết ion
+normal:
+- giải thích hiện tượng
+- phương trình phản ứng
+- tính chất hóa học
+hard:
+- bài toán hóa học
+- suy luận nhiều bước
+- cân bằng phản ứng phức tạp
+- điện hóa
+- hóa hữu cơ
 `
 },
 
@@ -87,6 +103,7 @@ Yêu cầu:
   content:`
 
 Topic: ${topic}
+Difficulty: ${difficulty}
 
 Không được tạo lại
 các câu hỏi sau:
