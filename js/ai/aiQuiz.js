@@ -48,7 +48,12 @@ document.addEventListener(
         "quizQuestion"
       ).innerText =
         "What is the chemical symbol of Water?";
-
+document.getElementById(
+  "quizFeedback"
+)?.style.display = "none";
+      document.getElementById(
+  "nextQuizBtn"
+)?.style.display = "none";
       document.getElementById(
   "quizAnswers"
 ).innerHTML = `
@@ -149,13 +154,6 @@ document.addEventListener(
   Next Question
 
 </button>
-  style="
-  display:none;
-  margin-top:15px;
-  font-weight:bold;
-  ">
-</div>
-
 `;
     }
 
