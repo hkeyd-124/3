@@ -150,7 +150,7 @@ if(
 <button
   class="quiz-option"
 
-  data-answer="${option}"
+  data-answer="${encodeURIComponent(option)}"
 
   style="
   width:100%;
@@ -265,16 +265,43 @@ if(
 
     const selectedAnswer =
 
-  e.target.dataset.answer;
+  decodeURIComponent(
+    e.target.dataset.answer
+  );
 
 const correctAnswer =
 
   AI_STATE.currentQuiz
     .correctAnswer;
 
-if(
-  selectedAnswer ===
+const normalize =
+  text=>
+    text
+      .replace(
+        /\s+/g,
+        ""
+      )
+      .trim();
+
+    
+    console.log(
+  "SELECTED:",
+  selectedAnswer
+);
+console.log(
+  "CORRECT:",
   correctAnswer
+);
+
+    
+if(
+  normalize(
+    selectedAnswer
+  )
+  ===
+  normalize(
+    correctAnswer
+  )
 ){
 
   e.target.style.background =
