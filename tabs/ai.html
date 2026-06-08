@@ -245,7 +245,99 @@
   </div>
 
 </div>
+    
+<!-- =========================
+     AI QUIZ VIEW
+========================= -->
 
+<div
+  id="aiQuizView"
+  style="display:none;">
+
+  <div class="ai-header">
+
+    <div class="ai-title">
+      🎯 AI Quiz
+    </div>
+
+    <div
+      class="ai-home"
+      onclick="backToAIHome()">
+
+      ← AI Assistant
+
+    </div>
+
+  </div>
+
+  <div
+    style="
+    background:white;
+    border-radius:24px;
+    padding:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.05);
+    ">
+
+    <div
+      style="
+      font-size:20px;
+      font-weight:bold;
+      margin-bottom:20px;
+      ">
+
+      Select Topic
+
+    </div>
+
+    <select
+      id="quizTopic"
+
+      style="
+      width:100%;
+      padding:14px;
+      border-radius:12px;
+      margin-bottom:20px;
+      ">
+
+      <option value="organic">
+        Organic Chemistry
+      </option>
+
+      <option value="inorganic">
+        Inorganic Chemistry
+      </option>
+
+      <option value="physical">
+        Physical Chemistry
+      </option>
+
+      <option value="random">
+        Random
+      </option>
+
+    </select>
+
+    <button
+
+      id="generateQuizBtn"
+
+      style="
+      width:100%;
+      padding:14px;
+      border:none;
+      border-radius:14px;
+      background:#111;
+      color:white;
+      cursor:pointer;
+      ">
+
+      Generate Quiz
+
+    </button>
+
+  </div>
+
+</div>
 
   </div>
 
