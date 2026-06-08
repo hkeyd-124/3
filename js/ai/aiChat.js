@@ -193,19 +193,102 @@ function sendMessage(){
   time: Date.now()
 
 });
+  const thinkingIndex =
+
   AI_STATE.messages.push({
 
-  role:"assistant",
+    role:"assistant",
 
-  content:"⏳ Thinking...",
+    content:"⏳ Thinking...",
 
-  time: Date.now()
+    time: Date.now()
 
-});
+  }) - 1;
 
-  renderMessages();
+renderMessages();
 
-  input.value = "";
+input.value = "";
+
+fetch(
+
+  "/api/ai-chat",
+
+  {
+
+    method:"POST",
+
+    headers:{
+
+      "Content-Type":
+        "application/json"
+
+    },
+
+    body:JSON.stringify({
+
+      message:text
+
+    })
+
+  }
+
+)
+
+.then(
+
+  res=>res.json()
+
+)
+
+.then(
+
+  data=>{
+
+    AI_STATE.messages[
+      thinkingIndex
+    ] = {
+
+      role:"assistant",
+
+      content:
+        data.answer ||
+
+        "No response",
+
+      time:Date.now()
+
+    };
+
+    renderMessages();
+
+  }
+
+)
+
+.catch(
+
+  err=>{
+
+    console.error(err);
+
+    AI_STATE.messages[
+      thinkingIndex
+    ] = {
+
+      role:"assistant",
+
+      content:
+        "❌ Failed to connect to AI",
+
+      time:Date.now()
+
+    };
+
+    renderMessages();
+
+  }
+
+);
 }
 
 document.addEventListener(
