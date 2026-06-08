@@ -95,12 +95,15 @@ document.getElementById(
 
     body:JSON.stringify({
 
-      topic:
-        document.getElementById(
-          "quizTopic"
-        ).value
+  topic:
+    document.getElementById(
+      "quizTopic"
+    ).value,
 
-    })
+  history:
+    AI_STATE.quizHistory
+
+})
 
   }
 
@@ -118,7 +121,18 @@ document.getElementById(
 
     AI_STATE.currentQuiz =
       quiz;
+AI_STATE.quizHistory.push(
+  quiz.question
+);
 
+if(
+  AI_STATE.quizHistory.length
+  > 10
+){
+
+  AI_STATE.quizHistory.shift();
+
+}
     document.getElementById(
       "quizQuestion"
     ).innerText =
