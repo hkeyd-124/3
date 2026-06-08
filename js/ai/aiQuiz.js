@@ -36,6 +36,9 @@ document.addEventListener(
     if(
       e.target.id ===
       "generateQuizBtn"
+      ||
+      e.target.id ===
+      "nextQuizBtn"
     ){
     AI_STATE.quizAnswered =
     false;
