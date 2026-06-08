@@ -87,7 +87,19 @@ document.addEventListener(
 
     AI_STATE.currentQuiz =
       quiz;
+document.getElementById(
+  "quizFeedback"
+).style.display =
+  "none";
 
+document.getElementById(
+  "quizFeedback"
+).innerHTML = "";
+
+document.getElementById(
+  "nextQuizBtn"
+).style.display =
+  "none";
     document.getElementById(
       "quizQuestion"
     ).innerText =
@@ -158,16 +170,25 @@ if(
         "quizFeedback"
       );
 
-    if(
-  e.target.dataset.correct
-  === "true"
+    const selectedAnswer =
+
+  e.target.dataset.answer;
+
+const correctAnswer =
+
+  AI_STATE.currentQuiz
+    .correctAnswer;
+
+if(
+  selectedAnswer ===
+  correctAnswer
 ){
 
   e.target.style.background =
     "#dcfce7";
 
   feedback.innerText =
-    "✅ Correct!";
+    "✅ Chính xác!";
 
   AI_STATE.quizScore++;
 
@@ -177,11 +198,19 @@ if(
     "#fee2e2";
 
   feedback.innerText =
-    "❌ Wrong Answer";
+    `❌ Sai
+
+Đáp án đúng:
+${correctAnswer}`;
+
 }
 
-    feedback.style.display =
-      "block";
+    feedback.innerHTML +=
+  `<br><br>
+  💡 ${AI_STATE.currentQuiz.explanation}`;
+feedback.style.display =
+  "block";
+    
     document.getElementById(
   "nextQuizBtn"
 ).style.display =
