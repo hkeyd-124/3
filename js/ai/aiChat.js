@@ -288,31 +288,39 @@ fetch(
 
     };
 
+    localStorage.setItem(
+
+  "hackchem_ai_messages",
+
+  JSON.stringify(
+    AI_STATE.messages
+  )
+
+);
+  
+    
     renderMessages();
-
   }
-
 )
-
 .catch(
-
   err=>{
-
     console.error(err);
-
     AI_STATE.messages[
       thinkingIndex
     ] = {
-
       role:"assistant",
-
       content:
         "❌ Failed to connect to AI",
-
       time:Date.now()
-
     };
-
+    
+localStorage.setItem(
+  "hackchem_ai_messages",
+  JSON.stringify(
+    AI_STATE.messages
+  )
+);
+    
     renderMessages();
 
   }
