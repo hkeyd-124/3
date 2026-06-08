@@ -94,22 +94,41 @@ Nếu là phương trình phản ứng:
 
 ...
 
-NOTE: Do NOT use LaTeX.
+NOTE: IMPORTANT FORMAT RULES
+When writing chemical formulas,
+always use LaTeX notation.
+Examples:
+H₂SO₄
+→
+$H_2SO_4$
 
-Write chemical equations in plain text.
+Ca(OH)₂
+→
+$Ca(OH)_2$
 
-Example:
+Na₂SO₄
+→
+$Na_2SO_4$
 
+Reaction equations:
 2Na + Cl₂ → 2NaCl
-
-instead of:
-
-\[
+→
+$$
 2Na + Cl_2 \rightarrow 2NaCl
-\]
+$$
 
-`
-},
+Use inline formulas with:
+$formula$
+Use full equations with:
+$$
+equation
+$$
+Do not output raw formulas like:
+H2SO4
+Na2SO4
+Cl2
+Always convert them to LaTeX.
+`},
 
             {
               role: "user",
