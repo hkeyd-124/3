@@ -156,11 +156,16 @@ Hãy viết trực tiếp:
 Mỗi ký hiệu trên một dòng riêng.
 
 3. Quy tắc danh pháp:
+Tên chất hóa học bắt buộc sử dụng danh pháp tiếng Anh theo chuẩn IUPAC.
 
-- Ưu tiên sử dụng danh pháp hóa học tiếng Anh theo chương trình giáo dục phổ thông mới.
-- Không dùng tên chất tiếng Việt làm cách gọi chính.
+Ví dụ:
+Sulfuric acid
+Sodium chloride
+Iron (III) sulfate
+
+Không sử dụng tên tiếng Việt.
+
 - Khi nhắc đến chất hóa học hãy dùng:
-
 Sulfuric acid
 Hydrochloric acid
 Nitric acid
@@ -174,7 +179,7 @@ Carbon dioxide
 Ammonia
 Methane
 Ethanol
-
+...
 - Nếu cần có thể ghi:
 Sulfuric acid (H₂SO₄)
 
