@@ -10,7 +10,7 @@ export default async function handler(req, res) {
 
   try {
 
-    const { topic } = req.body;
+    const {topic, history = [] } = req.body;
 
     const response = await fetch(
       "https://api.openai.com/v1/chat/completions",
@@ -83,12 +83,18 @@ Yêu cầu:
 
             {
   role:"user",
+
   content:`
 
 Topic: ${topic}
 
-Tạo một câu hỏi mới.
-Không lặp lại câu hỏi trước đó.
+Không được tạo lại
+các câu hỏi sau:
+
+${history.join("\n")}
+
+Tạo một câu hỏi mới
+khác hoàn toàn các câu trên.
 
 `
 }
