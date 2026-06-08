@@ -168,9 +168,9 @@ if(
   window.renderMathInElement
 ){
   renderMathInElement(
-    document.getElementById(
-      "quizResult"
-    ),
+  document.getElementById(
+    "quizQuestion"
+  ),
     {
       delimiters:[
         {
@@ -184,6 +184,33 @@ if(
           display:false
         }
       ]
+    }
+  );
+  document
+  .querySelectorAll(
+    ".quiz-option"
+  )
+  .forEach(
+    btn=>{
+
+      renderMathInElement(
+        btn,
+        {
+          delimiters:[
+            {
+              left:"$$",
+              right:"$$",
+              display:true
+            },
+            {
+              left:"$",
+              right:"$",
+              display:false
+            }
+          ]
+        }
+      );
+
     }
   );
 }
@@ -276,7 +303,29 @@ ${correctAnswer}`;
   💡 ${AI_STATE.currentQuiz.explanation}`;
 feedback.style.display =
   "block";
-    
+    if(
+  window.renderMathInElement
+){
+
+  renderMathInElement(
+    feedback,
+    {
+      delimiters:[
+        {
+          left:"$$",
+          right:"$$",
+          display:true
+        },
+        {
+          left:"$",
+          right:"$",
+          display:false
+        }
+      ]
+    }
+  );
+
+}
     document.getElementById(
   "nextQuizBtn"
 ).style.display =
