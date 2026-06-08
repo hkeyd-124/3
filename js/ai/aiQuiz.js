@@ -48,12 +48,6 @@ document.addEventListener(
         "quizQuestion"
       ).innerText =
         "What is the chemical symbol of Water?";
-document.getElementById(
-  "quizFeedback"
-)?.style.display = "none";
-      document.getElementById(
-  "nextQuizBtn"
-)?.style.display = "none";
       document.getElementById(
   "quizAnswers"
 ).innerHTML = `
@@ -155,6 +149,14 @@ document.getElementById(
 
 </button>
 `;
+      document.getElementById(
+  "quizFeedback"
+)?.style.display = "none";
+      document.getElementById(
+  "nextQuizBtn"
+)?.style.display = "none";
+
+      
     }
 
   }
