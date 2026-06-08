@@ -4,6 +4,10 @@ window.AI_STATE = {
 
   messages: [],
 
-  currentQuiz: null
+  currentQuiz: null,
+
+  quizScore: 0,
+
+  quizAnswered: false
 
 };
