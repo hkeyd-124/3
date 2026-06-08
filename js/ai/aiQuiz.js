@@ -135,9 +135,9 @@ if(
 
 }
     document.getElementById(
-      "quizQuestion"
-    ).innerText =
-      quiz.question;
+  "quizQuestion"
+).innerHTML =
+  quiz.question;
 
     document.getElementById(
       "quizAnswers"
@@ -160,13 +160,34 @@ if(
   border:1px solid #ddd;
   cursor:pointer;
   ">
-
   ${option}
-
 </button>
+`).join("");
 
-`
-      ).join("");
+if(
+  window.renderMathInElement
+){
+  renderMathInElement(
+    document.getElementById(
+      "quizResult"
+    ),
+    {
+      delimiters:[
+        {
+          left:"$$",
+          right:"$$",
+          display:true
+        },
+        {
+          left:"$",
+          right:"$",
+          display:false
+        }
+      ]
+    }
+  );
+}
+    
 document.getElementById(
   "quizFeedback"
 ).style.display =
