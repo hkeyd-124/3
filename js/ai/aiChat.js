@@ -193,6 +193,18 @@ function sendMessage(){
   time: Date.now()
 
 });
+localStorage.setItem(
+
+  "hackchem_ai_messages",
+
+  JSON.stringify(
+    AI_STATE.messages
+  )
+
+);
+
+
+  
   const thinkingIndex =
 
   AI_STATE.messages.push({
@@ -204,7 +216,16 @@ function sendMessage(){
     time: Date.now()
 
   }) - 1;
+  
+localStorage.setItem(
 
+  "hackchem_ai_messages",
+
+  JSON.stringify(
+    AI_STATE.messages
+  )
+);
+  
 renderMessages();
 
 input.value = "";
