@@ -251,9 +251,17 @@ fetch(
       role:"assistant",
 
       content:
-        data.answer ||
+  (data.answer || "No response")
 
-        "No response",
+    .replace(
+      /\*\*(.*?)\*\*/g,
+      "<strong>$1</strong>"
+    )
+
+    .replace(
+      /\n/g,
+      "<br>"
+    ),
 
       time:Date.now()
 
