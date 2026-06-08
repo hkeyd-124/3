@@ -94,15 +94,16 @@ document.getElementById(
     },
 
     body:JSON.stringify({
-
   topic:
     document.getElementById(
       "quizTopic"
     ).value,
-
+  difficulty:
+    document.getElementById(
+      "quizDifficulty"
+    ).value,
   history:
     AI_STATE.quizHistory
-
 })
 
   }
