@@ -47,18 +47,64 @@ document.addEventListener(
       ).style.display =
         "block";
 
-      document.getElementById(
-        "quizQuestion"
-      ).innerText =
-        "What is the chemical symbol of Water?";
+      fetch(
 
-      document.getElementById(
-  "quizAnswers"
-).innerHTML = `
+  "/api/ai-quiz",
+
+  {
+
+    method:"POST",
+
+    headers:{
+
+      "Content-Type":
+        "application/json"
+
+    },
+
+    body:JSON.stringify({
+
+      topic:
+        document.getElementById(
+          "quizTopic"
+        ).value
+
+    })
+
+  }
+
+)
+
+.then(
+
+  res=>res.json()
+
+)
+
+.then(
+
+  quiz=>{
+
+    AI_STATE.currentQuiz =
+      quiz;
+
+    document.getElementById(
+      "quizQuestion"
+    ).innerText =
+      quiz.question;
+
+    document.getElementById(
+      "quizAnswers"
+    ).innerHTML =
+
+      quiz.options.map(
+
+        option=>`
 
 <button
   class="quiz-option"
-  data-correct="true"
+
+  data-answer="${option}"
 
   style="
   width:100%;
@@ -68,91 +114,28 @@ document.addEventListener(
   border:1px solid #ddd;
   cursor:pointer;
   ">
-  A. H₂O
-</button>
 
-<button
-  class="quiz-option"
-
-  style="
-  width:100%;
-  margin-bottom:10px;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #ddd;
-  cursor:pointer;
-  ">
-  B. CO₂
-</button>
-
-<button
-  class="quiz-option"
-
-  style="
-  width:100%;
-  margin-bottom:10px;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #ddd;
-  cursor:pointer;
-  ">
-  C. NaCl
-</button>
-
-<button
-  class="quiz-option"
-
-  style="
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #ddd;
-  cursor:pointer;
-  ">
-  D. O₂
-</button>
-<div
-  id="quizScore"
-
-  style="
-  margin-top:15px;
-  margin-bottom:10px;
-  font-weight:bold;
-  ">
-
-  Score: ${AI_STATE.quizScore}
-
-</div>
-<div
-  id="quizFeedback"
-
-  style="
-  display:none;
-  margin-top:15px;
-  font-weight:bold;
-  ">
-</div>
-
-<button
-
-  id="nextQuizBtn"
-
-  style="
-  display:none;
-  margin-top:15px;
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:#111;
-  color:white;
-  cursor:pointer;
-  ">
-
-  Next Question
+  ${option}
 
 </button>
-`;
+
+`
+
+      ).join("");
+
+  }
+
+)
+
+.catch(
+
+  err=>{
+
+    console.error(err);
+
+  }
+
+);
     }
 
   }
