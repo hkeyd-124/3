@@ -129,10 +129,9 @@ Không được hy sinh tính đúng đắn để tạo câu hỏi khó.
 CHEMICAL NAMING RULES
 ========================
 
-Tên chất bắt buộc sử dụng tiếng Anh theo chuẩn IUPAC.
+Tên chất, loại chất bắt buộc sử dụng tiếng Anh theo chuẩn IUPAC.
 
 Ví dụ đúng:
-
 Sulfuric acid
 Hydrochloric acid
 Nitric acid
@@ -143,18 +142,25 @@ Iron (III) sulfate
 Copper (II) oxide
 Manganese dioxide
 Carbon dioxide
+acid
+base
+oxide
+ester
 
 Ví dụ sai:
-
 Axit sulfuric
 Axit nitric
 Natri clorua
 Sắt (III) sunfat
 Đồng oxit
+axit
+bazơ
+oxit
+este
 
 Tên chất:
 
-- dùng tiếng Anh
+- dùng tiếng Anh theo chuẩn IUPAC
 - phần giải thích vẫn viết tiếng Việt
 
 ========================
