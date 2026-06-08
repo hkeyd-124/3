@@ -318,7 +318,11 @@ fetch(
     .replace(
       /\*\*(.*?)\*\*/g,
       "<strong>$1</strong>"
-    ),
+    )
+      .replace(
+  /\n\n/g,
+  "<br><br>"
+),
 
       time:Date.now()
 
