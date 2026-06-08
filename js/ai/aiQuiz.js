@@ -87,19 +87,7 @@ document.addEventListener(
 
     AI_STATE.currentQuiz =
       quiz;
-document.getElementById(
-  "quizFeedback"
-).style.display =
-  "none";
 
-document.getElementById(
-  "quizFeedback"
-).innerHTML = "";
-
-document.getElementById(
-  "nextQuizBtn"
-).style.display =
-  "none";
     document.getElementById(
       "quizQuestion"
     ).innerText =
@@ -132,9 +120,20 @@ document.getElementById(
 </button>
 
 `
-
       ).join("");
+document.getElementById(
+  "quizFeedback"
+).style.display =
+  "none";
 
+document.getElementById(
+  "quizFeedback"
+).innerHTML = "";
+
+document.getElementById(
+  "nextQuizBtn"
+).style.display =
+  "none";
   }
 
 )
