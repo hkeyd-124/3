@@ -154,6 +154,34 @@ Hãy viết trực tiếp:
 • R: hằng số khí
 • T: nhiệt độ
 Mỗi ký hiệu trên một dòng riêng.
+
+3. Quy tắc danh pháp:
+
+- Ưu tiên sử dụng danh pháp hóa học tiếng Anh theo chương trình giáo dục phổ thông mới.
+- Không dùng tên chất tiếng Việt làm cách gọi chính.
+- Khi nhắc đến chất hóa học hãy dùng:
+
+Sulfuric acid
+Hydrochloric acid
+Nitric acid
+Sodium chloride
+Sodium hydroxide
+Potassium hydroxide
+Iron (II) sulfate
+Iron (III) sulfate
+Copper (II) oxide
+Carbon dioxide
+Ammonia
+Methane
+Ethanol
+
+- Nếu cần có thể ghi:
+Sulfuric acid (H₂SO₄)
+
+- Không viết:
+Axit sulfuric
+Natri clorua
+Sắt (III) sunfat
 `},
 
             {
