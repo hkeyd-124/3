@@ -94,6 +94,20 @@ Nếu là phương trình phản ứng:
 
 ...
 
+NOTE: Do NOT use LaTeX.
+
+Write chemical equations in plain text.
+
+Example:
+
+2Na + Cl₂ → 2NaCl
+
+instead of:
+
+\[
+2Na + Cl_2 \rightarrow 2NaCl
+\]
+
 `
 },
 
