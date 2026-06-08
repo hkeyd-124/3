@@ -228,6 +228,14 @@ localStorage.setItem(
   
 renderMessages();
 
+  
+console.log(
+  katex.renderToString(
+    "H_2SO_4"
+  )
+);
+
+  
 input.value = "";
 
 fetch(
