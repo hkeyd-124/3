@@ -1,10 +1,14 @@
-window.openAIQuiz = function(){
+window.backToAIHome = function(){
 
   document.getElementById(
-    "aiHomeView"
+    "aiTutorView"
   ).style.display = "none";
 
   document.getElementById(
     "aiQuizView"
+  ).style.display = "none";
+
+  document.getElementById(
+    "aiHomeView"
   ).style.display = "block";
 };
