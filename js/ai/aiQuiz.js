@@ -107,10 +107,39 @@ document.addEventListener(
   ">
   D. O₂
 </button>
+<div
+  id="quizScore"
 
+  style="
+  margin-top:15px;
+  margin-bottom:10px;
+  font-weight:bold;
+  ">
+
+  Score: ${AI_STATE.quizScore}
+
+</div>
 <div
   id="quizFeedback"
+<button
 
+  id="nextQuizBtn"
+
+  style="
+  display:none;
+  margin-top:15px;
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#111;
+  color:white;
+  cursor:pointer;
+  ">
+
+  Next Question
+
+</button>
   style="
   display:none;
   margin-top:15px;
@@ -124,9 +153,7 @@ document.addEventListener(
   }
 );
 document.addEventListener(
-
   "click",
-
   e=>{
 
     if(
@@ -135,34 +162,49 @@ document.addEventListener(
         "quiz-option"
       )
     ) return;
-
+if(
+  AI_STATE.quizAnswered
+) return;
     const feedback =
       document.getElementById(
         "quizFeedback"
       );
 
     if(
-      e.target.dataset.correct
-      === "true"
-    ){
+  e.target.dataset.correct
+  === "true"
+){
 
-      e.target.style.background =
-        "#dcfce7";
+  e.target.style.background =
+    "#dcfce7";
 
-      feedback.innerText =
-        "✅ Correct!";
+  feedback.innerText =
+    "✅ Correct!";
 
-    }else{
+  AI_STATE.quizScore++;
 
-      e.target.style.background =
-        "#fee2e2";
+}else{
 
-      feedback.innerText =
-        "❌ Wrong Answer";
+  e.target.style.background =
+    "#fee2e2";
 
-    }
+  feedback.innerText =
+    "❌ Wrong Answer";
+}
 
     feedback.style.display =
       "block";
+    document.getElementById(
+  "nextQuizBtn"
+).style.display =
+  "block";
+    AI_STATE.quizAnswered =
+  true;
+
+    document.getElementById(
+  "quizScore"
+).innerText =
+  `Score: ${AI_STATE.quizScore}`;
+    
   }
 );
