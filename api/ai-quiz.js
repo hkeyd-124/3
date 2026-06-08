@@ -82,11 +82,16 @@ Yêu cầu:
 },
 
             {
-              role: "user",
+  role:"user",
+  content:`
 
-              content:
-                `Topic: ${topic}`
-            }
+Topic: ${topic}
+
+Tạo một câu hỏi mới.
+Không lặp lại câu hỏi trước đó.
+
+`
+}
 
           ],
 
