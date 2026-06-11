@@ -33,13 +33,9 @@
 }
 
 .lb-card{
-
   background:#d6c2ae;
-
   border-radius:28px;
-
   padding:25px;
-
   overflow:auto;
 }
 
@@ -48,25 +44,17 @@
 ========================= */
 
 .lb-table-header{
-
   display:grid;
-
   grid-template-columns:
+
     80px
-    1.5fr
+    1fr
     120px
-    140px
-    150px
     120px;
-
   align-items:center;
-
   font-weight:bold;
-
   color:red;
-
-  margin-bottom:8px;
-
+  margin-bottom:15px;
   padding:0 20px;
 }
 
@@ -76,20 +64,17 @@
 
 .lb-filters{
   display:flex;
-  gap:10px;
+  gap:12px;
   justify-content:flex-end;
+  margin-bottom:20px;
 }
 
 .lb-select{
-
-  padding:6px 10px;
-
-  border-radius:8px;
-
+  min-width:220px;
+  padding:8px 12px;
+  border-radius:12px;
   border:1px solid #999;
-
   background:white;
-
   cursor:pointer;
 }
 
@@ -282,36 +267,31 @@
 
     <!-- TABLE HEADER -->
 
-    <div class="lb-table-header">
+   <div class="lb-filters">
 
-      <div>Hạng</div>
+  <select id="topicFilter"
+          class="lb-select"
+          onchange="loadLessons()">
+  </select>
 
-      <div>Tên</div>
+  <select id="lessonFilter"
+          class="lb-select"
+          onchange="loadLeaderboard()">
+  </select>
 
-      <div>Điểm</div>
+</div>
 
-      <div>Huy hiệu</div>
+<div class="lb-table-header">
 
-      <div>
+  <div>Hạng</div>
 
-       <select id="topicFilter"
-        class="lb-select"
-        onchange="loadLessons()">
-</select>
+  <div>Tên</div>
 
-      </div>
+  <div>Điểm</div>
 
-      <div>
+  <div>Huy hiệu</div>
 
-        <select id="lessonFilter"
-                class="lb-select"
-                onchange="loadLeaderboard()">
-
-        </select>
-
-      </div>
-
-    </div>
+</div>
 
     <!-- LIST -->
 
