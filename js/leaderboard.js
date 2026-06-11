@@ -10,33 +10,58 @@ from
    LEADERBOARD
 ========================= */
 
-window.lessonMap = {
+window.lessonMap = {};
 
-  topic1:[
+COURSE_CONFIG.forEach(topic=>{
 
-    {
-      id:"organic_1",
-      name:"Bài 1"
-    },
+  lessonMap[topic.id] =
 
-    {
-      id:"organic_2",
-      name:"Bài 2"
-    },
+    topic.lessons.map(
+      lesson=>({
 
-    {
-      id:"organic_3",
-      name:"Bài 3"
-    },
+        id:lesson.id,
 
-    {
-      id:"organic_4",
-      name:"Bài 4"
-    }
+        name:lesson.name
 
-  ]
+      })
+    );
 
-};
+});
+
+/* =========================
+   LOAD TOPICS
+========================= */
+
+window.loadTopics =
+function(){
+
+  const topicSelect =
+
+    document.getElementById(
+      "topicFilter"
+    );
+
+  if(!topicSelect) return;
+
+  topicSelect.innerHTML = "";
+
+  COURSE_CONFIG.forEach(topic=>{
+
+    topicSelect.innerHTML += `
+
+      <option
+        value="${topic.id}"
+      >
+
+        ${topic.title}
+
+      </option>
+
+    `;
+
+  });
+
+}
 
 /* =========================
    LOAD LESSONS
