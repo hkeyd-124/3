@@ -184,12 +184,14 @@ async function(
 
     if(tab === "leaderboard"){
 
-      setTimeout(()=>{
+  setTimeout(()=>{
 
-        loadLessons();
+    loadTopics();
 
-      },100);
-    }
+    loadLessons();
+
+  },100);
+}
 
   }catch(err){
 
