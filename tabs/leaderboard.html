@@ -36,7 +36,7 @@
   background:#d6c2ae;
   border-radius:28px;
   padding:25px;
-  overflow:auto;
+  overflow:hidden;
 }
 
 /* =========================
@@ -230,7 +230,25 @@
   padding:40px;
   font-size:18px;
 }
-
+#leaderboardList{
+  max-height:550px;
+  overflow-y:scroll;
+  overflow-x:hidden;
+}
+  #leaderboardList::-webkit-scrollbar{
+  width:10px;
+}
+#leaderboardList::-webkit-scrollbar-track{
+  background:#e5e7eb;
+  border-radius:999px;
+}
+#leaderboardList::-webkit-scrollbar-thumb{
+  background:#555;
+  border-radius:999px;
+}
+#leaderboardList::-webkit-scrollbar-thumb:hover{
+  background:#333;
+}
 @media(max-width:1000px){
 
   .lb-table-header,
