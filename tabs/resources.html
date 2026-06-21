@@ -3,9 +3,31 @@
   <style>
 
   .resources-page{
-    padding:20px;
-  }
+  padding:20px;
+  /* scroll area */
+  height:calc(100vh - 120px);
+  overflow-y:scroll;
+  overflow-x:hidden;
+}
 
+.resources-page::-webkit-scrollbar{
+  width:10px;
+}
+
+.resources-page::-webkit-scrollbar-track{
+  background:#e5e7eb;
+  border-radius:999px;
+}
+
+.resources-page::-webkit-scrollbar-thumb{
+  background:#555;
+  border-radius:999px;
+}
+
+.resources-page::-webkit-scrollbar-thumb:hover{
+  background:#333;
+}
+    
   .resources-container{
     max-width:900px;
     margin:auto;
