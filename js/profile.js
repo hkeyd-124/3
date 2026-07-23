@@ -320,14 +320,15 @@ gap:10px;
 ">
 
     <div style="
-    font-family:"Segoe UI",sans-serif;
-    font-size:34px;
-    font-weight:700;
-    line-height:1.25;
-    letter-spacing:-0.02em;
-    ">
-        ${username}
-    </div>
+    font-family:'Segoe UI',Tahoma,Arial,sans-serif;
+    font-size:42px;
+    font-weight:800;
+    color:#111;
+    line-height:1.2;
+    letter-spacing:-0.03em;
+">
+    ${username}
+</div>
 
     <div
         onclick="changeName()"
