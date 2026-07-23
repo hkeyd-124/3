@@ -702,10 +702,12 @@ if(
 ){
   startETHRealtime();
 }
-if(
-  window.initAvatarPicker
-){
-  initAvatarPicker();
+if(window.initAvatarPicker){
+    initAvatarPicker();
+}
+
+if(window.initCoverPicker){
+    initCoverPicker();
 }
       console.log(
         "HOME READY"
@@ -1265,7 +1267,7 @@ gap:16px;
   
 <div class="coverPreset" data-cover="ocean"></div>
 <div class="coverPreset" data-cover="emerald"></div>
-<div class="coverPreset" data-cover="sunrise"></div>
+<div class="coverPreset" data-cover="sunset"></div>
 <div class="coverPreset" data-cover="sakura"></div>
 <div class="coverPreset" data-cover="lavender"></div>
 <div class="coverPreset" data-cover="chemistry"></div>
