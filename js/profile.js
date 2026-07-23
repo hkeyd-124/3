@@ -679,49 +679,75 @@ function(){
 
 
 
-window.changeName = async function(){
-    const current =
-        currentUser.name || "";
-    const newName =
-        prompt(
-            "Nhập tên mới",
-            current
+window.changeName = function(){
+    const modal =
+        document.getElementById(
+            "changeNameModal"
         );
-    if(newName === null)
-        return;
+    const input =
+        document.getElementById(
+            "changeNameInput"
+        );
+    input.value =
+        currentUser.name || "";
+    modal.style.display="flex";
+    setTimeout(()=>{
+        input.focus();
+        input.select();
+    },50);
+}
+
+
+window.closeChangeName = function(){
+    document
+    .getElementById(
+        "changeNameModal"
+    )
+    .style.display="none";
+}
+
+
+
+window.saveChangeName =
+async function(){
+    const input =
+        document.getElementById(
+            "changeNameInput"
+        );
     const name =
-        newName.trim();
-    if(name.length === 0){
-        showToast("Tên không được để trống");
+        input.value.trim();
+    if(name.length===0){
+        showToast(
+            "Tên không được để trống"
+        );
         return;
     }
-    if(name.length > 30){
-        showToast("Tên tối đa 30 ký tự");
+    if(name.length>30){
+        showToast(
+            "Tên tối đa 30 ký tự"
+        );
         return;
     }
-    if(name === current){
-        return;
-    }
-    try{
-        await setDoc(
+    try{await setDoc(
             doc(
                 db,
                 "users",
-                getUID()
-            ),
-            {
-                name
-            },
-            {
-                merge:true
-            }
+                getUID()),
+            {name},
+            {merge:true});
+        closeChangeName();
+        showToast(
+            "Đã đổi tên"
         );
-        showToast("Đã đổi tên");
     }catch(err){
         console.error(err);
-        showToast("Đổi tên thất bại");
+        showToast(
+            "Đổi tên thất bại"
+        );
     }
 }
+
+
 /* =========================
    AVATAR PICKER
 ========================= */
@@ -900,3 +926,23 @@ async function(){
       "index.html";
   }
 }
+
+
+document.addEventListener(
+"keydown",
+(e)=>{
+const modal =
+document.getElementById(
+"changeNameModal"
+);
+if(
+!modal ||
+modal.style.display!=="flex"
+)return;
+if(e.key==="Escape"){
+closeChangeName();
+}
+if(e.key==="Enter"){
+saveChangeName();
+}
+});
