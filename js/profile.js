@@ -656,6 +656,66 @@ function(){
 /* =========================
    AVATAR PICKER
 ========================= */
+async function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+
+    img.onload = () => {
+      let width = img.width;
+      let height = img.height;
+
+      const MAX_SIZE = 768;
+
+      if (width > height) {
+        if (width > MAX_SIZE) {
+          height = Math.round(height * MAX_SIZE / width);
+          width = MAX_SIZE;
+        }
+      } else {
+        if (height > MAX_SIZE) {
+          width = Math.round(width * MAX_SIZE / height);
+          height = MAX_SIZE;
+        }
+      }
+
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+
+      const ctx = canvas.getContext("2d");
+
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+
+      ctx.drawImage(img, 0, 0, width, height);
+
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) {
+            reject("Compress failed");
+            return;
+          }
+
+          const reader = new FileReader();
+
+          reader.onloadend = () => {
+            resolve(reader.result);
+          };
+
+          reader.readAsDataURL(blob);
+        },
+        "image/jpeg",
+        0.9
+      );
+    };
+
+    img.onerror = reject;
+
+    img.src = URL.createObjectURL(file);
+  });
+}
+
+
 
 window.initAvatarPicker =
 function(){
@@ -698,65 +758,32 @@ function(){
          READER
       ========================= */
 
-      const reader =
-        new FileReader();
+     try {
 
-      reader.onload =
-      async ()=>{
+    const base64 = await compressImage(file);
 
-        try{
+    const uid = getUID();
 
-          const base64 =
-            reader.result;
+    if (!uid) return;
 
-          const uid =
-            getUID();
-
-          if(!uid) return;
-
-          /* =========================
-             SAVE FIRESTORE
-          ========================= */
-
-          await setDoc(
-
-            doc(
-              db,
-              "users",
-              uid
-            ),
-
-            {
-
-              avatar:
-                base64
-
-            },
-
-            {
-
-              merge:true
-
-            }
-          );
-
-          showToast(
-            "Đã cập nhật avatar"
-          );
-
-        }catch(err){
-
-          console.error(err);
-
-          showToast(
-            "Upload thất bại"
-          );
+    await setDoc(
+        doc(db, "users", uid),
+        {
+            avatar: base64
+        },
+        {
+            merge: true
         }
-      };
+    );
 
-      reader.readAsDataURL(
-        file
-      );
+    showToast("Đã cập nhật avatar");
+
+} catch (err) {
+
+    console.error(err);
+
+    showToast("Upload thất bại");
+}
 
     }catch(err){
 
