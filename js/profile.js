@@ -225,6 +225,33 @@ const avatar =
     "Not linked";
 
   box.innerHTML = `
+  
+<div
+id="coverEditButton"
+style="
+position:absolute;
+top:18px;
+right:18px;
+width:44px;
+height:44px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+background:rgba(255,255,255,.72);
+backdrop-filter:blur(12px);
+box-shadow:0 4px 14px rgba(0,0,0,.08);
+cursor:pointer;
+opacity:0;
+transform:scale(.92);
+transition:.25s;
+z-index:999;
+"
+onclick="openCoverModal()"
+>
+🖼️
+</div>
+
 
 <div style="
 display:flex;
@@ -565,8 +592,38 @@ gap:10px;
 </div>
 
 `;
+  box.onmouseenter = ()=>{
+
+    const btn =
+    document.getElementById(
+        "coverEditButton"
+    );
+
+    if(!btn) return;
+
+    btn.style.opacity="1";
+    btn.style.transform="scale(1)";
+};
+
+box.onmouseleave = ()=>{
+
+    const btn =
+    document.getElementById(
+        "coverEditButton"
+    );
+
+    if(!btn) return;
+
+    btn.style.opacity="0";
+    btn.style.transform="scale(.92)";
+};
 }
 
+
+window.openCoverModal = function(){
+
+    alert("Coming soon");
+}
 /* =========================
    REALTIME USER
 ========================= */
