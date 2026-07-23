@@ -27,7 +27,20 @@ body{
   min-height:100vh;
   overflow:hidden;
 }
-
+  
+.coverPreset{
+height:90px;
+border-radius:18px;
+cursor:pointer;
+transition:.2s;
+border:3px solid transparent;
+}
+  
+.coverPreset:hover{
+transform:translateY(-3px);
+box-shadow:0 10px 20px rgba(0,0,0,.08);
+}
+  
 /* =========================
    SIDEBAR
 ========================= */
@@ -1177,6 +1190,143 @@ Save
 </div>
 
 
+<div id="coverModal"
+style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+justify-content:center;
+align-items:center;
+z-index:999999;
+">
+<div
+style="
+width:620px;
+background:white;
+border-radius:28px;
+padding:30px;
+box-shadow:0 30px 70px rgba(0,0,0,.18);
+position:relative;
+">
+<!-- CLOSE -->
+<div
+onclick="closeCoverModal()"
+style="
+position:absolute;
+right:20px;
+top:20px;
+font-size:24px;
+cursor:pointer;
+width:38px;
+height:38px;
+display:flex;
+align-items:center;
+justify-content:center;
+border-radius:50%;
+transition:.2s;
+">
+✕
+</div>
+<h2
+style="
+font-size:30px;
+margin-bottom:8px;
+">
+🎨 Change Cover
+</h2>
+<div
+style="
+color:#666;
+margin-bottom:28px;
+">
+Choose a preset or upload your own cover.
+</div>
+<!-- PRESET -->
+<div
+style="
+font-weight:bold;
+margin-bottom:14px;
+">
+Preset Covers
+</div>
+<div
+id="coverPresetGrid"
+style="
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:16px;
+">
+
+  
+<div class="coverPreset" data-cover="ocean"></div>
+<div class="coverPreset" data-cover="emerald"></div>
+<div class="coverPreset" data-cover="sunrise"></div>
+<div class="coverPreset" data-cover="sakura"></div>
+<div class="coverPreset" data-cover="lavender"></div>
+<div class="coverPreset" data-cover="chemistry"></div>
+
+  
+</div>
+<!-- UPLOAD -->
+<div
+style="
+margin-top:28px;
+font-weight:bold;
+margin-bottom:14px;
+">
+Custom Cover
+</div>
+<div
+id="uploadCoverCard"
+style="
+border:2px dashed #d6d6d6;
+border-radius:22px;
+padding:28px;
+text-align:center;
+cursor:pointer;
+transition:.25s;
+"
+onclick="uploadCover()"
+>
+<div style="font-size:42px;">
+📷
+</div>
+<div
+style="
+font-size:18px;
+font-weight:bold;
+margin-top:12px;
+">
+Upload Image
+</div>
+<div
+style="
+margin-top:6px;
+color:#777;
+font-size:14px;
+">
+PNG · JPG · JPEG · WEBP
+</div>
+</div>
+<!-- RESET -->
+<div
+onclick="resetCover()"
+style="
+margin-top:22px;
+padding:15px;
+border-radius:18px;
+background:#f7f7f7;
+text-align:center;
+cursor:pointer;
+font-weight:bold;
+transition:.2s;
+">
+↺ Reset to Default
+</div>
+</div>
+</div>
+  
   
 </body>
 </html>
