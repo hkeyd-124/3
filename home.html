@@ -1088,6 +1088,89 @@ if(
   src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js">
 </script>
 
+<div id="changeNameModal"
+style="
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.45);
+justify-content:center;
+align-items:center;
+z-index:999999;
+">
+
+<div style="
+width:430px;
+background:white;
+border-radius:28px;
+padding:30px;
+box-shadow:0 25px 60px rgba(0,0,0,.15);
+">
+
+<div style="
+font-size:28px;
+font-weight:800;
+margin-bottom:20px;
+">
+✏️ Change Name
+</div>
+
+<div style="
+color:#666;
+margin-bottom:12px;
+">
+Display name
+</div>
+
+<input
+id="changeNameInput"
+maxlength="30"
+style="
+width:100%;
+padding:15px;
+border-radius:16px;
+border:1px solid #ddd;
+font-size:17px;
+outline:none;
+margin-bottom:22px;
+">
+
+<div style="
+display:flex;
+justify-content:flex-end;
+gap:12px;
+">
+
+  
+<button
+onclick="closeChangeName()"
+style="
+padding:12px 22px;
+border-radius:14px;
+border:none;
+background:#eee;
+cursor:pointer;
+font-weight:bold;
+">
+Cancel
+</button>
+<button
+onclick="saveChangeName()"
+style="
+padding:12px 24px;
+border:none;
+border-radius:14px;
+background:#111;
+color:white;
+cursor:pointer;
+font-weight:bold;
+">
+Save
+</button>
+</div>
+</div>
+</div>
+
 
   
 </body>
