@@ -312,16 +312,38 @@ width:100%;
 
         </div>
 
-        <div style="
-        font-size:34px;
-        font-weight:800;
-        color:#111;
-        line-height:1.1;
-        ">
+       <div
+style="
+display:flex;
+align-items:center;
+gap:10px;
+">
 
-          ${username}
+    <div style="
+    font-size:34px;
+    font-weight:800;
+    color:#111;
+    line-height:1.1;
+    ">
+        ${username}
+    </div>
 
-        </div>
+    <div
+        onclick="changeName()"
+        title="Đổi tên"
+        style="
+        cursor:pointer;
+        font-size:20px;
+        user-select:none;
+        transition:.2s;
+        "
+        onmouseover="this.style.transform='scale(1.15)'"
+        onmouseout="this.style.transform='scale(1)'"
+    >
+        ✏️
+    </div>
+
+</div>
 
       </div>
 
@@ -637,7 +659,7 @@ if(
   }
 }
 /* =========================
-   CHANGE AVATAR
+   CHANGE AVATAR and NAME
 ========================= */
 
 window.changeAvatar =
@@ -653,6 +675,51 @@ function(){
   input.click();
 }
 
+
+
+window.changeName = async function(){
+    const current =
+        currentUser.name || "";
+    const newName =
+        prompt(
+            "Nhập tên mới",
+            current
+        );
+    if(newName === null)
+        return;
+    const name =
+        newName.trim();
+    if(name.length === 0){
+        showToast("Tên không được để trống");
+        return;
+    }
+    if(name.length > 30){
+        showToast("Tên tối đa 30 ký tự");
+        return;
+    }
+    if(name === current){
+        return;
+    }
+    try{
+        await setDoc(
+            doc(
+                db,
+                "users",
+                getUID()
+            ),
+            {
+                name
+            },
+            {
+                merge:true
+            }
+        );
+        showToast("Đã đổi tên");
+    }catch(err){
+        console.error(err);
+        showToast("Đổi tên thất bại");
+    }
+}
 /* =========================
    AVATAR PICKER
 ========================= */
