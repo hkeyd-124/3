@@ -712,7 +712,16 @@ window.uploadCover = function(){
 
 
 window.resetCover=function(){
-alert("Reset Coming Soon");
+await setDoc(doc(db, "users", getUID()), {
+    coverType: null,
+    cover: null,
+    coverImage: null
+}, {
+    merge: true
+});
+
+closeCoverModal();
+showToast("Cover reset");
 }
 /* =========================
    REALTIME USER
