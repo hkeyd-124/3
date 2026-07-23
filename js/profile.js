@@ -320,10 +320,12 @@ gap:10px;
 ">
 
     <div style="
+    font-family:"Segoe UI", "Inter", Roboto, Arial, sans-serif;
     font-size:34px;
-    font-weight:800;
+    font-weight:700;
     color:#111;
-    line-height:1.1;
+    line-height:1.25;
+    letter-spacing:-0.02em;
     ">
         ${username}
     </div>
