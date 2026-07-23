@@ -620,9 +620,51 @@ box.onmouseleave = ()=>{
 }
 
 
-window.openCoverModal = function(){
 
-    alert("Coming soon");
+
+window.openCoverModal=function(){
+  
+document.getElementById(
+"coverModal"
+).style.display="flex";
+
+const presets=
+document.querySelectorAll(
+".coverPreset"
+);
+
+presets[0].style.background=
+COVER_GRADIENTS.ocean;
+
+presets[1].style.background=
+COVER_GRADIENTS.emerald;
+
+presets[2].style.background=
+COVER_GRADIENTS.sunrise;
+
+presets[3].style.background=
+COVER_GRADIENTS.sakura;
+
+presets[4].style.background=
+COVER_GRADIENTS.lavender;
+
+presets[5].style.background=
+COVER_GRADIENTS.chemistry;
+}
+
+
+window.closeCoverModal=function(){
+document.getElementById(
+"coverModal"
+).style.display="none";
+}
+
+
+window.uploadCover=function(){
+alert("Upload Coming Soon");
+}
+window.resetCover=function(){
+alert("Reset Coming Soon");
 }
 /* =========================
    REALTIME USER
