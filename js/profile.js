@@ -10,7 +10,13 @@ from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 
-const DEFAULT_COVER =`linear-gradient(135deg,#f5fbff 0%,#dbeafe 100%)`;
+const DEFAULT_COVER = `
+linear-gradient(
+135deg,
+#eefcfb 0%,
+#d7f5f1 100%
+)
+`;
 
 /* =========================
    FIREBASE
@@ -169,7 +175,7 @@ function(){
 
   const box =
     document.getElementById("profileCard");
-box.style.background = DEFAULT_COVER;
+box.style.background = `linear-gradient(rgba(255,255,255,.70),rgba(255,255,255,.80)),${DEFAULT_COVER}`;
 box.style.backgroundSize = "cover";
 box.style.backgroundPosition = "center";
 box.style.backgroundRepeat = "no-repeat";
