@@ -182,21 +182,43 @@ function(){
 
   const box =
     document.getElementById("profileCard");
-let cover = DEFAULT_COVER;
 if(
-    currentUser.coverType==="gradient"
+    currentUser.coverType==="image"
     &&
-    COVER_GRADIENTS[currentUser.cover]
+    currentUser.coverImage
 ){
-    cover = COVER_GRADIENTS[currentUser.cover];
+
+    box.style.background = `
+linear-gradient(
+rgba(255,255,255,.70),
+rgba(255,255,255,.80)
+),
+url(${currentUser.coverImage})
+`;
+
 }
-box.style.background = `
+else{
+
+    let cover = DEFAULT_COVER;
+
+    if(
+        currentUser.coverType==="gradient"
+        &&
+        COVER_GRADIENTS[currentUser.cover]
+    ){
+        cover =
+        COVER_GRADIENTS[currentUser.cover];
+    }
+
+    box.style.background = `
 linear-gradient(
 rgba(255,255,255,.70),
 rgba(255,255,255,.80)
 ),
 ${cover}
 `;
+}
+
 box.style.backgroundSize="cover";
 box.style.backgroundPosition="center";
 box.style.backgroundRepeat="no-repeat";
@@ -659,7 +681,8 @@ window.selectGradient = async function(name){
             doc(db,"users",getUID()),
             {
                 coverType:"gradient",
-                cover:name
+                cover:name,
+                coverImage: null
             },
             {
                 merge:true
@@ -681,9 +704,13 @@ document.getElementById(
 }
 
 
-window.uploadCover=function(){
-alert("Upload Coming Soon");
+window.uploadCover = function(){
+    document
+        .getElementById("coverInput")
+        .click();
 }
+
+
 window.resetCover=function(){
 alert("Reset Coming Soon");
 }
@@ -1018,10 +1045,82 @@ function(){
     }
   };
 }
-/* =========================
-   LOGOUT
-========================= */
 
+
+
+window.initCoverPicker = function(){
+
+  const input =
+document.getElementById("coverInput");
+
+  if(!input) return;
+
+  input.onchange =
+  async (e)=>{
+
+    try{
+
+      const file =
+        e.target.files[0];
+
+      if(!file) return;
+
+      /* =========================
+         ONLY IMAGE
+      ========================= */
+
+      if(
+        !file.type.startsWith(
+          "image/"
+        )
+      ){
+
+        showToast(
+          "File phải là ảnh"
+        );
+
+        return;
+      }
+
+      /* =========================
+         READER
+      ========================= */
+
+     try {
+
+    const base64 = await compressImage(file);
+
+    const uid = getUID();
+
+    if (!uid) return;
+
+    await setDoc(
+        doc(db, "users", uid),
+        {
+            coverType: "image",
+            coverImage: base64,
+            cover: null
+        },
+        {
+            merge: true
+        }
+    );
+
+    showToast("Đã cập nhật Cover");
+closeCoverModal();
+} catch (err) {
+
+    console.error(err);
+
+    showToast("Upload thất bại");
+}
+
+    }catch(err){
+
+      console.error(err);
+    }
+  };
+}
 /* =========================
    LOGOUT
 ========================= */
