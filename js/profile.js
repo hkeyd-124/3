@@ -157,35 +157,15 @@ return currentUser;
   }
 }
 
-
-// =========================
-// Cover Gradients
-// =========================
-const COVER_GRADIENTS = {
-    default:
-        "linear-gradient(135deg,#eef7ff 0%,#dbeafe 100%)",
-    ocean:
-        "linear-gradient(135deg,#b8ecff 0%,#d6f6ff 100%)",
-    emerald:
-        "linear-gradient(135deg,#d8ffe8 0%,#bff4d6 100%)",
-    sunrise:
-        "linear-gradient(135deg,#ffe6c9 0%,#fff6d6 100%)",
-    sakura:
-        "linear-gradient(135deg,#ffe2ef 0%,#fbe8ff 100%)",
-    lavender:
-        "linear-gradient(135deg,#efe4ff 0%,#ddd6fe 100%)",
-    chemistry:
-        "linear-gradient(135deg,#dff4ff 0%,#b8e4ff 100%)"
-};
-
-
 /* =========================
    RENDER PROFILE
 ========================= */
+
 window.renderProfileCard =
 function(){
 
-  const box = document.getElementById(
+  const box =
+    document.getElementById(
       "profileCard"
     );
 
@@ -194,49 +174,42 @@ function(){
     !currentUser
   ) return;
 
-  
-  const username = currentUser.name
+  const username =
+
+    currentUser.name
+
     ||
+
     "Unnamed";
+const avatar =
 
-  
-const avatar = currentUser.avatar
+  currentUser.avatar
+
   ||
-  "assets/images/default-avatar.png";
 
-  
-const cover = currentUser.cover 
-  || {
-    type: "gradient",
-    value: "default"
-};
-let coverBackground = COVER_GRADIENTS.default;
-if (
-    cover.type === "gradient" &&
-    COVER_GRADIENTS[cover.value]
-) {coverBackground =
-        COVER_GRADIENTS[cover.value];
-}
-const cardBackground = `
-linear-gradient(
-rgba(255,255,255,.72),
-rgba(255,255,255,.82)
-),
-${coverBackground}
-`;
-  
-  const points = currentUser.points
+  "assets/images/default-avatar.png";
+  const points =
+
+    currentUser.points
+
     ||
+
     0;
 
-  
-  const email = currentUser.email
+  const email =
+
+    currentUser.email
+
     ||
+
     "Not linked";
 
-  
-  const wallet = currentUser.wallet
+  const wallet =
+
+    currentUser.wallet
+
     ||
+
     "Not linked";
 
   box.innerHTML = `
@@ -305,10 +278,7 @@ width:100%;
           height:28px;
 
           border-radius:50%;
-          background:${cardBackground};
-          background-size:cover;
-          background-position:center;
-          background-repeat:no-repeat;
+          background:white;
 
           display:flex;
           align-items:center;
