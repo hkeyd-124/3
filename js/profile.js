@@ -711,18 +711,26 @@ window.uploadCover = function(){
 }
 
 
-window.resetCover=function(){
-await setDoc(doc(db, "users", getUID()), {
-    coverType: null,
-    cover: null,
-    coverImage: null
-}, {
-    merge: true
-});
-
-closeCoverModal();
-showToast("Cover reset");
-}
+window.resetCover = async function () {
+    try {
+        await setDoc(
+            doc(db, "users", getUID()),
+            {
+                coverType: null,
+                cover: null,
+                coverImage: null
+            },
+            {
+                merge: true
+            }
+        );
+        closeCoverModal();
+        showToast("Cover reset");
+    } catch (err) {
+        console.error(err);
+        showToast("Reset failed");
+    }
+};
 /* =========================
    REALTIME USER
 ========================= */
