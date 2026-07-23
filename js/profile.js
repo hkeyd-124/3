@@ -17,7 +17,14 @@ linear-gradient(
 #d7f5f1 100%
 )
 `;
-
+const COVER_GRADIENTS = {
+  ocean: "linear-gradient(135deg,#6dd5ed,#2193b0)",
+  emerald: "linear-gradient(135deg,#11998e,#38ef7d)",
+  sunset: "linear-gradient(135deg,#ff9966,#ff5e62)",
+  sakura: "linear-gradient(135deg,#fbc2eb,#a6c1ee)",
+  lavender: "linear-gradient(135deg,#c471f5,#fa71cd)",
+  chemistry: "linear-gradient(135deg,#00c6ff,#0072ff)"
+};
 /* =========================
    FIREBASE
 ========================= */
@@ -175,10 +182,24 @@ function(){
 
   const box =
     document.getElementById("profileCard");
-box.style.background = `linear-gradient(rgba(255,255,255,.70),rgba(255,255,255,.80)),${DEFAULT_COVER}`;
-box.style.backgroundSize = "cover";
-box.style.backgroundPosition = "center";
-box.style.backgroundRepeat = "no-repeat";
+let cover = DEFAULT_COVER;
+if(
+    currentUser.coverType==="gradient"
+    &&
+    COVER_GRADIENTS[currentUser.cover]
+){
+    cover = COVER_GRADIENTS[currentUser.cover];
+}
+box.style.background = `
+linear-gradient(
+rgba(255,255,255,.70),
+rgba(255,255,255,.80)
+),
+${cover}
+`;
+box.style.backgroundSize="cover";
+box.style.backgroundPosition="center";
+box.style.backgroundRepeat="no-repeat";
 
   
   if(
@@ -620,36 +641,36 @@ box.onmouseleave = ()=>{
 }
 
 
+window.openCoverModal = function () {
+    document.getElementById("coverModal").style.display = "flex";
+    const presets = document.querySelectorAll(".coverPreset");
+    const names = Object.keys(COVER_GRADIENTS);
+    presets.forEach((card, index) => {
+        const name = names[index];
+        card.style.background = COVER_GRADIENTS[name];
+        card.onclick = () => selectGradient(name);
+    });
+}
 
 
-window.openCoverModal=function(){
-  
-document.getElementById(
-"coverModal"
-).style.display="flex";
-
-const presets=
-document.querySelectorAll(
-".coverPreset"
-);
-
-presets[0].style.background=
-COVER_GRADIENTS.ocean;
-
-presets[1].style.background=
-COVER_GRADIENTS.emerald;
-
-presets[2].style.background=
-COVER_GRADIENTS.sunrise;
-
-presets[3].style.background=
-COVER_GRADIENTS.sakura;
-
-presets[4].style.background=
-COVER_GRADIENTS.lavender;
-
-presets[5].style.background=
-COVER_GRADIENTS.chemistry;
+window.selectGradient = async function(name){
+    try{
+        await setDoc(
+            doc(db,"users",getUID()),
+            {
+                coverType:"gradient",
+                cover:name
+            },
+            {
+                merge:true
+            }
+        );
+        closeCoverModal();
+        showToast("Cover updated");
+    }catch(err){
+        console.error(err);
+        showToast("Update failed");
+    }
 }
 
 
