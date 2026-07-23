@@ -9,6 +9,9 @@ from
 
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+
+const DEFAULT_COVER =`linear-gradient(135deg,#f5fbff 0%,#dbeafe 100%)`;
+
 /* =========================
    FIREBASE
 ========================= */
@@ -165,10 +168,13 @@ window.renderProfileCard =
 function(){
 
   const box =
-    document.getElementById(
-      "profileCard"
-    );
+    document.getElementById("profileCard");
+box.style.background = DEFAULT_COVER;
+box.style.backgroundSize = "cover";
+box.style.backgroundPosition = "center";
+box.style.backgroundRepeat = "no-repeat";
 
+  
   if(
     !box ||
     !currentUser
