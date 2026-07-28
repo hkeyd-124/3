@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HackChem Admin</title>
+</head>
 
+
+<script type="module">
+
+import {
+    getCurrentUID,
+    getCurrentUser
+} from "./js/core/auth.js";
+
+console.log("UID:", getCurrentUID());
+
+console.log(
+    "USER:",
+    await getCurrentUser()
+);
+
+</script>
+
+
+  
+<body>
+
+    <h1>HackChem Admin</h1>
+
+</body>
+</html>
