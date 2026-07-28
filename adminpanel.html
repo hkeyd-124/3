@@ -8,7 +8,29 @@
 
 
 <script type="module">
+import {
+    getCurrentUser
+} from "./js/core/auth.js";
 
+import {
+    isAdmin,
+    isUser
+} from "./js/core/permissions.js";
+
+const user = await getCurrentUser();
+
+console.log(user);
+
+console.log(
+    "isAdmin:",
+    isAdmin(user)
+);
+
+console.log(
+    "isUser:",
+    isUser(user)
+);
+    
 import {
     getCurrentUID,
     getCurrentUser
