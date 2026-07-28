@@ -1,54 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
     <title>HackChem Admin</title>
 </head>
 
-
-<script type="module">
-import {
-    getCurrentUser
-} from "./js/core/auth.js";
-
-import {
-    isAdmin,
-    isUser
-} from "./js/core/permissions.js";
-
-const user = await getCurrentUser();
-
-console.log(user);
-
-console.log(
-    "isAdmin:",
-    isAdmin(user)
-);
-
-console.log(
-    "isUser:",
-    isUser(user)
-);
-    
-import {
-    getCurrentUID,
-} from "./js/core/auth.js";
-
-console.log("UID:", getCurrentUID());
-
-console.log(
-    "USER:",
-    await getCurrentUser()
-);
-
-</script>
-
-
-  
 <body>
 
-    <h1>HackChem Admin</h1>
+    <h1>🧪 HackChem Admin</h1>
+
+    <hr>
+
+    <div id="status">
+        Checking permission...
+    </div>
+
+    <script type="module">
+
+        import {
+            ensureAdmin
+        } from "./js/core/adminGuard.js";
+
+        try {
+
+            const admin = await ensureAdmin();
+
+            document.getElementById("status").innerHTML = `
+                <h2>✅ Access Granted</h2>
+
+                <p><b>Name:</b> ${admin.name ?? "-"}</p>
+
+                <p><b>UID:</b> ${admin.uid ?? "-"}</p>
+
+                <p><b>Email:</b> ${admin.email ?? "-"}</p>
+
+                <p><b>Role:</b> ${admin.system?.role ?? "-"}</p>
+
+                <p><b>Status:</b> ${admin.system?.status ?? "-"}</p>
+            `;
+
+            console.log("Admin:", admin);
+
+        } catch (err) {
+
+            console.error(err);
+
+            document.getElementById("status").innerHTML = `
+                <h2>❌ Admin Guard Error</h2>
+                <pre>${err}</pre>
+            `;
+
+        }
+
+    </script>
 
 </body>
+
 </html>
