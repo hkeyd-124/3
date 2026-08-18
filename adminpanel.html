@@ -3,21 +3,326 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>HackChem Admin</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f6f8;
+            color: #1f2937;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           LAYOUT
+        ========================= */
+
+        .admin-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 240px;
+            background: #111827;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo {
+            height: 70px;
+            display: flex;
+            align-items: center;
+            padding: 0 22px;
+            font-size: 20px;
+            font-weight: 700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .sidebar-logo span {
+            margin-right: 8px;
+        }
+
+        .sidebar-menu {
+            padding: 18px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .menu-item {
+            width: 100%;
+            border: none;
+            background: transparent;
+            color: #cbd5e1;
+            padding: 12px 14px;
+            border-radius: 8px;
+            text-align: left;
+            font-size: 14px;
+            cursor: pointer;
+            transition: 0.15s ease;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+        }
+
+        .menu-icon {
+            display: inline-block;
+            width: 25px;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main-area {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            height: 70px;
+            background: white;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 28px;
+        }
+
+        .header-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .admin-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* =========================
+           CONTENT
+        ========================= */
+
+        .content {
+            flex: 1;
+            padding: 28px;
+        }
+
+        .content-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 28px;
+            min-height: 300px;
+        }
+
+        .content-card h2 {
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .content-card p {
+            color: #6b7280;
+            line-height: 1.6;
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                width: 70px;
+            }
+
+            .sidebar-logo {
+                justify-content: center;
+                padding: 0;
+            }
+
+            .sidebar-logo-text {
+                display: none;
+            }
+
+            .sidebar-menu {
+                padding: 12px 8px;
+            }
+
+            .menu-item {
+                text-align: center;
+                padding: 12px 6px;
+            }
+
+            .menu-text {
+                display: none;
+            }
+
+            .menu-icon {
+                width: auto;
+                font-size: 18px;
+            }
+
+            .header {
+                padding: 0 16px;
+            }
+
+            .content {
+                padding: 16px;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-    <h1>🧪 HackChem Admin</h1>
+    <div class="admin-layout">
 
-    <hr>
+        <!-- =========================
+             SIDEBAR
+        ========================== -->
 
-    <div id="status">
-        Checking permission...
+        <aside class="sidebar">
+
+            <div class="sidebar-logo">
+                <span>🧪</span>
+                <span class="sidebar-logo-text">HackChem Admin</span>
+            </div>
+
+            <nav class="sidebar-menu">
+
+                <button class="menu-item active">
+                    <span class="menu-icon">📊</span>
+                    <span class="menu-text">Dashboard</span>
+                </button>
+
+                <button class="menu-item">
+                    <span class="menu-icon">🔔</span>
+                    <span class="menu-text">Notifications</span>
+                </button>
+
+                <button class="menu-item">
+                    <span class="menu-icon">👥</span>
+                    <span class="menu-text">Users</span>
+                </button>
+
+                <button class="menu-item">
+                    <span class="menu-icon">🛠</span>
+                    <span class="menu-text">System</span>
+                </button>
+
+                <button class="menu-item">
+                    <span class="menu-icon">📈</span>
+                    <span class="menu-text">Analytics</span>
+                </button>
+
+                <button class="menu-item">
+                    <span class="menu-icon">📜</span>
+                    <span class="menu-text">Logs</span>
+                </button>
+
+            </nav>
+
+        </aside>
+
+
+        <!-- =========================
+             MAIN AREA
+        ========================== -->
+
+        <main class="main-area">
+
+            <!-- HEADER -->
+
+            <header class="header">
+
+                <div class="header-title">
+                    Dashboard
+                </div>
+
+                <div class="admin-info">
+
+                    <span id="adminName">
+                        Admin
+                    </span>
+
+                    <div class="admin-avatar">
+                        👤
+                    </div>
+
+                </div>
+
+            </header>
+
+
+            <!-- CONTENT -->
+
+            <section class="content">
+
+                <div class="content-card">
+
+                    <h2>Admin Dashboard</h2>
+
+                    <p>
+                        HackChem administration panel.
+                    </p>
+
+                    <p style="margin-top: 10px;">
+                        Admin modules will be added in future phases.
+                    </p>
+
+                </div>
+
+            </section>
+
+        </main>
+
     </div>
+
+
+    <!-- =========================
+         ADMIN AUTH
+    ========================== -->
 
     <script type="module">
 
@@ -25,34 +330,33 @@
             ensureAdmin
         } from "./js/core/adminGuard.js";
 
+
         try {
 
             const admin = await ensureAdmin();
 
-            document.getElementById("status").innerHTML = `
-                <h2>✅ Access Granted</h2>
+            /*
+             * Phase 0.5:
+             * Chỉ sử dụng dữ liệu admin để hiển thị shell.
+             * Chưa có chức năng quản trị.
+             */
 
-                <p><b>Name:</b> ${admin.name ?? "-"}</p>
+            const adminName =
+                document.getElementById("adminName");
 
-                <p><b>UID:</b> ${admin.uid ?? "-"}</p>
+            if (adminName) {
+                adminName.textContent =
+                    admin.name || "Admin";
+            }
 
-                <p><b>Email:</b> ${admin.email ?? "-"}</p>
+            console.log("Admin Shell loaded:", admin);
 
-                <p><b>Role:</b> ${admin.system?.role ?? "-"}</p>
+        } catch (error) {
 
-                <p><b>Status:</b> ${admin.system?.status ?? "-"}</p>
-            `;
-
-            console.log("Admin:", admin);
-
-        } catch (err) {
-
-            console.error(err);
-
-            document.getElementById("status").innerHTML = `
-                <h2>❌ Admin Guard Error</h2>
-                <pre>${err}</pre>
-            `;
+            console.error(
+                "Admin Panel Error:",
+                error
+            );
 
         }
 
