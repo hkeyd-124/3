@@ -577,6 +577,10 @@
             initAdminRouter
         } from "./js/admin/adminRouter.js";
 
+        
+import {
+    connectRealtime
+} from "./js/realtime/hcRealtime.js";
 
         try {
 
@@ -617,11 +621,20 @@
 
             initAdminRouter();
 
+/* =========================
+   PHASE 0B - REALTIME TEST
+========================= */
 
-            console.log(
-                "HackChem Admin initialized.",
-                admin
-            );
+await connectRealtime();
+
+console.log(
+    "HackChem Realtime connected."
+);
+
+console.log(
+    "HackChem Admin initialized.",
+    admin
+);
 
 
         } catch (error) {
