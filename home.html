@@ -465,6 +465,22 @@ window.setDoc = setDoc;
 
 window.serverTimestamp =
   serverTimestamp;
+
+
+/* =========================
+   NOTIFICATION REALTIME
+========================= */
+subscribeEvent(
+  EVENTS.NOTIFICATION_CREATED,
+  payload => {
+    console.log(
+      "📢 HOME RECEIVED NOTIFICATION EVENT:",
+      payload
+    );
+  }
+);
+
+  
 </script>
 
 <!-- =========================
@@ -717,21 +733,6 @@ if(window.initCoverPicker){
     initCoverPicker();
 }
 
-
-      
-
-subscribeEvent(
-  EVENTS.NOTIFICATION_CREATED,
-  payload => {
-    console.log(
-      "📢 HOME RECEIVED NOTIFICATION EVENT:",
-      payload
-    );
-  }
-);
-
-
-      
       console.log(
         "HOME READY"
       );
