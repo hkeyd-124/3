@@ -583,7 +583,6 @@ import {
 } from "./js/realtime/hcRealtime.js";
 
        import {
-    subscribeEvent,
     publishEvent,
     EVENTS
 } from "./js/realtime/hcEvents.js";
@@ -639,19 +638,6 @@ await connectRealtime();
 console.log(
     "HackChem Realtime connected."
 );
-
-subscribeEvent(
-    EVENTS.NOTIFICATION_CREATED,
-    payload => {
-
-        console.log(
-            "📢 USER RECEIVED NOTIFICATION EVENT:",
-            payload
-        );
-
-    }
-);
-
 console.log(
     "HackChem Admin initialized.",
     admin
