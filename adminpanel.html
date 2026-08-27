@@ -582,6 +582,11 @@ import {
     connectRealtime
 } from "./js/realtime/hcRealtime.js";
 
+        import {
+    publishEvent,
+    EVENTS
+} from "./js/realtime/hcEvents.js";
+
         try {
 
             /*
@@ -620,7 +625,17 @@ import {
              */
 
             initAdminRouter();
+subscribeEvent(
+    EVENTS.NOTIFICATION_CREATED,
+    payload => {
 
+        console.log(
+            "📢 USER RECEIVED NOTIFICATION EVENT:",
+            payload
+        );
+
+    }
+);
 /* =========================
    PHASE 0B - REALTIME TEST
 ========================= */
