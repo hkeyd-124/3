@@ -578,14 +578,7 @@
         } from "./js/admin/adminRouter.js";
 
         
-import {
-    connectRealtime
-} from "./js/realtime/hcRealtime.js";
 
-       import {
-    publishEvent,
-    EVENTS
-} from "./js/realtime/hcEvents.js";
 
 window.testPublishEvent = publishEvent;
 window.TEST_EVENTS = EVENTS;
@@ -629,15 +622,6 @@ window.TEST_EVENTS = EVENTS;
 
             initAdminRouter();
 
-/* =========================
-   PHASE 0B - REALTIME TEST
-========================= */
-
-await connectRealtime();
-
-console.log(
-    "HackChem Realtime connected."
-);
 console.log(
     "HackChem Admin initialized.",
     admin
