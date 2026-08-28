@@ -11,11 +11,11 @@ import {
     orderBy,
     limit,
     Timestamp
-} from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 import {
     db
-} from "../firebase/firestore.js";
+} from "../../firebase.js";
 
 
 /* =========================
@@ -52,7 +52,8 @@ export async function createNotification({
 
     const notification = {
 
-        title: title.trim(),
+        title:
+            title.trim(),
 
         preview:
             preview?.trim() ||
