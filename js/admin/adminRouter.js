@@ -1,3 +1,6 @@
+import {
+    createNotification
+} from "./js/notifications/notificationService.js";
 /* =========================
    ADMIN ROUTER
 ========================= */
@@ -12,13 +15,81 @@ const routes = {
     },
 
     notifications: {
-        title: "Notifications",
-        content: `
-            <h2>Notifications</h2>
-            <p>Notification management will be added in a future phase.</p>
-        `
-    },
+    title: "Notifications",
+    content: `
 
+        <h2>Create Notification</h2>
+
+        <p>
+            Send a notification to HackChem users.
+        </p>
+
+        <input
+            id="notificationTitleInput"
+            type="text"
+            placeholder="Notification title"
+            style="
+                width:100%;
+                padding:14px;
+                border-radius:14px;
+                border:1px solid #ddd;
+                margin-bottom:16px;
+                box-sizing:border-box;
+            "
+        >
+
+        <input
+            id="notificationPreviewInput"
+            type="text"
+            placeholder="Preview (optional)"
+            style="
+                width:100%;
+                padding:14px;
+                border-radius:14px;
+                border:1px solid #ddd;
+                margin-bottom:16px;
+                box-sizing:border-box;
+            "
+        >
+
+        <textarea
+            id="notificationContentInput"
+            placeholder="Notification content"
+            style="
+                width:100%;
+                min-height:140px;
+                padding:14px;
+                border-radius:14px;
+                border:1px solid #ddd;
+                margin-bottom:16px;
+                box-sizing:border-box;
+                resize:vertical;
+            "
+        ></textarea>
+
+        <button
+            id="sendNotificationButton"
+            type="button"
+            style="
+                padding:14px 20px;
+                border:none;
+                border-radius:12px;
+                cursor:pointer;
+            "
+        >
+            Send Notification
+        </button>
+
+        <div
+            id="notificationStatus"
+            style="
+                margin-top:14px;
+                min-height:20px;
+            "
+        ></div>
+
+    `
+},
     users: {
         title: "Users",
         content: `
@@ -147,7 +218,11 @@ function loadRoute(route, push = true) {
             ${data.content}
         </div>
     `;
+if (route === "notifications") {
 
+    bindNotificationPage();
+
+}
 
     /* =========================
        URL
@@ -205,7 +280,120 @@ function bindMenuEvents() {
         });
 }
 
+/* =========================
+   NOTIFICATION PAGE
+========================= */
 
+function bindNotificationPage() {
+
+    const button =
+        document.getElementById(
+            "sendNotificationButton"
+        );
+
+    if (!button) {
+        return;
+    }
+
+    button.addEventListener(
+        "click",
+        async () => {
+
+            const titleInput =
+                document.getElementById(
+                    "notificationTitleInput"
+                );
+
+            const previewInput =
+                document.getElementById(
+                    "notificationPreviewInput"
+                );
+
+            const contentInput =
+                document.getElementById(
+                    "notificationContentInput"
+                );
+
+            const status =
+                document.getElementById(
+                    "notificationStatus"
+                );
+
+            const title =
+                titleInput?.value.trim();
+
+            const preview =
+                previewInput?.value.trim();
+
+            const content =
+                contentInput?.value.trim();
+
+            if (!title || !content) {
+
+                if (status) {
+                    status.textContent =
+                        "Title and content are required.";
+                }
+
+                return;
+            }
+
+            button.disabled = true;
+
+            if (status) {
+                status.textContent =
+                    "Sending...";
+            }
+
+            try {
+
+                const notification =
+                    await createNotification({
+
+                        title,
+
+                        preview,
+
+                        content
+
+                    });
+
+                console.log(
+                    "HackChem Notification Created:",
+                    notification
+                );
+
+                if (status) {
+                    status.textContent =
+                        "Notification sent successfully.";
+                }
+
+                titleInput.value = "";
+                previewInput.value = "";
+                contentInput.value = "";
+
+            } catch (error) {
+
+                console.error(
+                    "Notification creation failed:",
+                    error
+                );
+
+                if (status) {
+                    status.textContent =
+                        "Failed to send notification.";
+                }
+
+            } finally {
+
+                button.disabled = false;
+
+            }
+
+        }
+    );
+
+}
 /* =========================
    BACK / FORWARD
 ========================= */
