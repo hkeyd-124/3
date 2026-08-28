@@ -7,6 +7,8 @@ import {
     collection,
     addDoc,
     getDocs,
+    getDoc,
+    doc,
     query,
     orderBy,
     limit,
@@ -16,6 +18,11 @@ import {
 import {
     db
 } from "../../firebase.js";
+
+import {
+    publishEvent,
+    EVENTS
+} from "../realtime/hcEvents.js";
 
 
 /* =========================
@@ -68,6 +75,10 @@ export async function createNotification({
     };
 
 
+    /* =========================
+       FIRESTORE WRITE
+    ========================= */
+
     const docRef =
         await addDoc(
             notificationsRef,
@@ -75,10 +86,32 @@ export async function createNotification({
         );
 
 
+    const notificationId =
+        docRef.id;
+
+
+    /* =========================
+       REALTIME EVENT
+    ========================= */
+
+    await publishEvent(
+
+        EVENTS.NOTIFICATION_CREATED,
+
+        {
+            notificationId
+        }
+
+    );
+
+
+    /* =========================
+       RETURN
+    ========================= */
+
     return {
 
-        notificationId:
-            docRef.id,
+        notificationId,
 
         ...notification
 
@@ -128,5 +161,59 @@ export async function getLatestNotifications(
 
         })
     );
+
+}
+
+
+/* =========================
+   GET NOTIFICATION BY ID
+========================= */
+
+export async function getNotificationById(
+    notificationId
+) {
+
+    if (!notificationId) {
+
+        throw new Error(
+            "notificationId is required."
+        );
+
+    }
+
+
+    const notificationRef =
+        doc(
+
+            db,
+
+            "notifications",
+
+            notificationId
+
+        );
+
+
+    const snapshot =
+        await getDoc(
+            notificationRef
+        );
+
+
+    if (!snapshot.exists()) {
+
+        return null;
+
+    }
+
+
+    return {
+
+        notificationId:
+            snapshot.id,
+
+        ...snapshot.data()
+
+    };
 
 }
