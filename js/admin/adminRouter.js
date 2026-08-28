@@ -17,77 +17,88 @@ const routes = {
     notifications: {
     title: "Notifications",
     content: `
-
         <h2>Create Notification</h2>
 
         <p>
             Send a notification to HackChem users.
         </p>
 
-        <input
-            id="notificationTitleInput"
-            type="text"
-            placeholder="Notification title"
-            style="
-                width:100%;
-                padding:14px;
-                border-radius:14px;
-                border:1px solid #ddd;
-                margin-bottom:16px;
-                box-sizing:border-box;
-            "
-        >
-
-        <input
-            id="notificationPreviewInput"
-            type="text"
-            placeholder="Preview (optional)"
-            style="
-                width:100%;
-                padding:14px;
-                border-radius:14px;
-                border:1px solid #ddd;
-                margin-bottom:16px;
-                box-sizing:border-box;
-            "
-        >
-
-        <textarea
-            id="notificationContentInput"
-            placeholder="Notification content"
-            style="
-                width:100%;
-                min-height:140px;
-                padding:14px;
-                border-radius:14px;
-                border:1px solid #ddd;
-                margin-bottom:16px;
-                box-sizing:border-box;
-                resize:vertical;
-            "
-        ></textarea>
-
-        <button
-            id="sendNotificationButton"
-            type="button"
-            style="
-                padding:14px 20px;
-                border:none;
-                border-radius:12px;
-                cursor:pointer;
-            "
-        >
-            Send Notification
-        </button>
-
         <div
-            id="notificationStatus"
             style="
-                margin-top:14px;
-                min-height:20px;
+                margin-top: 24px;
+                display: flex;
+                flex-direction: column;
+                gap: 14px;
+                max-width: 700px;
             "
-        ></div>
+        >
 
+            <input
+                id="notificationTitle"
+                type="text"
+                placeholder="Notification title"
+                style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 8px;
+                    font-size: 14px;
+                "
+            >
+
+            <input
+                id="notificationPreview"
+                type="text"
+                placeholder="Preview (optional)"
+                style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 8px;
+                    font-size: 14px;
+                "
+            >
+
+            <textarea
+                id="notificationContent"
+                rows="6"
+                placeholder="Notification content"
+                style="
+                    width: 100%;
+                    padding: 12px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    resize: vertical;
+                "
+            ></textarea>
+
+            <button
+                id="sendNotificationBtn"
+                type="button"
+                style="
+                    width: fit-content;
+                    padding: 12px 18px;
+                    border: none;
+                    border-radius: 8px;
+                    background: #111827;
+                    color: white;
+                    font-size: 14px;
+                    cursor: pointer;
+                "
+            >
+                Send Notification
+            </button>
+
+            <div
+                id="notificationStatus"
+                style="
+                    min-height: 20px;
+                    font-size: 14px;
+                "
+            ></div>
+
+        </div>
     `
 },
     users: {
