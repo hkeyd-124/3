@@ -425,21 +425,28 @@ if( !localStorage.getItem("uid")){
 
 import {
   db
-}
-from "./firebase.js";
+} from "./firebase.js";
+
 
 import {
+  subscribeEvent,
+  EVENTS
+} from "./js/realtime/hcEvents.js";
 
+  
+import {
+  getNotificationById
+} from "./js/notifications/notificationService.js";
+
+  
+import {
   collection,
   getDocs,
   doc,
   getDoc,
   setDoc,
   serverTimestamp
-
-}
-
-from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 /* =========================
    GLOBAL EXPORT
@@ -694,9 +701,44 @@ window.addEventListener(
       if(
         window.startUserRealtime
       ){
-
         startUserRealtime();
       }
+
+/* =========================
+   NOTIFICATION REALTIME
+========================= */
+subscribeEvent(
+  EVENTS.NOTIFICATION_CREATED,
+  async payload => {
+    try {
+      const notificationId =
+        payload?.notificationId;
+      if(!notificationId){
+        return;
+      }
+      const notification =
+        await getNotificationById(
+          notificationId
+        );
+      if(!notification){
+        return;
+      }
+      console.log(
+        "HackChem Notification received:",
+        notification
+      );
+    }catch(error){
+      console.error(
+        "Notification receive failed:",
+        error
+      );
+    }
+  }
+);
+
+
+
+      
 if(
   window.startETHRealtime
 ){
@@ -709,9 +751,8 @@ if(window.initAvatarPicker){
 if(window.initCoverPicker){
     initCoverPicker();
 }
-      console.log(
-        "HOME READY"
-      );
+
+      
 
     }catch(err){
 
