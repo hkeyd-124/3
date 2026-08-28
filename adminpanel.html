@@ -573,9 +573,66 @@
         } from "./js/core/adminGuard.js";
 
 
+        
+import {
+    createNotification,
+    getLatestNotifications
+} from "./js/notifications/notificationService.js";
+
+        
+
         import {
             initAdminRouter
         } from "./js/admin/adminRouter.js";
+
+        
+        /* =========================
+   TEMP TEST - 1B.1
+========================= */
+
+try {
+
+    const created =
+        await createNotification({
+
+            title:
+                "TEST - HackChem Notification",
+
+            preview:
+                "Đây là notification test 1B.1.",
+
+            content:
+                "Nếu bạn nhìn thấy document này trong Firestore thì Firestore WRITE đã hoạt động."
+
+        });
+
+
+    console.log(
+        "1B.1 WRITE SUCCESS:",
+        created
+    );
+
+
+    const notifications =
+        await getLatestNotifications();
+
+
+    console.log(
+        "1B.1 READ SUCCESS:",
+        notifications
+    );
+
+
+} catch (error) {
+
+    console.error(
+        "1B.1 TEST FAILED:",
+        error
+    );
+
+}
+
+
 
         
         try {
