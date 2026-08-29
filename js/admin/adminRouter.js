@@ -1,6 +1,6 @@
 import {
     createNotification
-} from "./js/notifications/notificationService.js";
+} from "../notifications/notificationService.js";
 /* =========================
    ADMIN ROUTER
 ========================= */
@@ -299,7 +299,7 @@ function bindNotificationPage() {
 
     const button =
         document.getElementById(
-            "sendNotificationButton"
+            "sendNotificationBtn"
         );
 
     if (!button) {
@@ -312,17 +312,17 @@ function bindNotificationPage() {
 
             const titleInput =
                 document.getElementById(
-                    "notificationTitleInput"
+                    "notificationTitle"
                 );
 
             const previewInput =
                 document.getElementById(
-                    "notificationPreviewInput"
+                    "notificationPreview"
                 );
 
             const contentInput =
                 document.getElementById(
-                    "notificationContentInput"
+                    "notificationContent"
                 );
 
             const status =
