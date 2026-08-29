@@ -438,6 +438,40 @@ import {
   getNotificationById
 } from "./js/notifications/notificationService.js";
 
+
+
+/* =========================
+   NOTIFICATION REALTIME
+========================= */
+subscribeEvent(
+  EVENTS.NOTIFICATION_CREATED,
+  async payload => {
+    try {
+      const notificationId =
+        payload?.notificationId;
+      if (!notificationId) {
+        return;
+      }
+      const notification =
+        await getNotificationById(
+          notificationId
+        );
+      if (!notification) {
+        return;
+      }
+      console.log(
+        "HackChem Notification received:",
+        notification
+      );
+    } catch (error) {
+      console.error(
+        "Notification receive failed:",
+        error
+      );
+    }
+  }
+);
+  
   
 import {
   collection,
@@ -703,39 +737,6 @@ window.addEventListener(
       ){
         startUserRealtime();
       }
-
-/* =========================
-   NOTIFICATION REALTIME
-========================= */
-subscribeEvent(
-  EVENTS.NOTIFICATION_CREATED,
-  async payload => {
-    try {
-      const notificationId =
-        payload?.notificationId;
-      if(!notificationId){
-        return;
-      }
-      const notification =
-        await getNotificationById(
-          notificationId
-        );
-      if(!notification){
-        return;
-      }
-      console.log(
-        "HackChem Notification received:",
-        notification
-      );
-    }catch(error){
-      console.error(
-        "Notification receive failed:",
-        error
-      );
-    }
-  }
-);
-
 
 
       
