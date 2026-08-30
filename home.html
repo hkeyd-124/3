@@ -216,121 +216,6 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
   }
 }
 
-
-  /* =========================
-   NOTIFICATION BELL
-========================= */
-
-#notificationBell {
-
-  position: relative;
-
-  width: 42px;
-  height: 42px;
-
-  border: none;
-  background: transparent;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  cursor: pointer;
-
-  padding: 0;
-}
-
-
-/* BELL */
-
-#notificationBellIcon {
-
-  width: 27px;
-  height: 27px;
-
-  fill: #f5b400;
-
-  stroke: #f5b400;
-  stroke-width: 1.5;
-
-  overflow: visible;
-}
-
-
-/* BADGE */
-
-#notificationBadge {
-
-  position: absolute;
-
-  top: -3px;
-  right: -4px;
-
-  min-width: 19px;
-  height: 19px;
-
-  padding: 0 5px;
-
-  border-radius: 50px;
-
-  background: #ff0000;
-  color: white;
-
-  font-size: 12px;
-  font-weight: 700;
-
-  display: none;
-
-  align-items: center;
-  justify-content: center;
-
-  line-height: 1;
-}
-
-
-/* =========================
-   HAS NOTIFICATION
-========================= */
-
-#notificationBell.has-notification
-#notificationBellIcon {
-
-  animation:
-    notificationBellShake
-    0.8s
-    ease-in-out
-    infinite;
-}
-
-
-/* RINGING EFFECT */
-@keyframes notificationBellShake {
-  0% {
-    transform: rotate(0deg);
-  }
-  15% {
-    transform: rotate(12deg);
-  }
-  30% {
-    transform: rotate(-12deg);
-  }
-  45% {
-    transform: rotate(9deg);
-  }
-  60% {
-    transform: rotate(-9deg);
-  }
-  75% {
-    transform: rotate(4deg);
-  }
-  90% {
-    transform: rotate(-4deg);
-  }
-  100% {
-    transform: rotate(0deg);
-  }
-}
-  
 </style>
 </head>
 
@@ -418,62 +303,26 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
 ========================= -->
 
 <div class="main">
-
 <div style="
 display:flex;
 justify-content:flex-end;
-align-items:center;
-gap:12px;
 margin-bottom:20px;
 ">
 
-    <!-- NOTIFICATION BELL -->
-    <button
-        id="notificationBell"
-        type="button"
-        aria-label="Notifications"
-    >
+  <div
+    class="point-box"
+    id="ethBox"
+  >
 
-        <svg
-            id="notificationBellIcon"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-        >
-            <path
-                d="M18 8
-                   A6 6 0 0 0 6 8
-                   C6 13 4 14 4 16
-                   H20
-                   C20 14 18 13 18 8
-                   Z"
-            ></path>
+    <span id="ethIcon">
+      ⏳
+    </span>
 
-            <path
-                d="M10 20
-                   H14"
-            ></path>
-        </svg>
+    <span id="ethBalance">
+      Loading...
+    </span>
 
-        <span id="notificationBadge">0</span>
-
-    </button>
-
-
-    <!-- ETH -->
-    <div
-        class="point-box"
-        id="ethBox"
-    >
-
-        <span id="ethIcon">
-            ⏳
-        </span>
-
-        <span id="ethBalance">
-            Loading...
-        </span>
-
-    </div>
+  </div>
 
 </div>
   <!-- HOME -->
@@ -590,41 +439,7 @@ import {
 } from "./js/notifications/notificationService.js";
 
 
-/* =========================
-   NOTIFICATION UI
-========================= */
-let unreadNotificationCount = 0;
-function updateNotificationBell() {
-  const bell =
-    document.getElementById(
-      "notificationBell"
-    );
-  const badge =
-    document.getElementById(
-      "notificationBadge"
-    );
-  if (!bell || !badge) {
-    return;
-  }
-  if (unreadNotificationCount > 0) {
-    bell.classList.add(
-      "has-notification"
-    );
-    badge.style.display =
-      "flex";
-    badge.textContent =
-      unreadNotificationCount > 99
-        ? "99+"
-        : unreadNotificationCount;
-  } else {
-    bell.classList.remove(
-      "has-notification"
-    );
-    badge.style.display =
-      "none";
-  }
-}
-  
+
 /* =========================
    NOTIFICATION REALTIME
 ========================= */
@@ -648,12 +463,7 @@ subscribeEvent(
         "HackChem Notification received:",
         notification
       );
-      /* =========================
-         UPDATE BELL
-      ========================= */
-      unreadNotificationCount++;
-      updateNotificationBell();
-    } catch(error) {
+    } catch (error) {
       console.error(
         "Notification receive failed:",
         error
