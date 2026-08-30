@@ -423,21 +423,41 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
 display:flex;
 justify-content:flex-end;
 align-items:center;
-gap:12px;
-margin-bottom:20px;
+gap:14px;
+margin-bottom:12px;
 ">
 
-    <!-- NOTIFICATION BELL -->
+    <!-- =========================
+         NOTIFICATION BELL
+    ========================== -->
     <button
         id="notificationBell"
         type="button"
         aria-label="Notifications"
+        style="
+            width:34px;
+            height:34px;
+            padding:0;
+            margin:0;
+            border:none;
+            background:transparent;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            position:relative;
+            cursor:pointer;
+        "
     >
 
         <svg
             id="notificationBellIcon"
             viewBox="0 0 24 24"
             aria-hidden="true"
+            style="
+                width:26px;
+                height:26px;
+                display:block;
+            "
         >
             <path
                 d="M18 8
@@ -454,18 +474,31 @@ margin-bottom:20px;
             ></path>
         </svg>
 
-        <span id="notificationBadge">0</span>
+        <span id="notificationBadge">
+            0
+        </span>
 
     </button>
 
 
-    <!-- ETH -->
+    <!-- =========================
+         ETH
+    ========================== -->
+
     <div
         class="point-box"
         id="ethBox"
+        style="
+            font-size:16px;
+        "
     >
 
-        <span id="ethIcon">
+        <span
+            id="ethIcon"
+            style="
+                font-size:18px;
+            "
+        >
             ⏳
         </span>
 
