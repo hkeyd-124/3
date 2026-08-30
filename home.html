@@ -418,68 +418,62 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
 ========================= -->
 
 <div class="main">
+
 <div style="
 display:flex;
 justify-content:flex-end;
+align-items:center;
+gap:12px;
 margin-bottom:20px;
 ">
 
-  <!-- =========================
-       NOTIFICATION BELL
-  ========================== -->
-  <button
-    id="notificationBell"
-    type="button"
-    aria-label="Notifications"
-  >
-
-    <svg
-      id="notificationBellIcon"
-      viewBox="0 0 24 24"
-      aria-hidden="true"
+    <!-- NOTIFICATION BELL -->
+    <button
+        id="notificationBell"
+        type="button"
+        aria-label="Notifications"
     >
-      <path
-        d="M18 8
-           A6 6 0 0 0 6 8
-           C6 13 4 14 4 16
-           H20
-           C20 14 18 13 18 8
-           Z"
-      ></path>
 
-      <path
-        d="M10 20
-           H14"
-      ></path>
-    </svg>
+        <svg
+            id="notificationBellIcon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+        >
+            <path
+                d="M18 8
+                   A6 6 0 0 0 6 8
+                   C6 13 4 14 4 16
+                   H20
+                   C20 14 18 13 18 8
+                   Z"
+            ></path>
 
-    <span
-      id="notificationBadge"
+            <path
+                d="M10 20
+                   H14"
+            ></path>
+        </svg>
+
+        <span id="notificationBadge">0</span>
+
+    </button>
+
+
+    <!-- ETH -->
+    <div
+        class="point-box"
+        id="ethBox"
     >
-      0
-    </span>
 
-  </button>
+        <span id="ethIcon">
+            ⏳
+        </span>
 
+        <span id="ethBalance">
+            Loading...
+        </span>
 
-  <!-- =========================
-       ETH
-  ========================== -->
-
-  <div
-    class="point-box"
-    id="ethBox"
-  >
-
-    <span id="ethIcon">
-      ⏳
-    </span>
-
-    <span id="ethBalance">
-      Loading...
-    </span>
-
-  </div>
+    </div>
 
 </div>
   <!-- HOME -->
