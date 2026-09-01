@@ -12,6 +12,179 @@ import {
     getNotificationById
 } from "./notificationService.js";
 
+/* =========================
+   NOTIFICATION UI STYLES
+========================= */
+
+const notificationStyle = document.createElement("style");
+
+notificationStyle.textContent = `
+
+#notificationUI{
+    position:relative;
+    display:flex;
+    align-items:center;
+}
+
+#notificationBell{
+    position:relative;
+    width:34px;
+    height:34px;
+    padding:0;
+    margin:0;
+    border:none;
+    background:transparent;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+}
+
+#notificationBellIcon{
+    width:26px;
+    height:26px;
+    display:block;
+    fill:#f5b400;
+    stroke:#f5b400;
+    stroke-width:1.5;
+    overflow:visible;
+}
+
+#notificationBadge{
+    position:absolute;
+    top:-3px;
+    right:-4px;
+
+    min-width:19px;
+    height:19px;
+
+    padding:0 5px;
+    border-radius:50px;
+
+    background:#ff0000;
+    color:white;
+
+    font-size:12px;
+    font-weight:700;
+
+    display:none;
+    align-items:center;
+    justify-content:center;
+
+    line-height:1;
+}
+
+#notificationBell.has-notification
+#notificationBellIcon{
+    animation:
+        notificationBellShake
+        0.8s
+        ease-in-out
+        infinite;
+}
+
+@keyframes notificationBellShake{
+
+    0%{
+        transform:rotate(0deg);
+    }
+
+    15%{
+        transform:rotate(12deg);
+    }
+
+    30%{
+        transform:rotate(-12deg);
+    }
+
+    45%{
+        transform:rotate(9deg);
+    }
+
+    60%{
+        transform:rotate(-9deg);
+    }
+
+    75%{
+        transform:rotate(4deg);
+    }
+
+    90%{
+        transform:rotate(-4deg);
+    }
+
+    100%{
+        transform:rotate(0deg);
+    }
+
+}
+
+`;
+
+document.head.appendChild(
+    notificationStyle
+);
+
+/* =========================
+   RENDER NOTIFICATION UI
+========================= */
+
+function renderNotificationUI(){
+
+    const container =
+        document.getElementById(
+            "notificationUI"
+        );
+
+    if(!container){
+        return;
+    }
+
+    container.innerHTML = `
+
+        <button
+            id="notificationBell"
+            type="button"
+            aria-label="Notifications"
+        >
+
+            <svg
+                id="notificationBellIcon"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+            >
+
+                <path
+                    d="
+                        M18 8
+                        A6 6 0 0 0 6 8
+                        C6 13 4 14 4 16
+                        H20
+                        C20 14 18 13 18 8
+                        Z
+                    "
+                ></path>
+
+                <path
+                    d="
+                        M10 20
+                        H14
+                    "
+                ></path>
+
+            </svg>
+
+            <span
+                id="notificationBadge"
+            >
+                0
+            </span>
+
+        </button>
+
+    `;
+
+}
 
 /* =========================
    STATE
@@ -387,7 +560,23 @@ window.addEventListener(
     "DOMContentLoaded",
     () => {
 
+        /* =========================
+           RENDER UI
+        ========================= */
+
+        renderNotificationUI();
+
+
+        /* =========================
+           BIND EVENTS
+        ========================= */
+
         bindNotificationBell();
+
+
+        /* =========================
+           INITIAL STATE
+        ========================= */
 
         updateNotificationBell();
 
