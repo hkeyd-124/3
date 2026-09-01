@@ -477,10 +477,14 @@ function renderNotificationList() {
            
 item.addEventListener(
     "click",
-    () => {
+    event => {
+
+        event.stopPropagation();
+
         openNotificationDetail(
             notification
         );
+
     }
 );
             list.appendChild(item);
@@ -586,7 +590,9 @@ function openNotificationDetail(notification) {
 
       backBtn.addEventListener(
     "click",
-    () => {
+    event => {
+
+        event.stopPropagation();
 
         renderNotificationList();
 
@@ -710,6 +716,10 @@ renderNotificationList();
    CLOSE DROPDOWN ON OUTSIDE CLICK
 ========================= */
 
+/* =========================
+   CLOSE DROPDOWN ON OUTSIDE CLICK
+========================= */
+
 function bindNotificationOutsideClick() {
 
     document.addEventListener(
@@ -726,19 +736,29 @@ function bindNotificationOutsideClick() {
                     "notificationDropdown"
                 );
 
+            const bell =
+                document.getElementById(
+                    "notificationBell"
+                );
+
             if (!container || !dropdown) {
                 return;
             }
 
             if (
-                !container.contains(
+                dropdown.contains(
+                    event.target
+                ) ||
+                bell?.contains(
                     event.target
                 )
             ) {
-
-                dropdown.style.display =
-                    "none";
+                return;
             }
+
+            dropdown.style.display =
+                "none";
+
         }
     );
 }
