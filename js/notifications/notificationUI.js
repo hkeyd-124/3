@@ -580,6 +580,46 @@ function createNotificationDropdown() {
 
     `;
 
+/* =========================
+   CLOSE DROPDOWN ON OUTSIDE CLICK
+========================= */
+
+function bindNotificationOutsideClick() {
+
+    document.addEventListener(
+        "click",
+        event => {
+
+            const container =
+                document.getElementById(
+                    "notificationUI"
+                );
+
+            const dropdown =
+                document.getElementById(
+                    "notificationDropdown"
+                );
+
+            if (!container || !dropdown) {
+                return;
+            }
+
+            if (
+                !container.contains(
+                    event.target
+                )
+            ) {
+
+                dropdown.style.display =
+                    "none";
+            }
+        }
+    );
+}
+
+
+   
+   
     container.appendChild(
         dropdown
     );
@@ -681,6 +721,6 @@ window.addEventListener(
         ========================= */
 
         updateNotificationBell();
-
+bindNotificationOutsideClick();
     }
 );
