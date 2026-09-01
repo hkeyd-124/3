@@ -119,6 +119,145 @@ notificationStyle.textContent = `
 
 }
 
+/* =========================
+   NOTIFICATION DROPDOWN
+========================= */
+
+#notificationDropdown{
+    position:absolute;
+    top:42px;
+    right:0;
+
+    width:380px;
+    max-height:520px;
+
+    background:white;
+    border:1px solid #e5e7eb;
+    border-radius:14px;
+
+    box-shadow:
+        0 12px 35px
+        rgba(0,0,0,0.15);
+
+    z-index:9999;
+
+    overflow:hidden;
+    display:none;
+}
+
+.notification-dropdown-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:14px 16px;
+
+    border-bottom:1px solid #e5e7eb;
+}
+
+.notification-dropdown-actions{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.notification-dropdown-actions button{
+    border:none;
+    background:transparent;
+    cursor:pointer;
+}
+
+#notificationRefreshBtn{
+    width:30px;
+    height:30px;
+
+    border-radius:50%;
+
+    font-size:18px;
+}
+
+#notificationRefreshBtn:hover{
+    background:#f3f4f6;
+}
+
+#markAllNotificationsReadBtn{
+    font-size:12px;
+    color:#2563eb;
+}
+
+.notification-list{
+    max-height:410px;
+    overflow-y:auto;
+}
+
+.notification-item{
+    position:relative;
+
+    padding:14px 16px;
+
+    border-bottom:1px solid #f1f5f9;
+
+    cursor:pointer;
+}
+
+.notification-item:hover{
+    background:#f8fafc;
+}
+
+.notification-item.unread{
+    background:#eff6ff;
+}
+
+.notification-item-title{
+    font-size:14px;
+    font-weight:600;
+
+    padding-right:14px;
+}
+
+.notification-item-preview{
+    margin-top:5px;
+
+    font-size:13px;
+    line-height:1.4;
+
+    color:#6b7280;
+}
+
+.notification-unread-dot{
+    position:absolute;
+
+    top:12px;
+    right:12px;
+
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#2563eb;
+}
+
+.notification-load-more{
+    width:100%;
+
+    padding:12px;
+
+    border:none;
+    border-top:1px solid #e5e7eb;
+
+    background:white;
+
+    font-size:13px;
+    font-weight:600;
+
+    cursor:pointer;
+}
+
+.notification-load-more:hover{
+    background:#f8fafc;
+}
+
 `;
 
 document.head.appendChild(
@@ -241,233 +380,7 @@ function updateNotificationBell() {
 
 }
 
-/* =========================
-   OPEN NOTIFICATION DETAIL
-========================= */
 
-function openNotificationDetail() {
-
-    if (!latestNotification) {
-        return;
-    }
-
-
-    let modal =
-        document.getElementById(
-            "notificationDetailModal"
-        );
-
-
-    /* =========================
-       CREATE MODAL
-       ========================= */
-
-    if (!modal) {
-
-        modal =
-            document.createElement(
-                "div"
-            );
-
-        modal.id =
-            "notificationDetailModal";
-
-        modal.innerHTML = `
-
-            <div
-                id="notificationDetailBackdrop"
-                style="
-                    position: fixed;
-                    inset: 0;
-                    background: rgba(0,0,0,0.45);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    padding: 20px;
-                    z-index: 9999;
-                "
-            >
-
-                <div
-                    style="
-                        width: min(520px, 100%);
-                        background: white;
-                        border-radius: 18px;
-                        padding: 24px;
-                        box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-                        position: relative;
-                    "
-                >
-
-                    <button
-                        id="notificationDetailClose"
-                        type="button"
-                        aria-label="Close"
-                        style="
-                            position: absolute;
-                            top: 14px;
-                            right: 14px;
-                            width: 32px;
-                            height: 32px;
-                            border: none;
-                            border-radius: 50%;
-                            background: #f3f4f6;
-                            cursor: pointer;
-                            font-size: 18px;
-                        "
-                    >
-                        ×
-                    </button>
-
-                    <div
-                        style="
-                            font-size: 13px;
-                            color: #6b7280;
-                            margin-bottom: 8px;
-                        "
-                    >
-                        Notification
-                    </div>
-
-                    <h2
-                        id="notificationDetailTitle"
-                        style="
-                            margin: 0 40px 12px 0;
-                            font-size: 22px;
-                            line-height: 1.3;
-                        "
-                    ></h2>
-
-                    <div
-                        id="notificationDetailPreview"
-                        style="
-                            font-size: 14px;
-                            color: #6b7280;
-                            margin-bottom: 18px;
-                        "
-                    ></div>
-
-                    <div
-                        id="notificationDetailContent"
-                        style="
-                            font-size: 15px;
-                            line-height: 1.6;
-                            color: #1f2937;
-                            white-space: pre-wrap;
-                        "
-                    ></div>
-
-                </div>
-
-            </div>
-
-        `;
-
-
-        document.body.appendChild(
-            modal
-        );
-
-
-        /* =========================
-           CLOSE BUTTON
-        ========================= */
-
-        document
-            .getElementById(
-                "notificationDetailClose"
-            )
-            .addEventListener(
-                "click",
-                closeNotificationDetail
-            );
-
-
-        /* =========================
-           BACKDROP
-        ========================= */
-
-        document
-            .getElementById(
-                "notificationDetailBackdrop"
-            )
-            .addEventListener(
-                "click",
-                event => {
-
-                    if (
-                        event.target.id ===
-                        "notificationDetailBackdrop"
-                    ) {
-
-                        closeNotificationDetail();
-
-                    }
-
-                }
-            );
-
-    }
-
-
-    /* =========================
-       FILL DATA
-    ========================= */
-
-    document
-        .getElementById(
-            "notificationDetailTitle"
-        )
-        .textContent =
-            latestNotification.title ||
-            "";
-
-
-    document
-        .getElementById(
-            "notificationDetailPreview"
-        )
-        .textContent =
-            latestNotification.preview ||
-            "";
-
-
-    document
-        .getElementById(
-            "notificationDetailContent"
-        )
-        .textContent =
-            latestNotification.content ||
-            "";
-
-
-    /* =========================
-       SHOW
-    ========================= */
-
-    modal.style.display =
-        "block";
-
-}
-
-/* =========================
-   CLOSE NOTIFICATION DETAIL
-========================= */
-
-function closeNotificationDetail() {
-
-    const modal =
-        document.getElementById(
-            "notificationDetailModal"
-        );
-
-    if (!modal) {
-        return;
-    }
-
-    modal.remove();
-
-}
 
 /* =========================
    BIND NOTIFICATION BELL
@@ -484,14 +397,119 @@ function bindNotificationBell() {
         return;
     }
 
-
     bell.addEventListener(
         "click",
         () => {
 
-            openNotificationDetail();
+            toggleNotificationDropdown();
 
         }
+    );
+
+}
+
+/* =========================
+   NOTIFICATION DROPDOWN
+========================= */
+
+function toggleNotificationDropdown() {
+
+    let dropdown =
+        document.getElementById(
+            "notificationDropdown"
+        );
+
+    if (!dropdown) {
+
+        createNotificationDropdown();
+
+        dropdown =
+            document.getElementById(
+                "notificationDropdown"
+            );
+
+    }
+
+    if (!dropdown) {
+        return;
+    }
+
+    const isOpen =
+        dropdown.style.display === "block";
+
+    dropdown.style.display =
+        isOpen
+            ? "none"
+            : "block";
+
+}
+
+
+function createNotificationDropdown() {
+
+    const container =
+        document.getElementById(
+            "notificationUI"
+        );
+
+    if (!container) {
+        return;
+    }
+
+    const dropdown =
+        document.createElement(
+            "div"
+        );
+
+    dropdown.id =
+        "notificationDropdown";
+
+    dropdown.innerHTML = `
+
+        <div class="notification-dropdown-header">
+
+            <strong>
+                Notifications
+            </strong>
+
+            <div class="notification-dropdown-actions">
+
+                <button
+                    id="notificationRefreshBtn"
+                    type="button"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+                <button
+                    id="markAllNotificationsReadBtn"
+                    type="button"
+                >
+                    Mark all as read
+                </button>
+
+            </div>
+
+        </div>
+
+        <div
+            id="notificationList"
+            class="notification-list"
+        ></div>
+
+        <button
+            id="loadMoreNotificationsBtn"
+            type="button"
+            class="notification-load-more"
+        >
+            Xem thêm
+        </button>
+
+    `;
+
+    container.appendChild(
+        dropdown
     );
 
 }
