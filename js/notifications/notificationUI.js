@@ -662,8 +662,6 @@ function openNotificationDetail(notification) {
     }
 }
 
-
-
 /* =========================
    NOTIFICATION DROPDOWN
 ========================= */
@@ -693,10 +691,32 @@ function toggleNotificationDropdown() {
     const isOpen =
         dropdown.style.display === "block";
 
-    dropdown.style.display =
-        isOpen
-            ? "none"
-            : "block";
+    if (isOpen) {
+
+        dropdown.style.display =
+            "none";
+
+        return;
+    }
+
+    /*
+     * Always return to notification list
+     * whenever the bell is opened.
+     */
+
+    restoreNotificationListView();
+
+    dropdown =
+        document.getElementById(
+            "notificationDropdown"
+        );
+
+    if (dropdown) {
+
+        dropdown.style.display =
+            "block";
+
+    }
 
 }
 
