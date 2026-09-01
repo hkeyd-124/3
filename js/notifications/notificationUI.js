@@ -330,7 +330,8 @@ function renderNotificationUI(){
 ========================= */
 
 let unreadNotificationCount = 0;
-let latestNotification = null;
+
+let notifications = [];
 
 /* =========================
    UPDATE BELL
@@ -406,6 +407,77 @@ function bindNotificationBell() {
         }
     );
 
+}
+
+/* =========================
+   RENDER NOTIFICATION LIST
+========================= */
+
+function renderNotificationList() {
+
+    const list =
+        document.getElementById(
+            "notificationList"
+        );
+
+    if (!list) {
+        return;
+    }
+
+    list.innerHTML = "";
+
+    if (notifications.length === 0) {
+
+        list.innerHTML = `
+            <div
+                style="
+                    padding:30px 16px;
+                    text-align:center;
+                    color:#6b7280;
+                    font-size:13px;
+                "
+            >
+                Không có thông báo
+            </div>
+        `;
+
+        return;
+    }
+
+    notifications.forEach(
+        notification => {
+
+            const item =
+                document.createElement(
+                    "div"
+                );
+
+            item.className =
+                "notification-item unread";
+
+            item.innerHTML = `
+
+                <span
+                    class="notification-unread-dot"
+                ></span>
+
+                <div
+                    class="notification-item-title"
+                >
+                    ${notification.title || ""}
+                </div>
+
+                <div
+                    class="notification-item-preview"
+                >
+                    ${notification.preview || ""}
+                </div>
+
+            `;
+
+            list.appendChild(item);
+        }
+    );
 }
 
 /* =========================
@@ -511,7 +583,7 @@ function createNotificationDropdown() {
     container.appendChild(
         dropdown
     );
-
+renderNotificationList();
 }
 
 
@@ -544,19 +616,31 @@ subscribeEvent(
 
 
             console.log(
-                "HackChem Notification received:",
-                notification
-            );
-            latestNotification =
-            notification;
+    "HackChem Notification received:",
+    notification
+);
 
-            /* =========================
-               UPDATE BELL
-            ========================= */
+/* =========================
+   ADD NOTIFICATION
+========================= */
 
-            unreadNotificationCount++;
+notifications.unshift(
+    notification
+);
 
-            updateNotificationBell();
+/* =========================
+   UPDATE BELL
+========================= */
+
+unreadNotificationCount++;
+
+updateNotificationBell();
+
+/* =========================
+   UPDATE DROPDOWN
+========================= */
+
+renderNotificationList();
 
         } catch (error) {
 
