@@ -474,11 +474,139 @@ function renderNotificationList() {
                 </div>
 
             `;
-
+           
+item.addEventListener(
+    "click",
+    () => {
+        openNotificationDetail(
+            notification
+        );
+    }
+);
             list.appendChild(item);
         }
     );
 }
+
+/* =========================
+   OPEN NOTIFICATION DETAIL
+========================= */
+
+function openNotificationDetail(notification) {
+
+    const dropdown =
+        document.getElementById(
+            "notificationDropdown"
+        );
+
+    if (!dropdown) {
+        return;
+    }
+
+    dropdown.innerHTML = `
+
+       <div
+    class="notification-dropdown-header"
+    style="
+        justify-content:flex-start;
+    "
+>
+
+    <button
+        id="notificationBackBtn"
+        type="button"
+        title="Quay lại"
+        style="
+            border:none;
+            background:transparent;
+            cursor:pointer;
+            font-size:18px;
+            padding:4px 8px;
+            margin-right:6px;
+        "
+    >
+        ←
+    </button>
+
+    <strong>
+        Notification
+    </strong>
+
+</div>
+
+        <div
+            style="
+                padding:18px 16px;
+                overflow-y:auto;
+                max-height:420px;
+            "
+        >
+
+            <div
+                style="
+                    font-size:16px;
+                    font-weight:700;
+                    line-height:1.4;
+                    margin-bottom:8px;
+                "
+            >
+                ${notification.title || ""}
+            </div>
+
+            <div
+                style="
+                    font-size:13px;
+                    color:#6b7280;
+                    margin-bottom:16px;
+                "
+            >
+                ${notification.preview || ""}
+            </div>
+
+            <div
+                style="
+                    font-size:14px;
+                    line-height:1.6;
+                    color:#1f2937;
+                    white-space:pre-wrap;
+                "
+            >
+                ${notification.content || ""}
+            </div>
+
+        </div>
+    `;
+
+    const backBtn =
+        document.getElementById(
+            "notificationBackBtn"
+        );
+
+    if (backBtn) {
+
+        backBtn.addEventListener(
+            "click",
+            () => {
+
+                createNotificationDropdown();
+
+                const dropdown =
+                    document.getElementById(
+                        "notificationDropdown"
+                    );
+
+                if (dropdown) {
+                    dropdown.style.display =
+                        "block";
+                }
+
+            }
+        );
+
+    }
+}
+
+
 
 /* =========================
    NOTIFICATION DROPDOWN
