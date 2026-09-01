@@ -104,69 +104,106 @@ export async function publishEvent(
         );
 
 
-    await new Promise(
-        (resolve, reject) => {
+    try {
 
-            channel.subscribe(
-                async status => {
+        await new Promise(
+            (resolve, reject) => {
 
-                    if (
-                        status === "SUBSCRIBED"
-                    ) {
-
-                        const result =
-                            await channel.send({
-
-                                type: "broadcast",
-
-                                event: eventName,
-
-                                payload
-
-                            });
+                let finished = false;
 
 
-                        if (result !== "ok") {
+                channel.subscribe(
+                    async status => {
 
-                            reject(
-                                new Error(
-                                    `Event publish failed: ${result}`
-                                )
-                            );
-
+                        if (finished) {
                             return;
                         }
 
 
-                        console.log(
-                            "HackChem Event Published:",
-                            eventName,
-                            payload
-                        );
+                        if (
+                            status === "SUBSCRIBED"
+                        ) {
+
+                            try {
+
+                                const result =
+                                    await channel.send({
+
+                                        type: "broadcast",
+
+                                        event: eventName,
+
+                                        payload
+
+                                    });
 
 
-                        resolve();
+                                if (
+                                    result !== "ok"
+                                ) {
+
+                                    throw new Error(
+                                        `Event publish failed: ${result}`
+                                    );
+
+                                }
+
+
+                                console.log(
+                                    "HackChem Event Published:",
+                                    eventName,
+                                    payload
+                                );
+
+
+                                finished = true;
+
+                                resolve();
+
+                            } catch (error) {
+
+                                finished = true;
+
+                                reject(error);
+
+                            }
+
+                        }
+
+
+                        if (
+                            status === "CHANNEL_ERROR" ||
+                            status === "TIMED_OUT"
+                        ) {
+
+                            finished = true;
+
+                            reject(
+                                new Error(
+                                    `Event channel failed: ${status}`
+                                )
+                            );
+
+                        }
 
                     }
+                );
 
+            }
+        );
 
-                    if (
-                        status === "CHANNEL_ERROR" ||
-                        status === "TIMED_OUT"
-                    ) {
+    } finally {
 
-                        reject(
-                            new Error(
-                                `Event channel failed: ${status}`
-                            )
-                        );
+        /*
+         * IMPORTANT:
+         * Remove temporary publish channel
+         * after publish completes/fails.
+         */
 
-                    }
+        await supabase.removeChannel(
+            channel
+        );
 
-                }
-            );
-
-        }
-    );
+    }
 
 }
