@@ -408,7 +408,67 @@ function bindNotificationBell() {
     );
 
 }
+/* =========================
+   RESTORE NOTIFICATION LIST VIEW
+========================= */
 
+function restoreNotificationListView() {
+
+    const dropdown =
+        document.getElementById(
+            "notificationDropdown"
+        );
+
+    if (!dropdown) {
+        return;
+    }
+
+    dropdown.innerHTML = `
+
+        <div class="notification-dropdown-header">
+
+            <strong>
+                Notifications
+            </strong>
+
+            <div class="notification-dropdown-actions">
+
+                <button
+                    id="notificationRefreshBtn"
+                    type="button"
+                    title="Refresh"
+                >
+                    ↻
+                </button>
+
+                <button
+                    id="markAllNotificationsReadBtn"
+                    type="button"
+                >
+                    Mark all as read
+                </button>
+
+            </div>
+
+        </div>
+
+        <div
+            id="notificationList"
+            class="notification-list"
+        ></div>
+
+        <button
+            id="loadMoreNotificationsBtn"
+            type="button"
+            class="notification-load-more"
+        >
+            Xem thêm
+        </button>
+
+    `;
+
+    renderNotificationList();
+}
 /* =========================
    RENDER NOTIFICATION LIST
 ========================= */
@@ -594,7 +654,7 @@ function openNotificationDetail(notification) {
 
         event.stopPropagation();
 
-        renderNotificationList();
+       restoreNotificationListView();
 
     }
 );
@@ -706,9 +766,9 @@ function createNotificationDropdown() {
 
 
     container.appendChild(
-        dropdown
-    );
-renderNotificationList();
+    dropdown
+);
+restoreNotificationListView();
 }
 
 
