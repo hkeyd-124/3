@@ -584,24 +584,14 @@ function openNotificationDetail(notification) {
 
     if (backBtn) {
 
-        backBtn.addEventListener(
-            "click",
-            () => {
+      backBtn.addEventListener(
+    "click",
+    () => {
 
-                createNotificationDropdown();
+        renderNotificationList();
 
-                const dropdown =
-                    document.getElementById(
-                        "notificationDropdown"
-                    );
-
-                if (dropdown) {
-                    dropdown.style.display =
-                        "block";
-                }
-
-            }
-        );
+    }
+);
 
     }
 }
@@ -708,6 +698,14 @@ function createNotificationDropdown() {
 
     `;
 
+
+    container.appendChild(
+        dropdown
+    );
+renderNotificationList();
+}
+
+
 /* =========================
    CLOSE DROPDOWN ON OUTSIDE CLICK
 ========================= */
@@ -744,17 +742,6 @@ function bindNotificationOutsideClick() {
         }
     );
 }
-
-
-   
-   
-    container.appendChild(
-        dropdown
-    );
-renderNotificationList();
-}
-
-
 /* =========================
    NOTIFICATION REALTIME
 ========================= */
