@@ -193,11 +193,82 @@ notificationStyle.textContent = `
 .notification-item{
     position:relative;
 
-    padding:14px 16px;
+    display:flex;
+    gap:12px;
+
+    padding:12px 16px;
 
     border-bottom:1px solid #f1f5f9;
 
     cursor:pointer;
+}
+
+.notification-item-image{
+    width:52px;
+    height:52px;
+
+    flex-shrink:0;
+
+    border-radius:10px;
+
+    overflow:hidden;
+
+    background:#f1f5f9;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+}
+
+.notification-item-image img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    display:block;
+}
+
+.notification-item-image-placeholder{
+    font-size:22px;
+    opacity:0.55;
+}
+
+.notification-item-body{
+    min-width:0;
+    flex:1;
+}
+
+.notification-item-title{
+    font-size:14px;
+    font-weight:600;
+
+    padding-right:14px;
+
+    line-height:1.4;
+}
+
+.notification-item-preview{
+    margin-top:4px;
+
+    font-size:13px;
+    line-height:1.4;
+
+    color:#6b7280;
+
+    display:-webkit-box;
+    -webkit-line-clamp:2;
+    -webkit-box-orient:vertical;
+
+    overflow:hidden;
+}
+
+.notification-item-date{
+    margin-top:5px;
+
+    font-size:11px;
+
+    color:#9ca3af;
 }
 
 .notification-item:hover{
@@ -551,6 +622,54 @@ function restoreNotificationListView() {
     }
 
 }
+
+/* =========================
+   FORMAT NOTIFICATION DATE
+========================= */
+
+function formatNotificationDate(createdAt) {
+
+    if (!createdAt) {
+        return "";
+    }
+
+    let date;
+
+    if (
+        createdAt?.toDate &&
+        typeof createdAt.toDate === "function"
+    ) {
+
+        date = createdAt.toDate();
+
+    } else if (
+        createdAt instanceof Date
+    ) {
+
+        date = createdAt;
+
+    } else {
+
+        date = new Date(createdAt);
+
+    }
+
+    if (Number.isNaN(date.getTime())) {
+        return "";
+    }
+
+    return date.toLocaleString(
+        "vi-VN",
+        {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        }
+    );
+}
+
 /* =========================
    RENDER NOTIFICATION LIST
 ========================= */
@@ -619,16 +738,49 @@ item.innerHTML = `
             : ""
     }
 
-    <div
-        class="notification-item-title"
-    >
-        ${notification.title || ""}
+    <div class="notification-item-image">
+
+        ${
+            notification.imageUrl
+                ? `
+                    <img
+                        src="${notification.imageUrl}"
+                        alt=""
+                    >
+                `
+                : `
+                    <div
+                        class="notification-item-image-placeholder"
+                    >
+                        🔔
+                    </div>
+                `
+        }
+
     </div>
 
-    <div
-        class="notification-item-preview"
-    >
-        ${notification.preview || ""}
+    <div class="notification-item-body">
+
+        <div
+            class="notification-item-title"
+        >
+            ${notification.title || ""}
+        </div>
+
+        <div
+            class="notification-item-preview"
+        >
+            ${notification.preview || ""}
+        </div>
+
+        <div
+            class="notification-item-date"
+        >
+            ${formatNotificationDate(
+                notification.createdAt
+            )}
+        </div>
+
     </div>
 
 `;
@@ -750,6 +902,44 @@ function openNotificationDetail(notification) {
                     white-space:pre-wrap;
                 "
             >
+            ${notification.imageUrl
+        ? `
+            <div
+                style="
+                    width:100%;
+                    height:180px;
+                    margin-bottom:16px;
+                    border-radius:12px;
+                    overflow:hidden;
+                    background:#f1f5f9;
+                "
+            >
+                <img
+                    src="${notification.imageUrl}"
+                    alt=""
+                    style="
+                        width:100%;
+                        height:100%;
+                        object-fit:cover;
+                        display:block;
+                    "
+                >
+            </div>
+        `
+        : ""
+}
+
+<div
+    style="
+        font-size:12px;
+        color:#9ca3af;
+        margin-bottom:16px;
+    "
+>
+    ${formatNotificationDate(
+        notification.createdAt
+    )}
+</div>
                 ${notification.content || ""}
             </div>
 
