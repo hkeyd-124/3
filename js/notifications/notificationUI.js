@@ -552,6 +552,23 @@ item.addEventListener(
 
         event.stopPropagation();
 
+        /* =========================
+           MARK NOTIFICATION AS READ
+        ========================= */
+
+        if (notification.read !== true) {
+
+            notification.read = true;
+
+            unreadNotificationCount--;
+
+            if (unreadNotificationCount < 0) {
+                unreadNotificationCount = 0;
+            }
+
+            updateNotificationBell();
+        }
+
         openNotificationDetail(
             notification
         );
