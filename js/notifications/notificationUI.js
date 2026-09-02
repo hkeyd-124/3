@@ -471,7 +471,7 @@ function restoreNotificationListView() {
 
         renderNotificationList();
 
-       /* =========================
+      /* =========================
        MARK ALL NOTIFICATIONS AS READ
     ========================= */
 
@@ -504,6 +504,52 @@ function restoreNotificationListView() {
         );
 
     }
+
+
+    /* =========================
+       LOAD MORE NOTIFICATIONS
+    ========================= */
+
+    const loadMoreBtn =
+        document.getElementById(
+            "loadMoreNotificationsBtn"
+        );
+
+    if (loadMoreBtn) {
+
+        if (
+            notifications.length <= 4 ||
+            showAllNotifications
+        ) {
+
+            loadMoreBtn.style.display =
+                "none";
+
+        } else {
+
+            loadMoreBtn.style.display =
+                "block";
+
+        }
+
+        loadMoreBtn.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                showAllNotifications = true;
+
+                renderNotificationList();
+
+                loadMoreBtn.style.display =
+                    "none";
+
+            }
+        );
+
+    }
+
 }
 /* =========================
    RENDER NOTIFICATION LIST
@@ -808,51 +854,6 @@ function createNotificationDropdown() {
 
     dropdown.id =
         "notificationDropdown";
-
-    dropdown.innerHTML = `
-
-        <div class="notification-dropdown-header">
-
-            <strong>
-                Notifications
-            </strong>
-
-            <div class="notification-dropdown-actions">
-
-                <button
-                    id="notificationRefreshBtn"
-                    type="button"
-                    title="Refresh"
-                >
-                    ↻
-                </button>
-
-                <button
-                    id="markAllNotificationsReadBtn"
-                    type="button"
-                >
-                    Mark all as read
-                </button>
-
-            </div>
-
-        </div>
-
-        <div
-            id="notificationList"
-            class="notification-list"
-        ></div>
-
-        <button
-            id="loadMoreNotificationsBtn"
-            type="button"
-            class="notification-load-more"
-        >
-            Xem thêm
-        </button>
-
-    `;
-
 
     container.appendChild(
     dropdown
