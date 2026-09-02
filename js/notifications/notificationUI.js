@@ -467,7 +467,41 @@ function restoreNotificationListView() {
 
     `;
 
-    renderNotificationList();
+        renderNotificationList();
+
+    /* =========================
+       MARK ALL NOTIFICATIONS AS READ
+    ========================= */
+
+    const markAllBtn =
+        document.getElementById(
+            "markAllNotificationsReadBtn"
+        );
+
+    if (markAllBtn) {
+
+        markAllBtn.addEventListener(
+            "click",
+            event => {
+
+                event.stopPropagation();
+
+                notifications.forEach(
+                    notification => {
+                        notification.read = true;
+                    }
+                );
+
+                unreadNotificationCount = 0;
+
+                updateNotificationBell();
+
+                renderNotificationList();
+
+            }
+        );
+
+    }
 }
 /* =========================
    RENDER NOTIFICATION LIST
