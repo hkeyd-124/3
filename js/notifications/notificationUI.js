@@ -512,28 +512,39 @@ function renderNotificationList() {
                     "div"
                 );
 
-            item.className =
-                "notification-item unread";
+            const isUnread =
+    notification.read !== true;
 
-            item.innerHTML = `
+item.className =
+    isUnread
+        ? "notification-item unread"
+        : "notification-item";
 
+item.innerHTML = `
+
+    ${
+        isUnread
+            ? `
                 <span
                     class="notification-unread-dot"
                 ></span>
+            `
+            : ""
+    }
 
-                <div
-                    class="notification-item-title"
-                >
-                    ${notification.title || ""}
-                </div>
+    <div
+        class="notification-item-title"
+    >
+        ${notification.title || ""}
+    </div>
 
-                <div
-                    class="notification-item-preview"
-                >
-                    ${notification.preview || ""}
-                </div>
+    <div
+        class="notification-item-preview"
+    >
+        ${notification.preview || ""}
+    </div>
 
-            `;
+`;
            
 item.addEventListener(
     "click",
@@ -888,6 +899,7 @@ const alreadyExists =
 if (alreadyExists) {
     return;
 }
+notification.read = false;
 notifications.unshift(
     notification
 );
