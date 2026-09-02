@@ -814,11 +814,11 @@ function toggleNotificationDropdown() {
         return;
     }
 
-    /*
-     * Always return to notification list
-     * whenever the bell is opened.
-     */
-
+    /* 
+ * Always return to the first 4 notifications
+ * whenever the bell is opened.
+ */
+   showAllNotifications = false;
     restoreNotificationListView();
 
     dropdown =
