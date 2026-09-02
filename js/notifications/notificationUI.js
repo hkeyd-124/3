@@ -878,7 +878,16 @@ subscribeEvent(
 /* =========================
    ADD NOTIFICATION
 ========================= */
+const alreadyExists =
+    notifications.some(
+        item =>
+            item.notificationId ===
+            notification.notificationId
+    );
 
+if (alreadyExists) {
+    return;
+}
 notifications.unshift(
     notification
 );
