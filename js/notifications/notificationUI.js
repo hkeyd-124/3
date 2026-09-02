@@ -471,7 +471,7 @@ function restoreNotificationListView() {
 
         renderNotificationList();
 
-    /* =========================
+       /* =========================
        MARK ALL NOTIFICATIONS AS READ
     ========================= */
 
@@ -492,50 +492,7 @@ function restoreNotificationListView() {
                     notification => {
                         notification.read = true;
                     }
-                       /* =========================
-       LOAD MORE NOTIFICATIONS
-    ========================= */
-
-    const loadMoreBtn =
-        document.getElementById(
-            "loadMoreNotificationsBtn"
-        );
-
-    if (loadMoreBtn) {
-
-        if (
-            notifications.length <= 4 ||
-            showAllNotifications
-        ) {
-
-            loadMoreBtn.style.display =
-                "none";
-
-        } else {
-
-            loadMoreBtn.style.display =
-                "block";
-
-            loadMoreBtn.addEventListener(
-                "click",
-                event => {
-
-                    event.stopPropagation();
-
-                    showAllNotifications = true;
-
-                    renderNotificationList();
-
-                    loadMoreBtn.style.display =
-                        "none";
-
-                }
-            );
-
-        }
-
-    }     
-);
+                );
 
                 unreadNotificationCount = 0;
 
