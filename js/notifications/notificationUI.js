@@ -333,6 +333,8 @@ let unreadNotificationCount = 0;
 
 let notifications = [];
 
+let showAllNotifications = false;
+
 /* =========================
    UPDATE BELL
 ========================= */
@@ -490,7 +492,50 @@ function restoreNotificationListView() {
                     notification => {
                         notification.read = true;
                     }
-                );
+                       /* =========================
+       LOAD MORE NOTIFICATIONS
+    ========================= */
+
+    const loadMoreBtn =
+        document.getElementById(
+            "loadMoreNotificationsBtn"
+        );
+
+    if (loadMoreBtn) {
+
+        if (
+            notifications.length <= 4 ||
+            showAllNotifications
+        ) {
+
+            loadMoreBtn.style.display =
+                "none";
+
+        } else {
+
+            loadMoreBtn.style.display =
+                "block";
+
+            loadMoreBtn.addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+                    showAllNotifications = true;
+
+                    renderNotificationList();
+
+                    loadMoreBtn.style.display =
+                        "none";
+
+                }
+            );
+
+        }
+
+    }     
+);
 
                 unreadNotificationCount = 0;
 
@@ -538,8 +583,13 @@ function renderNotificationList() {
         return;
     }
 
-    notifications.forEach(
-        notification => {
+   const visibleNotifications =
+    showAllNotifications
+        ? notifications
+        : notifications.slice(0, 4);
+
+visibleNotifications.forEach(
+    notification => {
 
             const item =
                 document.createElement(
