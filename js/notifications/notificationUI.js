@@ -400,12 +400,104 @@ function renderNotificationUI(){
    STATE
 ========================= */
 
+const NOTIFICATION_STORAGE_KEY =
+    "hackchem_notifications";
+
+const MAX_STORED_NOTIFICATIONS = 10;
+
 let unreadNotificationCount = 0;
 
 let notifications = [];
 
 let showAllNotifications = false;
 
+
+/* =========================
+   NOTIFICATION STORAGE
+========================= */
+
+function serializeNotification(notification) {
+    return {
+        ...notification,
+        createdAt:
+            notification.createdAt?.toDate &&
+            typeof notification.createdAt.toDate === "function"
+                ? notification.createdAt.toDate().toISOString()
+                : notification.createdAt instanceof Date
+                    ? notification.createdAt.toISOString()
+                    : notification.createdAt
+    };
+}
+
+
+function saveNotificationState() {
+    try {
+        const storedNotifications =
+            notifications
+                .slice(0, MAX_STORED_NOTIFICATIONS)
+                .map(serializeNotification);
+
+        localStorage.setItem(
+            NOTIFICATION_STORAGE_KEY,
+            JSON.stringify(storedNotifications)
+        );
+
+    } catch (error) {
+        console.error(
+            "Notification state save failed:",
+            error
+        );
+    }
+}
+
+
+function loadNotificationState() {
+    try {
+        const storedData =
+            localStorage.getItem(
+                NOTIFICATION_STORAGE_KEY
+            );
+
+        if (!storedData) {
+            return;
+        }
+
+        const parsedData =
+            JSON.parse(storedData);
+
+        if (!Array.isArray(parsedData)) {
+            return;
+        }
+
+        notifications =
+            parsedData
+                .filter(
+                    notification =>
+                        notification &&
+                        notification.notificationId
+                )
+                .slice(
+                    0,
+                    MAX_STORED_NOTIFICATIONS
+                );
+
+        unreadNotificationCount =
+            notifications.filter(
+                notification =>
+                    notification.read !== true
+            ).length;
+
+    } catch (error) {
+        console.error(
+            "Notification state load failed:",
+            error
+        );
+
+        notifications = [];
+
+        unreadNotificationCount = 0;
+    }
+}
 /* =========================
    UPDATE BELL
 ========================= */
@@ -559,17 +651,27 @@ function restoreNotificationListView() {
 
                 event.stopPropagation();
 
-                notifications.forEach(
-                    notification => {
-                        notification.read = true;
-                    }
-                );
+                const hadUnreadNotifications =
+    notifications.some(
+        notification =>
+            notification.read !== true
+    );
 
-                unreadNotificationCount = 0;
+notifications.forEach(
+    notification => {
+        notification.read = true;
+    }
+);
 
-                updateNotificationBell();
+unreadNotificationCount = 0;
 
-                renderNotificationList();
+if (hadUnreadNotifications) {
+    saveNotificationState();
+}
+
+updateNotificationBell();
+
+renderNotificationList();
 
             }
         );
@@ -804,7 +906,7 @@ item.addEventListener(
             if (unreadNotificationCount < 0) {
                 unreadNotificationCount = 0;
             }
-
+            saveNotificationState();
             updateNotificationBell();
         }
 
@@ -1149,9 +1251,23 @@ if (alreadyExists) {
     return;
 }
 notification.read = false;
+
 notifications.unshift(
     notification
 );
+
+if (
+    notifications.length >
+    MAX_STORED_NOTIFICATIONS
+) {
+    notifications =
+        notifications.slice(
+            0,
+            MAX_STORED_NOTIFICATIONS
+        );
+}
+
+saveNotificationState();
 
 /* =========================
    UPDATE BELL
@@ -1204,7 +1320,7 @@ window.addEventListener(
         /* =========================
            INITIAL STATE
         ========================= */
-
+      loadNotificationState();
         updateNotificationBell();
 bindNotificationOutsideClick();
     }
