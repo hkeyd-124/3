@@ -9,7 +9,8 @@ import {
 } from "../realtime/hcEvents.js";
 
 import {
-    getNotificationById
+    getNotificationById,
+    getLatestNotifications
 } from "./notificationService.js";
 
 /* =========================
@@ -498,6 +499,137 @@ function loadNotificationState() {
         unreadNotificationCount = 0;
     }
 }
+
+/* =========================
+   NOTIFICATION SYNC
+========================= */
+
+function getNotificationTimestamp(createdAt) {
+    if (!createdAt) {
+        return 0;
+    }
+
+    if (
+        createdAt?.toDate &&
+        typeof createdAt.toDate === "function"
+    ) {
+        return createdAt.toDate().getTime();
+    }
+
+    if (
+        createdAt instanceof Date
+    ) {
+        return createdAt.getTime();
+    }
+
+    const date =
+        new Date(createdAt);
+
+    const timestamp =
+        date.getTime();
+
+    return Number.isNaN(timestamp)
+        ? 0
+        : timestamp;
+}
+
+
+async function syncNotifications() {
+
+    try {
+
+        const latestNotifications =
+            await getLatestNotifications(
+                MAX_STORED_NOTIFICATIONS
+            );
+
+        const existingIds =
+            new Set(
+                notifications.map(
+                    notification =>
+                        notification.notificationId
+                )
+            );
+
+        const missedNotifications =
+            latestNotifications
+                .filter(
+                    notification =>
+                        !existingIds.has(
+                            notification.notificationId
+                        )
+                )
+                .map(
+                    notification => ({
+                        ...notification,
+                        read: false
+                    })
+                );
+
+        if (
+            missedNotifications.length === 0
+        ) {
+
+            unreadNotificationCount =
+                notifications.filter(
+                    notification =>
+                        notification.read !== true
+                ).length;
+
+            updateNotificationBell();
+            renderNotificationList();
+
+            return;
+        }
+
+        notifications = [
+            ...notifications,
+            ...missedNotifications
+        ];
+
+        notifications.sort(
+            (a, b) =>
+                getNotificationTimestamp(
+                    b.createdAt
+                ) -
+                getNotificationTimestamp(
+                    a.createdAt
+                )
+        );
+
+        notifications =
+            notifications.slice(
+                0,
+                MAX_STORED_NOTIFICATIONS
+            );
+
+        unreadNotificationCount =
+            notifications.filter(
+                notification =>
+                    notification.read !== true
+            ).length;
+
+        saveNotificationState();
+
+        updateNotificationBell();
+
+        renderNotificationList();
+
+        console.log(
+            "HackChem Notifications Synced:",
+            missedNotifications.length
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Notification sync failed:",
+            error
+        );
+
+    }
+}
+
 /* =========================
    UPDATE BELL
 ========================= */
@@ -631,9 +763,30 @@ function restoreNotificationListView() {
         </button>
 
     `;
-
         renderNotificationList();
+   
+/* =========================
+   REFRESH NOTIFICATIONS
+========================= */
 
+const refreshBtn =
+    document.getElementById(
+        "notificationRefreshBtn"
+    );
+
+if (refreshBtn) {
+
+    refreshBtn.addEventListener(
+        "click",
+        async event => {
+
+            event.stopPropagation();
+
+            await syncNotifications();
+        }
+    );
+}
+   
       /* =========================
        MARK ALL NOTIFICATIONS AS READ
     ========================= */
@@ -1273,7 +1426,11 @@ saveNotificationState();
    UPDATE BELL
 ========================= */
 
-unreadNotificationCount++;
+unreadNotificationCount =
+    notifications.filter(
+        notification =>
+            notification.read !== true
+    ).length;
 
 updateNotificationBell();
 
