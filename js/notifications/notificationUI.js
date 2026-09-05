@@ -1221,10 +1221,56 @@ function openNotificationDetail(notification) {
 </div>
 
         <div
+    style="
+        padding:18px 16px;
+        overflow-y:auto;
+        max-height:420px;
+    "
+>
+
+    <!-- =========================
+         NOTIFICATION HEADER
+    ========================== -->
+
+    <div
+        style="
+            display:flex;
+            align-items:center;
+            gap:14px;
+            margin-bottom:20px;
+        "
+    >
+
+        <div
             style="
-                padding:18px 16px;
-                overflow-y:auto;
-                max-height:420px;
+                width:64px;
+                height:64px;
+                flex-shrink:0;
+                border-radius:12px;
+                background:#f1f5f9;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                overflow:hidden;
+            "
+        >
+            <img
+                src="${getNotificationImage(notification)}"
+                alt=""
+                style="
+                    width:50px;
+                    height:50px;
+                    object-fit:contain;
+                    display:block;
+                "
+            >
+        </div>
+
+
+        <div
+            style="
+                min-width:0;
+                flex:1;
             "
         >
 
@@ -1233,69 +1279,60 @@ function openNotificationDetail(notification) {
                     font-size:16px;
                     font-weight:700;
                     line-height:1.4;
-                    margin-bottom:8px;
+                    color:#111827;
+                    margin-bottom:5px;
                 "
             >
                 ${notification.title || ""}
             </div>
 
+
             <div
                 style="
                     font-size:13px;
+                    line-height:1.4;
                     color:#6b7280;
-                    margin-bottom:16px;
+                    margin-bottom:5px;
                 "
             >
                 ${notification.preview || ""}
             </div>
 
+
             <div
                 style="
-                    font-size:14px;
-                    line-height:1.6;
-                    color:#1f2937;
-                    white-space:pre-wrap;
+                    font-size:12px;
+                    color:#9ca3af;
                 "
             >
-            <div
-    style="
-        width:100%;
-        height:180px;
-        margin-bottom:16px;
-        border-radius:12px;
-        overflow:hidden;
-        background:#f1f5f9;
-    "
->
-    <img
-        src="${getNotificationImage(notification)}"
-        alt=""
-        style="
-            width:100%;
-            height:100%;
-            object-fit:contain;
-            display:block;
-        "
-    >
-</div>
-
-<div
-    style="
-        font-size:12px;
-        color:#9ca3af;
-        margin-bottom:16px;
-    "
->
-    ${formatNotificationDate(
-        notification.createdAt
-    )}
-</div>
-                ${notification.content || ""}
+                ${formatNotificationDate(
+                    notification.createdAt
+                )}
             </div>
 
         </div>
-    `;
 
+    </div>
+
+
+    <!-- =========================
+         NOTIFICATION CONTENT
+    ========================== -->
+
+    <div
+        style="
+            padding-top:4px;
+            font-size:14px;
+            line-height:1.7;
+            color:#1f2937;
+            white-space:pre-wrap;
+            word-break:break-word;
+        "
+    >
+        ${notification.content || ""}
+    </div>
+
+</div>
     const backBtn =
         document.getElementById(
             "notificationBackBtn"
