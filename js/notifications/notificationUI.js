@@ -14,6 +14,30 @@ import {
 } from "./notificationService.js";
 
 /* =========================
+   NOTIFICATION ICON LIBRARY
+========================= */
+
+const NOTIFICATION_ICON_LIBRARY = {
+    default: "/assets/notifications/default.png",
+    exam: "/assets/notifications/exam.png",
+    lesson: "/assets/notifications/lesson.png",
+    reward: "/assets/notifications/reward.png",
+    warning: "/assets/notifications/warning.png"
+};
+
+
+function getNotificationImage(notification) {
+
+    const imageId =
+        notification?.imageId || "default";
+
+    return (
+        NOTIFICATION_ICON_LIBRARY[imageId] ||
+        NOTIFICATION_ICON_LIBRARY.default
+    );
+
+}
+/* =========================
    NOTIFICATION UI STYLES
 ========================= */
 
@@ -1083,24 +1107,12 @@ item.innerHTML = `
 
     <div class="notification-item-image">
 
-        ${
-            notification.imageUrl
-                ? `
-                    <img
-                        src="${notification.imageUrl}"
-                        alt=""
-                    >
-                `
-                : `
-                    <div
-                        class="notification-item-image-placeholder"
-                    >
-                        🔔
-                    </div>
-                `
-        }
+    <img
+        src="${getNotificationImage(notification)}"
+        alt=""
+    >
 
-    </div>
+</div>
 
     <div class="notification-item-body">
 
@@ -1245,32 +1257,27 @@ function openNotificationDetail(notification) {
                     white-space:pre-wrap;
                 "
             >
-            ${notification.imageUrl
-        ? `
             <div
-                style="
-                    width:100%;
-                    height:180px;
-                    margin-bottom:16px;
-                    border-radius:12px;
-                    overflow:hidden;
-                    background:#f1f5f9;
-                "
-            >
-                <img
-                    src="${notification.imageUrl}"
-                    alt=""
-                    style="
-                        width:100%;
-                        height:100%;
-                        object-fit:cover;
-                        display:block;
-                    "
-                >
-            </div>
-        `
-        : ""
-}
+    style="
+        width:100%;
+        height:180px;
+        margin-bottom:16px;
+        border-radius:12px;
+        overflow:hidden;
+        background:#f1f5f9;
+    "
+>
+    <img
+        src="${getNotificationImage(notification)}"
+        alt=""
+        style="
+            width:100%;
+            height:100%;
+            object-fit:contain;
+            display:block;
+        "
+    >
+</div>
 
 <div
     style="
