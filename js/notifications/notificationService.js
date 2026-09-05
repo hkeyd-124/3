@@ -2,15 +2,14 @@
    HACKCHEM
    NOTIFICATION SERVICE
 ========================= */
-
 import {
     collection,
     addDoc,
     getDocs,
     getDoc,
-    deleteDoc,
     doc,
     query,
+    where,
     orderBy,
     limit,
     Timestamp
