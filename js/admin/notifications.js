@@ -417,6 +417,38 @@ export function loadNotifications() {
                         "
                     ></div>
 
+                                </div>
+
+            </div>
+
+            <!-- =========================
+                 NOTIFICATION MANAGEMENT
+            ========================== -->
+
+            <div
+                style="
+                    margin-top: 24px;
+                    padding: 22px;
+                    border: 1px solid #d1d5db;
+                    border-radius: 12px;
+                    background: #ffffff;
+                "
+            >
+
+                <h2
+                    style="
+                        margin: 0 0 18px;
+                        font-size: 22px;
+                        color: #111827;
+                    "
+                >
+                    Quản lý thông báo
+                </h2>
+
+                <div
+                    id="adminNotificationList"
+                >
+                    Đang tải thông báo...
                 </div>
 
             </div>
@@ -1115,6 +1147,8 @@ function bindNotificationPage() {
 
 
                 renderNotificationIconLibrary();
+
+               await loadNotificationManagement();
 
 
             } catch (error) {
