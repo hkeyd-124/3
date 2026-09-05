@@ -1559,8 +1559,8 @@ function scheduleNotificationAutoSync() {
     const nextSync = new Date(now);
 
     nextSync.setHours(
-        19,
-        20,
+        8,
+        22,
         0,
         0
     );
