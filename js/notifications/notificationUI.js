@@ -1541,6 +1541,70 @@ renderNotificationList();
 );
 
 /* =========================
+   AUTO SYNC — 20:00 DAILY
+========================= */
+
+let notificationAutoSyncTimer = null;
+
+function scheduleNotificationAutoSync() {
+
+    if (notificationAutoSyncTimer) {
+        clearTimeout(
+            notificationAutoSyncTimer
+        );
+    }
+
+    const now = new Date();
+
+    const nextSync = new Date(now);
+
+    nextSync.setHours(
+        8,
+        13,
+        0,
+        0
+    );
+
+    /*
+     * Nếu hiện tại đã qua 20:00
+     * thì chuyển sang 20:00 ngày mai.
+     */
+    if (now >= nextSync) {
+
+        nextSync.setDate(
+            nextSync.getDate() + 1
+        );
+
+    }
+
+    const delay =
+        nextSync.getTime() -
+        now.getTime();
+
+    notificationAutoSyncTimer =
+        setTimeout(
+            async () => {
+
+                await syncNotifications();
+
+                /*
+                 * Sau khi sync xong,
+                 * lên lịch cho 20:00 ngày tiếp theo.
+                 */
+                scheduleNotificationAutoSync();
+
+            },
+            delay
+        );
+
+    console.log(
+        "HackChem Notification Auto Sync scheduled:",
+        nextSync
+    );
+
+}
+
+/* =========================
    INITIALIZE
 ========================= */
 
@@ -1565,8 +1629,9 @@ window.addEventListener(
         /* =========================
            INITIAL STATE
         ========================= */
-      loadNotificationState();
-        updateNotificationBell();
-bindNotificationOutsideClick();
+         loadNotificationState();
+         updateNotificationBell();
+         bindNotificationOutsideClick();
+         scheduleNotificationAutoSync();
     }
 );
