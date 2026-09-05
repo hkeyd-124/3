@@ -15,9 +15,10 @@ const routes = {
     },
 
     notifications: {
-    title: "Notifications",
-    load: loadNotifications
-},
+        title: "Notifications",
+        load: loadNotifications
+    },
+
     users: {
         title: "Users",
         content: `
@@ -36,7 +37,7 @@ const routes = {
 
     analytics: {
         title: "Analytics",
-      : `
+        content: `
             <h2>Analytics</h2>
             <p>Analytics will be added in a future phase.</p>
         `
@@ -44,13 +45,12 @@ const routes = {
 
     logs: {
         title: "Logs",
-      : `
+        content: `
             <h2>Logs</h2>
             <p>Logs will be added in a future phase.</p>
         `
     }
 };
-
 
 /* =========================
    GET CURRENT ROUTE
