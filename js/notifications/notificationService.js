@@ -8,9 +8,9 @@ import {
     addDoc,
     getDocs,
     getDoc,
+    deleteDoc,
     doc,
     query,
-    where,
     orderBy,
     limit,
     Timestamp
@@ -315,4 +315,32 @@ export async function getNotificationById(
 
     };
 
+}
+/* =========================
+   DELETE NOTIFICATION
+========================= */
+
+export async function deleteNotification(
+    notificationId
+) {
+    if (!notificationId) {
+        throw new Error(
+            "notificationId is required."
+        );
+    }
+
+    const notificationRef =
+        doc(
+            db,
+            "notifications",
+            notificationId
+        );
+
+    await deleteDoc(
+        notificationRef
+    );
+
+    return {
+        notificationId
+    };
 }
