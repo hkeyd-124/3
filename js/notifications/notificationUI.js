@@ -1331,8 +1331,9 @@ function openNotificationDetail(notification) {
     >
         ${notification.content || ""}
     </div>
-
 </div>
+`;
+   
     const backBtn =
         document.getElementById(
             "notificationBackBtn"
