@@ -10,6 +10,7 @@ import {
     getDoc,
     doc,
     query,
+    where,
     orderBy,
     limit,
     Timestamp
@@ -164,6 +165,114 @@ export async function getLatestNotifications(
 
 }
 
+/* =========================
+   GET NOTIFICATIONS AFTER
+========================= */
+
+export async function getNotificationsAfter(
+    createdAt,
+    maxResults = 10
+) {
+
+    /* =========================
+       INITIAL SYNC
+    ========================= */
+
+    if (!createdAt) {
+
+        return getLatestNotifications(
+            maxResults
+        );
+
+    }
+
+
+    /* =========================
+       NORMALIZE TIMESTAMP
+    ========================= */
+
+    let queryTimestamp;
+
+    if (
+        createdAt?.toDate &&
+        typeof createdAt.toDate === "function"
+    ) {
+
+        queryTimestamp =
+            createdAt;
+
+    } else {
+
+        const date =
+            createdAt instanceof Date
+                ? createdAt
+                : new Date(createdAt);
+
+        if (
+            Number.isNaN(
+                date.getTime()
+            )
+        ) {
+
+            return getLatestNotifications(
+                maxResults
+            );
+
+        }
+
+        queryTimestamp =
+            Timestamp.fromDate(
+                date
+            );
+
+    }
+
+
+    /* =========================
+       INCREMENTAL QUERY
+    ========================= */
+
+    const notificationsQuery =
+        query(
+
+            notificationsRef,
+
+            where(
+                "createdAt",
+                ">",
+                queryTimestamp
+            ),
+
+            orderBy(
+                "createdAt",
+                "desc"
+            ),
+
+            limit(
+                maxResults
+            )
+
+        );
+
+
+    const snapshot =
+        await getDocs(
+            notificationsQuery
+        );
+
+
+    return snapshot.docs.map(
+        doc => ({
+
+            notificationId:
+                doc.id,
+
+            ...doc.data()
+
+        })
+    );
+
+}
 
 /* =========================
    GET NOTIFICATION BY ID
