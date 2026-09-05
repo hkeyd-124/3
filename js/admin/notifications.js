@@ -492,7 +492,7 @@ async function loadNotificationManagement() {
     try {
 
         const notifications =
-            await getLatestNotifications(50);
+            await getLatestNotifications(3);
 
         if (!notifications.length) {
 
