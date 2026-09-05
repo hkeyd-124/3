@@ -2,11 +2,11 @@
    HACKCHEM ADMIN
    NOTIFICATIONS MODULE
 ========================= */
-
 import {
-    createNotification
+    createNotification,
+    getLatestNotifications,
+    deleteNotification
 } from "../notifications/notificationService.js";
-
 
 /* =========================
    NOTIFICATION ICON LIBRARY
@@ -425,13 +425,278 @@ export function loadNotifications() {
     `;
 
 
-    renderNotificationIconLibrary();
-    bindNotificationPage();
-    bindNotificationPreview();
+   renderNotificationIconLibrary();
+   bindNotificationPage();
+   bindNotificationPreview();
+   loadNotificationManagement();
 
 }
 
+/* =========================
+   NOTIFICATION MANAGEMENT
+========================= */
 
+async function loadNotificationManagement() {
+
+    const list =
+        document.getElementById(
+            "adminNotificationList"
+        );
+
+    if (!list) {
+        return;
+    }
+
+    list.innerHTML = `
+        <div style="
+            padding:24px;
+            text-align:center;
+            color:#6b7280;
+        ">
+            Đang tải thông báo...
+        </div>
+    `;
+
+    try {
+
+        const notifications =
+            await getLatestNotifications(50);
+
+        if (!notifications.length) {
+
+            list.innerHTML = `
+                <div style="
+                    padding:30px;
+                    text-align:center;
+                    color:#6b7280;
+                ">
+                    Chưa có thông báo nào.
+                </div>
+            `;
+
+            return;
+        }
+
+        list.innerHTML =
+            notifications
+                .map(notification => {
+
+                    const icon =
+                        NOTIFICATION_ICONS[
+                            notification.imageId
+                        ] ||
+                        NOTIFICATION_ICONS.default;
+
+                    const date =
+                        formatNotificationDate(
+                            notification.createdAt
+                        );
+
+                    return `
+                        <div
+                            data-notification-id="${notification.notificationId}"
+                            style="
+                                display:flex;
+                                align-items:center;
+                                gap:16px;
+                                padding:14px;
+                                border:1px solid #e5e7eb;
+                                border-radius:12px;
+                                margin-bottom:10px;
+                                background:#ffffff;
+                            "
+                        >
+
+                            <div style="
+                                width:58px;
+                                height:58px;
+                                flex-shrink:0;
+                                border-radius:10px;
+                                background:#f3f4f6;
+                                display:flex;
+                                align-items:center;
+                                justify-content:center;
+                            ">
+                                <img
+                                    src="${icon.src}"
+                                    alt="${icon.name}"
+                                    style="
+                                        width:44px;
+                                        height:44px;
+                                        object-fit:contain;
+                                    "
+                                >
+                            </div>
+
+                            <div style="
+                                flex:1;
+                                min-width:0;
+                            ">
+
+                                <div style="
+                                    font-size:15px;
+                                    font-weight:700;
+                                    color:#111827;
+                                ">
+                                    ${notification.title || ""}
+                                </div>
+
+                                <div style="
+                                    margin-top:4px;
+                                    font-size:13px;
+                                    color:#6b7280;
+                                    overflow:hidden;
+                                    text-overflow:ellipsis;
+                                    white-space:nowrap;
+                                ">
+                                    ${notification.preview || ""}
+                                </div>
+
+                                <div style="
+                                    margin-top:4px;
+                                    font-size:12px;
+                                    color:#9ca3af;
+                                ">
+                                    ${date}
+                                </div>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                class="admin-delete-notification"
+                                data-notification-id="${notification.notificationId}"
+                                style="
+                                    padding:8px 14px;
+                                    border:1px solid #fecaca;
+                                    border-radius:8px;
+                                    background:#fff;
+                                    color:#dc2626;
+                                    cursor:pointer;
+                                    font-weight:600;
+                                "
+                            >
+                                Xóa
+                            </button>
+
+                        </div>
+                    `;
+                })
+                .join("");
+
+        bindNotificationDeleteButtons();
+
+    } catch (error) {
+
+        console.error(
+            "Notification management load failed:",
+            error
+        );
+
+        list.innerHTML = `
+            <div style="
+                padding:24px;
+                text-align:center;
+                color:#dc2626;
+            ">
+                Không thể tải danh sách thông báo.
+            </div>
+        `;
+    }
+}
+
+function formatNotificationDate(timestamp) {
+
+    if (!timestamp) {
+        return "";
+    }
+
+    const date =
+        timestamp.toDate &&
+        typeof timestamp.toDate === "function"
+            ? timestamp.toDate()
+            : new Date(timestamp);
+
+    if (Number.isNaN(date.getTime())) {
+        return "";
+    }
+
+    const hours =
+        String(date.getHours()).padStart(2, "0");
+
+    const minutes =
+        String(date.getMinutes()).padStart(2, "0");
+
+    const day =
+        String(date.getDate()).padStart(2, "0");
+
+    const month =
+        String(date.getMonth() + 1).padStart(2, "0");
+
+    const year =
+        date.getFullYear();
+
+    return `${hours}:${minutes} ${day}/${month}/${year}`;
+}
+
+function bindNotificationDeleteButtons() {
+
+    document
+        .querySelectorAll(
+            ".admin-delete-notification"
+        )
+        .forEach(button => {
+
+            button.addEventListener(
+                "click",
+                async () => {
+
+                    const notificationId =
+                        button.dataset.notificationId;
+
+                    if (!notificationId) {
+                        return;
+                    }
+
+                    const confirmed =
+                        confirm(
+                            "Bạn có chắc muốn xóa thông báo này?"
+                        );
+
+                    if (!confirmed) {
+                        return;
+                    }
+
+                    button.disabled = true;
+                    button.textContent = "Đang xóa...";
+
+                    try {
+
+                        await deleteNotification(
+                            notificationId
+                        );
+
+                        await loadNotificationManagement();
+
+                    } catch (error) {
+
+                        console.error(
+                            "Notification deletion failed:",
+                            error
+                        );
+
+                        alert(
+                            "Không thể xóa thông báo."
+                        );
+
+                        button.disabled = false;
+                        button.textContent = "Xóa";
+                    }
+                }
+            );
+
+        });
+}
 /* =========================
    ICON LIBRARY
 ========================= */
