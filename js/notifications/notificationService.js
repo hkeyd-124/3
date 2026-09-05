@@ -42,11 +42,10 @@ const notificationsRef =
 ========================= */
 
 export async function createNotification({
-
     title,
     preview,
-    content
-
+    content,
+    imageId = "default"
 }) {
 
     if (!title || !content) {
@@ -59,21 +58,12 @@ export async function createNotification({
 
 
     const notification = {
-
-        title:
-            title.trim(),
-
-        preview:
-            preview?.trim() ||
-            content.trim(),
-
-        content:
-            content.trim(),
-
-        createdAt:
-            Timestamp.now()
-
-    };
+    title: title.trim(),
+    preview: preview?.trim() || content.trim(),
+    content: content.trim(),
+    imageId: imageId || "default",
+    createdAt: Timestamp.now()
+};
 
 
     /* =========================
