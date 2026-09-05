@@ -509,7 +509,13 @@ async function loadNotificationManagement() {
             return;
         }
 
-        list.innerHTML =
+
+         list.style.display = "grid";
+
+         list.style.gridTemplateColumns =
+             "repeat(auto-fit, minmax(280px, 1fr))";
+         list.style.gap = "14px";
+         list.innerHTML =
             notifications
                 .map(notification => {
 
@@ -534,7 +540,6 @@ async function loadNotificationManagement() {
                                 padding:14px;
                                 border:1px solid #e5e7eb;
                                 border-radius:12px;
-                                margin-bottom:10px;
                                 background:#ffffff;
                             "
                         >
