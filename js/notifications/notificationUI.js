@@ -1560,7 +1560,7 @@ function scheduleNotificationAutoSync() {
 
     nextSync.setHours(
         8,
-        47,
+        49,
         0,
         0
     );
