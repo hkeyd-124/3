@@ -10,7 +10,7 @@ import {
 
 import {
     getNotificationById,
-    getLatestNotifications
+    getNotificationsAfter
 } from "./notificationService.js";
 
 /* =========================
@@ -412,6 +412,7 @@ let notifications = [];
 
 let showAllNotifications = false;
 
+let isNotificationSyncing = false;
 
 /* =========================
    NOTIFICATION STORAGE
@@ -536,12 +537,38 @@ function getNotificationTimestamp(createdAt) {
 
 async function syncNotifications() {
 
+    if (isNotificationSyncing) {
+        return;
+    }
+
+    isNotificationSyncing = true;
+
     try {
 
+        /* =========================
+           GET LATEST LOCAL TIMESTAMP
+        ========================= */
+
+        const latestLocalNotification =
+            notifications.length > 0
+                ? notifications[0]
+                : null;
+
         const latestNotifications =
-            await getLatestNotifications(
+            await getNotificationsAfter(
+
+                latestLocalNotification
+                    ? latestLocalNotification.createdAt
+                    : null,
+
                 MAX_STORED_NOTIFICATIONS
+
             );
+
+
+        /* =========================
+           REMOVE DUPLICATES
+        ========================= */
 
         const existingIds =
             new Set(
@@ -550,6 +577,7 @@ async function syncNotifications() {
                         notification.notificationId
                 )
             );
+
 
         const missedNotifications =
             latestNotifications
@@ -561,10 +589,18 @@ async function syncNotifications() {
                 )
                 .map(
                     notification => ({
+
                         ...notification,
+
                         read: false
+
                     })
                 );
+
+
+        /* =========================
+           NO NEW NOTIFICATIONS
+        ========================= */
 
         if (
             missedNotifications.length === 0
@@ -577,31 +613,67 @@ async function syncNotifications() {
                 ).length;
 
             updateNotificationBell();
+
             renderNotificationList();
 
+            console.log(
+                "HackChem Notifications Synced: 0"
+            );
+
             return;
+
         }
 
+
+        /* =========================
+           MERGE
+        ========================= */
+
         notifications = [
+
             ...notifications,
+
             ...missedNotifications
+
         ];
 
+
+        /* =========================
+           SORT NEWEST FIRST
+        ========================= */
+
         notifications.sort(
+
             (a, b) =>
+
                 getNotificationTimestamp(
                     b.createdAt
                 ) -
+
                 getNotificationTimestamp(
                     a.createdAt
                 )
+
         );
+
+
+        /* =========================
+           KEEP ONLY 10
+        ========================= */
 
         notifications =
             notifications.slice(
+
                 0,
+
                 MAX_STORED_NOTIFICATIONS
+
             );
+
+
+        /* =========================
+           RECALCULATE UNREAD
+        ========================= */
 
         unreadNotificationCount =
             notifications.filter(
@@ -609,16 +681,28 @@ async function syncNotifications() {
                     notification.read !== true
             ).length;
 
+
+        /* =========================
+           SAVE LOCAL STATE
+        ========================= */
+
         saveNotificationState();
+
+
+        /* =========================
+           UPDATE UI
+        ========================= */
 
         updateNotificationBell();
 
         renderNotificationList();
 
+
         console.log(
             "HackChem Notifications Synced:",
             missedNotifications.length
         );
+
 
     } catch (error) {
 
@@ -627,9 +711,13 @@ async function syncNotifications() {
             error
         );
 
-    }
-}
+    } finally {
 
+        isNotificationSyncing = false;
+
+    }
+
+}
 /* =========================
    UPDATE BELL
 ========================= */
