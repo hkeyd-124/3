@@ -1091,38 +1091,65 @@ item.innerHTML = `
 
     <div class="notification-item-image">
 
-    <img
-        src="${getNotificationImage(notification)}"
-        alt=""
-    >
+        <img
+            src="${getNotificationImage(notification)}"
+            alt=""
+        >
 
-</div>
+    </div>
 
     <div class="notification-item-body">
 
         <div
             class="notification-item-title"
-        >
-            ${notification.title || ""}
-        </div>
+            data-notification-title
+        ></div>
 
         <div
             class="notification-item-preview"
-        >
-            ${notification.preview || ""}
-        </div>
+            data-notification-preview
+        ></div>
 
         <div
             class="notification-item-date"
-        >
-            ${formatNotificationDate(
-                notification.createdAt
-            )}
-        </div>
+            data-notification-date
+        ></div>
 
     </div>
 
 `;
+
+const titleElement =
+    item.querySelector(
+        "[data-notification-title]"
+    );
+
+const previewElement =
+    item.querySelector(
+        "[data-notification-preview]"
+    );
+
+const dateElement =
+    item.querySelector(
+        "[data-notification-date]"
+    );
+
+if (titleElement) {
+    titleElement.textContent =
+        notification.title || "";
+}
+
+if (previewElement) {
+    previewElement.textContent =
+        notification.preview || "";
+}
+
+if (dateElement) {
+    dateElement.textContent =
+        formatNotificationDate(
+            notification.createdAt
+        );
+}
            
 item.addEventListener(
     "click",
@@ -1259,29 +1286,26 @@ function openNotificationDetail(notification) {
         >
 
             <div
-                style="
-                    font-size:16px;
-                    font-weight:700;
-                    line-height:1.4;
-                    color:#111827;
-                    margin-bottom:5px;
-                "
-            >
-                ${notification.title || ""}
-            </div>
+    data-notification-detail-title
+    style="
+        font-size:16px;
+        font-weight:700;
+        line-height:1.4;
+        color:#111827;
+        margin-bottom:5px;
+    "
+></div>
 
 
-            <div
-                style="
-                    font-size:13px;
-                    line-height:1.4;
-                    color:#6b7280;
-                    margin-bottom:5px;
-                "
-            >
-                ${notification.preview || ""}
-            </div>
-
+<div
+    data-notification-detail-preview
+    style="
+        font-size:13px;
+        line-height:1.4;
+        color:#6b7280;
+        margin-bottom:5px;
+    "
+></div>
 
             <div
                 style="
@@ -1303,21 +1327,48 @@ function openNotificationDetail(notification) {
          NOTIFICATION CONTENT
     ========================== -->
 
-    <div
-        style="
-            padding-top:4px;
-            font-size:14px;
-            line-height:1.7;
-            color:#1f2937;
-            white-space:pre-wrap;
-            word-break:break-word;
-        "
-    >
-        ${notification.content || ""}
-    </div>
+   <div
+    data-notification-detail-content
+    style="
+        padding-top:4px;
+        font-size:14px;
+        line-height:1.7;
+        color:#1f2937;
+        white-space:pre-wrap;
+        word-break:break-word;
+    "
+></div>
 </div>
 `;
-   
+   const detailTitle =
+    detail.querySelector(
+        "[data-notification-detail-title]"
+    );
+
+const detailPreview =
+    detail.querySelector(
+        "[data-notification-detail-preview]"
+    );
+
+const detailContent =
+    detail.querySelector(
+        "[data-notification-detail-content]"
+    );
+
+if (detailTitle) {
+    detailTitle.textContent =
+        notification.title || "";
+}
+
+if (detailPreview) {
+    detailPreview.textContent =
+        notification.preview || "";
+}
+
+if (detailContent) {
+    detailContent.textContent =
+        notification.content || "";
+}
     const backBtn =
         document.getElementById(
             "notificationBackBtn"
