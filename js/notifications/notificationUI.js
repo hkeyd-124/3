@@ -1341,17 +1341,17 @@ function openNotificationDetail(notification) {
 </div>
 `;
    const detailTitle =
-    detail.querySelector(
+    dropdown.querySelector(
         "[data-notification-detail-title]"
     );
 
 const detailPreview =
-    detail.querySelector(
+    dropdown.querySelector(
         "[data-notification-detail-preview]"
     );
 
 const detailContent =
-    detail.querySelector(
+    dropdown.querySelector(
         "[data-notification-detail-content]"
     );
 
