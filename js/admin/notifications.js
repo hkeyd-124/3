@@ -1147,10 +1147,6 @@ function bindNotificationPage() {
                         selectedNotificationIcon.src;
                 }
 
-
-                bindNotificationPreview();
-
-
                 renderNotificationIconLibrary();
 
                await loadNotificationManagement();
