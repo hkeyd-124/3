@@ -274,7 +274,7 @@ notificationStyle.textContent = `
 }
 
 .notification-item-preview{
-    margin-top:4px;
+    margin-top:5px;
 
     font-size:13px;
     line-height:1.4;
@@ -302,22 +302,6 @@ notificationStyle.textContent = `
 
 .notification-item.unread{
     background:#eff6ff;
-}
-
-.notification-item-title{
-    font-size:14px;
-    font-weight:600;
-
-    padding-right:14px;
-}
-
-.notification-item-preview{
-    margin-top:5px;
-
-    font-size:13px;
-    line-height:1.4;
-
-    color:#6b7280;
 }
 
 .notification-unread-dot{
