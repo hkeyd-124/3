@@ -100,9 +100,7 @@ function setActiveMenu(route) {
 
 function loadRoute(route, push = true) {
 
-    const routeData = routes[route];
-
-    if (!routeData) {
+    if (!routes[route]) {
         route = "dashboard";
     }
 
