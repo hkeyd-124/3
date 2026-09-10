@@ -104,16 +104,25 @@ async function(){
 
       return null;
     }
+/* =========================
+   CHECK BAN
+========================= */
 
+const userData = snap.data();
+
+if(userData.system?.status === "banned"){
+    alert("🚫 Bạn đã bị khóa!");
+    localStorage.clear();
+    window.location.href = "index.html";
+    return null;
+}
     /* =========================
        SAVE GLOBAL
     ========================= */
 
-   window.currentUser =
-  snap.data();
+   window.currentUser = userData();
 
-window.currentUserData =
-  currentUser;
+window.currentUserData = currentUser;
 
 setUserState(
   currentUser
