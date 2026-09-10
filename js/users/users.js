@@ -353,12 +353,6 @@ function renderUserRow(user) {
             ? "Activate"
             : "Ban";
 
-    const actionClass =
-        isBanned
-            ? "hc-user-action-activate"
-            : "hc-user-action-ban";
-
-
     return `
         <div
             class="hc-user-row ${
