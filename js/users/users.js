@@ -539,17 +539,60 @@ function renderUserRow(user) {
 
             <div class="hc-user-actions">
 
-                <button
-                    type="button"
-                    class="hc-user-more"
-                    data-user-action="${actionText.toLowerCase()}"
-                    data-uid="${escapeHTML(user.uid)}"
-                    title="${actionText}"
-                >
-                    ⋮
-                </button>
+    <button
+        type="button"
+        class="hc-user-more"
+        data-uid="${escapeHTML(user.uid)}"
+        title="More"
+    >
+        ⋮
+    </button>
 
-            </div>
+    <div class="hc-user-menu">
+
+        <button
+            type="button"
+            class="hc-user-menu-item hc-user-view"
+            data-action="view"
+            data-uid="${escapeHTML(user.uid)}"
+        >
+            👁 <span>Xem</span>
+        </button>
+
+        <button
+            type="button"
+            class="
+                hc-user-menu-item
+                ${
+                    isBanned
+                        ? "hc-user-unban"
+                        : "hc-user-ban"
+                }
+            "
+            data-action="${
+                isBanned
+                    ? "activate"
+                    : "ban"
+            }"
+            data-uid="${escapeHTML(user.uid)}"
+        >
+            ${
+                isBanned
+                    ? "✓"
+                    : "🚫"
+            }
+            <span>
+                ${
+                    isBanned
+                        ? "Bỏ chặn"
+                        : "Chặn"
+                }
+            </span>
+        </button>
+
+    </div>
+
+</div>
 
         </div>
     `;
@@ -562,51 +605,145 @@ function renderUserRow(user) {
 
 function bindUserActions() {
 
-    const buttons =
+    const rows =
         document.querySelectorAll(
-            ".hc-user-more"
+            ".hc-user-row"
         );
 
-    buttons.forEach(button => {
+    rows.forEach(row => {
 
-        button.addEventListener(
+        const moreButton =
+            row.querySelector(
+                ".hc-user-more"
+            );
+
+        const menu =
+            row.querySelector(
+                ".hc-user-menu"
+            );
+
+        if (!moreButton || !menu) {
+            return;
+        }
+
+
+        // Mở / đóng menu
+        moreButton.addEventListener(
             "click",
-            async event => {
+            event => {
 
                 event.stopPropagation();
 
-                const uid =
-                    button.dataset.uid;
+                document
+                    .querySelectorAll(
+                        ".hc-user-menu.hc-user-menu-open"
+                    )
+                    .forEach(openMenu => {
 
-                const action =
-                    button.dataset.userAction;
+                        if (openMenu !== menu) {
+                            openMenu.classList.remove(
+                                "hc-user-menu-open"
+                            );
+                        }
 
-                if (!uid) {
-                    return;
-                }
+                    });
 
-                if (action === "ban") {
-
-                    await changeUserStatus(
-                        uid,
-                        "banned"
-                    );
-
-                    return;
-                }
-
-                if (action === "activate") {
-
-                    await changeUserStatus(
-                        uid,
-                        "active"
-                    );
-                }
-
+                menu.classList.toggle(
+                    "hc-user-menu-open"
+                );
             }
         );
 
+
+        // Các lựa chọn trong menu
+        const actions =
+            menu.querySelectorAll(
+                ".hc-user-menu-item"
+            );
+
+        actions.forEach(actionButton => {
+
+            actionButton.addEventListener(
+                "click",
+                async event => {
+
+                    event.stopPropagation();
+
+                    const uid =
+                        actionButton.dataset.uid;
+
+                    const action =
+                        actionButton.dataset.action;
+
+                    if (!uid || !action) {
+                        return;
+                    }
+
+                    menu.classList.remove(
+                        "hc-user-menu-open"
+                    );
+
+
+                    // XEM
+                    if (action === "view") {
+
+                        openUserDetail(uid);
+
+                        return;
+                    }
+
+
+                    // CHẶN
+                    if (action === "ban") {
+
+                        await changeUserStatus(
+                            uid,
+                            "banned"
+                        );
+
+                        return;
+                    }
+
+
+                    // BỎ CHẶN
+                    if (action === "activate") {
+
+                        await changeUserStatus(
+                            uid,
+                            "active"
+                        );
+                    }
+
+                }
+            );
+
+        });
+
     });
+
+
+    // Click bên ngoài → đóng menu
+    document.addEventListener(
+        "click",
+        () => {
+
+            document
+                .querySelectorAll(
+                    ".hc-user-menu.hc-user-menu-open"
+                )
+                .forEach(menu => {
+
+                    menu.classList.remove(
+                        "hc-user-menu-open"
+                    );
+
+                });
+
+        },
+        {
+            once: true
+        }
+    );
 }
 
 
@@ -633,10 +770,6 @@ async function changeUserStatus(
         newStatus === "banned"
             ? `Ban user "${user.name || user.email || uid}"?`
             : `Activate user "${user.name || user.email || uid}"?`;
-
-    if (!window.confirm(message)) {
-        return;
-    }
 
 
     try {
@@ -1142,7 +1275,73 @@ function injectStyles() {
         .hc-user-more:hover {
             background: #f3f4f6;
         }
+.hc-user-actions {
+    position: relative;
+    display: flex;
+    justify-content: flex-end;
+}
 
+.hc-user-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    right: 0;
+
+    min-width: 125px;
+
+    padding: 5px;
+
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+
+    box-shadow:
+        0 10px 25px rgba(0,0,0,0.10);
+
+    display: none;
+
+    z-index: 100;
+}
+
+.hc-user-menu-open {
+    display: flex;
+    flex-direction: column;
+}
+
+.hc-user-menu-item {
+    width: 100%;
+
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 8px 10px;
+
+    border: none;
+    border-radius: 7px;
+
+    background: transparent;
+
+    font-size: 13px;
+    text-align: left;
+
+    cursor: pointer;
+}
+
+.hc-user-menu-item:hover {
+    background: #f3f4f6;
+}
+
+.hc-user-view {
+    color: #374151;
+}
+
+.hc-user-ban {
+    color: #dc2626;
+}
+
+.hc-user-unban {
+    color: #16a34a;
+}
         .hc-users-empty {
             min-height: 220px;
             display: flex;
