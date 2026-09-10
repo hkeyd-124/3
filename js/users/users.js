@@ -2,7 +2,7 @@
 
 import {
     db
-} from "../firebase.js";
+} from "../../firebase.js";
 
 import {
     collection,
