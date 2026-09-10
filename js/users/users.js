@@ -1137,9 +1137,13 @@ function injectStyles() {
     position: relative;
     z-index: 1000;
 }
-        .hc-user-row-banned {
-            opacity: 0.72;
-        }
+        .hc-user-row-banned > *:not(.hc-user-actions) {
+    opacity: 0.72;
+}
+
+.hc-user-row-banned .hc-user-actions {
+    opacity: 1;
+}
 
         .hc-user-main {
             display: flex;
