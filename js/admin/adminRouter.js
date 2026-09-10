@@ -1,6 +1,9 @@
 import {
     loadNotifications
 } from "./notifications.js";
+import {
+    loadUsers
+} from "../users/users.js";
 /* =========================
    ADMIN ROUTER
 ========================= */
@@ -21,10 +24,7 @@ const routes = {
 
     users: {
         title: "Users",
-        content: `
-            <h2>Users</h2>
-            <p>User management will be added in a future phase.</p>
-        `
+        load: loadUsers
     },
 
     system: {
