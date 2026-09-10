@@ -1130,11 +1130,13 @@ function injectStyles() {
         }
 
         .hc-user-row:hover {
-            transform: translateY(-1px);
-            box-shadow:
-                0 7px 20px rgba(0,0,0,0.07);
-        }
-
+    box-shadow:
+        0 7px 20px rgba(0,0,0,0.07);
+}
+.hc-user-row:has(.hc-user-menu-open) {
+    position: relative;
+    z-index: 1000;
+}
         .hc-user-row-banned {
             opacity: 0.72;
         }
@@ -1293,7 +1295,7 @@ function injectStyles() {
 
     display: none;
 
-    z-index: 100;
+    z-index: 1001;
 }
 
 .hc-user-menu-open {
