@@ -744,8 +744,7 @@ window.resetCover = async function () {
    REALTIME USER
 ========================= */
 
-window.startUserRealtime =
-function(){
+window.startUserRealtime = function(){
 
   try{
 
@@ -774,16 +773,21 @@ function(){
       (snap)=>{
 
         if(!snap.exists()){
-
           return;
         }
+const data = snap.data();
 
+if(data.system?.status === "banned"){
+    showToast("🚫 Bạn đã bị khóa!");
+    localStorage.clear();
+    window.location.href = "index.html";
+    return;
+}
         /* =========================
            UPDATE USER
         ========================= */
 
-       window.currentUser =
-  snap.data();
+       window.currentUser = data();
 
 window.currentUserData =
   currentUser;
