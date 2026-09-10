@@ -11,11 +11,6 @@ import {
     updateDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-import {
-    getCurrentUID
-} from "../core/auth.js";
-
-
 /* =========================
    CONSTANTS
 ========================= */
@@ -37,9 +32,8 @@ let currentFilters = {
 ========================= */
 
 function getCacheKey() {
-
-    const adminUID = getCurrentUID();
-
+    const adminUID =
+        localStorage.getItem("uid");
     return `${CACHE_PREFIX}${adminUID || "unknown"}`;
 }
 
