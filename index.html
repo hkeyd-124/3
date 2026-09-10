@@ -808,14 +808,22 @@ async function checkFirstTime() {
   if (snapshot.exists()) {
     const data = snapshot.data();
 
-   if (!data.name || data.name.trim() === "") {
-    hideLoading();
-      document.getElementById("nameModal").style.display = "flex";
-      return true;
-    }
-  }
+    /* =========================
+       CHECK BAN
+    ========================= */
 
-  return false;
+    if(data.system?.status === "banned"){
+        alert("🚫 Bạn đã bị khóa!");
+        localStorage.clear();
+        window.location.href = "index.html";
+        return false;
+    }
+
+    if (!data.name || data.name.trim() === "") {
+        hideLoading();
+        document.getElementById("nameModal").style.display = "flex";
+        return true;
+    }
 }
 
 // SAVE NAME
