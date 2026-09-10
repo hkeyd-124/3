@@ -120,7 +120,7 @@ if(userData.system?.status === "banned"){
        SAVE GLOBAL
     ========================= */
 
-   window.currentUser = userData();
+   window.currentUser = userData;
 
 window.currentUserData = currentUser;
 
@@ -787,7 +787,7 @@ if(data.system?.status === "banned"){
            UPDATE USER
         ========================= */
 
-       window.currentUser = data();
+       window.currentUser = data;
 
 window.currentUserData =
   currentUser;
