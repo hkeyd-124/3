@@ -47,8 +47,7 @@ export default async function handler(
       cid:
         result.IpfsHash,
 
-      metadataURI:
-        `ipfs://${result.IpfsHash}`
+      metadataURI:`https://gateway.pinata.cloud/ipfs/${result.IpfsHash}`
 
     });
 
