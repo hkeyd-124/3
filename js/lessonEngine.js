@@ -513,8 +513,7 @@ uploadMetadata:async function(imageCid){
     description:
       "HackChem NFT Certificate",
 
-    image:
-      `ipfs://${imageCid}`,
+    image: `https://gateway.pinata.cloud/ipfs/${imageCid}`,
 
     attributes:[
 
