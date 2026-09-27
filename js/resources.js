@@ -25,9 +25,9 @@ window.openLessonSPA = function(id){
 
   const lessonMap = {
 
-    organic_1:"organic.html",
+    organic_1:"resources/Alkane/alkane.html",
 
-    organic_2:"alkane.html",
+    organic_2:"resources/Alkane/alkane.html",
 
     organic_3:"alkene.html",
 
