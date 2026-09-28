@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soft Base Neon Erlenmeyer Flask - Three.js</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: #020712;
+      height: 100%;
+      overflow-x: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      color: #fff;
+    }
+    #scene {
+      position: fixed;
+      inset: 0;
+      display: block;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
+    #scroll-host {
+      height: 300vh;
+      position: relative;
+      z-index: 2;
+      pointer-events: none;
+    }
+    .ui-header {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+      z-index: 10;
+      pointer-events: none;
+      user-select: none;
+    }
+    .ui-title {
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      background: linear-gradient(135deg, #00ffcc, #00bfff, #0072ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin: 0 0 6px 0;
+      text-transform: uppercase;
+      text-shadow: 0 0 25px rgba(0,255,204,0.4);
+    }
+    .ui-subtitle {
+      font-size: 13px;
+      color: #7dd3fc;
+      letter-spacing: 2px;
+      margin: 0;
+      opacity: 0.85;
+      text-transform: uppercase;
+    }
+    .scroll-hint {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: rgba(0, 255, 204, 0.85);
+      font-size: 13px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      z-index: 10;
+      pointer-events: none;
+      animation: bounce 2s infinite ease-in-out;
+      user-select: none;
+      text-shadow: 0 0 12px rgba(0,255,204,0.5);
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translate(-50%, 0); opacity: 0.5; }
+      50% { transform: translate(-50%, -8px); opacity: 1; }
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.143.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.143.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <!-- Fixed Canvas -->
+  <canvas id="scene"></canvas>
+
+  <!-- UI Overlay -->
+  <div class="ui-header">
+    <h1 class="ui-title">NEON ERLENMEYER</h1>
+    <p class="ui-subtitle">Soft Rounded Base & Pure Liquid Dynamics</p>
+  </div>
+
+  <div id="scroll-host"></div>
+  <div class="scroll-hint">Cuộn chuột để xoay & phóng to ↓</div>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+    import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+    import { GammaCorrectionShader } from 'three/addons/shaders/GammaCorrectionShader.js';
+
+    const CONFIG = {
+      bgColor: '#020712',
+      liquidColorA: '#00f2fe',
+      liquidColorB: '#00ffaa',
+      liquidColorC: '#38ef7d',
+      glassColor: '#80e5ff',
+      baseGlowColor: '#00ffcc',
+      liquidCount: 45000,
+      glassCount: 25000,
+      baseDiskCount: 15000,
+      scrollDive: 2.8,
+      scrollGrow: 0.45,
+      scrollSpin: 0.7,
+      parallax: 0.8
+    };
+
+    function hexToVec3(hex) {
+      const n = parseInt(hex.slice(1), 16);
+      return new THREE.Vector3(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255);
+    }
+
+    const canvas = document.getElementById('scene');
+    const renderer = new THREE.WebGL1Renderer({ canvas, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(CONFIG.bgColor);
+
+    const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 80);
+    camera.position.set(0, 0, 7.5);
+    scene.add(camera);
+
+    const renderScene = new RenderPass(scene, camera);
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      0.85, // Bloom Strength
+      0.45, // Bloom Radius
+      0.08  // Threshold
+    );
+
+    const composer = new EffectComposer(renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+    composer.addPass(new ShaderPass(GammaCorrectionShader));
+
+    const flaskGroup = new THREE.Group();
+    scene.add(flaskGroup);
+
+    // Geometry dimensions with a soft rounded bevel at the bottom base
+    const baseR = 1.70;
+    const bottomRadiusCurvature = 0.35; // Soft rounding radius at the bottom-outer corner
+    const waistR = 0.55;
+    const bodyHeight = 3.2; // Tăng chiều cao thân bình, giữ nguyên bề rộng
+    const minY = -bodyHeight / 2; // Bottom center position
+    const liquidMaxY = 0.15;
+
+    // Helper function to map height Y to Radius with soft bo-tròn curve at bottom edge
+    function getFlaskRadiusAtY(y) {
+      if (y < minY + bottomRadiusCurvature) {
+        // Smooth rounded bottom edge transition
+        const t = (y - minY) / bottomRadiusCurvature; // 0 to 1
+        const cornerFactor = Math.sin(t * Math.PI * 0.5); // Soft sine curve
+        return (baseR - bottomRadiusCurvature) + bottomRadiusCurvature * cornerFactor;
+      } else {
+        // Standard conical slope upwards
+        const tHeight = (y - (minY + bottomRadiusCurvature)) / (bodyHeight - bottomRadiusCurvature);
+        const startR = baseR;
+        return startR * (1 - tHeight) + waistR * tHeight;
+      }
+    }
+
+    const liquidCount = CONFIG.liquidCount;
+    const liquidPos = new Float32Array(liquidCount * 3);
+    const liquidParams = new Float32Array(liquidCount * 3);
+
+    for (let i = 0; i < liquidCount; i++) {
+      const i3 = i * 3;
+      const yNorm = Math.random();
+      const y = minY + yNorm * (liquidMaxY - minY);
+      
+      const currentMaxR = getFlaskRadiusAtY(y);
+      const rRatio = Math.sqrt(Math.random());
+      const r = rRatio * currentMaxR * 0.96;
+      const angle = Math.random() * Math.PI * 2;
+
+      liquidPos[i3]     = r * Math.cos(angle);
+      liquidPos[i3 + 1] = y;
+      liquidPos[i3 + 2] = r * Math.sin(angle);
+
+      liquidParams[i3]     = rRatio;
+      liquidParams[i3 + 1] = yNorm;
+      liquidParams[i3 + 2] = Math.random() * Math.PI * 2;
+    }
+
+    const liquidGeo = new THREE.BufferGeometry();
+    liquidGeo.setAttribute('position', new THREE.Float32BufferAttribute(liquidPos, 3));
+    liquidGeo.setAttribute('aParams', new THREE.Float32BufferAttribute(liquidParams, 3));
+
+    const liquidMat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uCursor: { value: new THREE.Vector3() },
+        uActivity: { value: 0 },
+        uColorA: { value: hexToVec3(CONFIG.liquidColorA) },
+        uColorB: { value: hexToVec3(CONFIG.liquidColorB) },
+        uColorC: { value: hexToVec3(CONFIG.liquidColorC) }
+      },
+      vertexShader: `
+        uniform float uTime;
+        uniform vec3 uCursor;
+        uniform float uActivity;
+        uniform vec3 uColorA;
+        uniform vec3 uColorB;
+        uniform vec3 uColorC;
+        attribute vec3 aParams;
+        varying vec3 vColor;
+        varying float vAlpha;
+
+        void main() {
+          vec3 pos = position;
+
+          // Liquid surface and fluid waves
+          float wave = sin(uTime * 2.8 + pos.x * 3.5 + pos.z * 3.5 + aParams.z) * 0.07 * aParams.y;
+          float wave2 = cos(uTime * 2.0 + pos.x * 2.5 - pos.z * 2.5) * 0.05 * aParams.y;
+          pos.y += wave + wave2;
+
+          // Internal fluid rotation
+          float angle = uTime * 0.4 * (1.1 - aParams.y) + aParams.z;
+          mat2 rot = mat2(cos(angle), -sin(angle), sin(angle), cos(angle));
+          pos.xz = rot * pos.xz;
+
+          vec4 modelPos = modelMatrix * vec4(pos, 1.0);
+
+          // Interactive repulsion
+          vec3 toCursor = modelPos.xyz - uCursor;
+          float dist = length(toCursor);
+          float repel = smoothstep(1.3, 0.0, dist);
+          modelPos.xyz += normalize(toCursor + vec3(0.001)) * repel * 0.9 * uActivity;
+
+          vec4 viewPos = viewMatrix * modelPos;
+          gl_Position = projectionMatrix * viewPos;
+
+          gl_PointSize = (26.0 + aParams.x * 14.0) * (1.0 / -viewPos.z);
+
+          vec3 col = mix(uColorA, uColorB, aParams.y);
+          vColor = mix(col, uColorC, sin(uTime * 1.5 + aParams.z) * 0.5 + 0.5);
+          vAlpha = 0.55 + 0.45 * aParams.x;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          vec2 uv = gl_PointCoord - 0.5;
+          float d = length(uv);
+          if (d > 0.5) discard;
+          float strength = pow(1.0 - d * 2.0, 2.2);
+          gl_FragColor = vec4(vColor * 1.5, strength * vAlpha);
+        }
+      `
+    });
+
+    const liquidMesh = new THREE.Points(liquidGeo, liquidMat);
+    flaskGroup.add(liquidMesh);
+
+    const glassCount = CONFIG.glassCount;
+    const glassPos = new Float32Array(glassCount * 3);
+    const glassAlpha = new Float32Array(glassCount);
+
+    const neckR = waistR;
+    const neckTopY = 2.4; // Dời đỉnh cổ theo chiều cao thân bình
+    const lipR = 0.68;
+
+    for (let i = 0; i < glassCount; i++) {
+      const i3 = i * 3;
+      const angle = Math.random() * Math.PI * 2;
+      let r, y;
+
+      const part = Math.random();
+      if (part < 0.70) {
+        // Body shell including bottom curved edge
+        const t = Math.random();
+        y = minY + t * bodyHeight;
+        r = getFlaskRadiusAtY(y);
+      } else if (part < 0.90) {
+        // Neck section
+        const t = Math.random();
+        y = bodyHeight / 2 + t * (neckTopY - bodyHeight / 2);
+        r = neckR;
+      } else {
+        // Top lip rim
+        y = neckTopY;
+        r = neckR + (lipR - neckR) * Math.random();
+      }
+
+      glassPos[i3]     = r * Math.cos(angle) + (Math.random() - 0.5) * 0.015;
+      glassPos[i3 + 1] = y + (Math.random() - 0.5) * 0.015;
+      glassPos[i3 + 2] = r * Math.sin(angle) + (Math.random() - 0.5) * 0.015;
+      glassAlpha[i]    = 0.35 + Math.random() * 0.65;
+    }
+
+    const glassGeo = new THREE.BufferGeometry();
+    glassGeo.setAttribute('position', new THREE.Float32BufferAttribute(glassPos, 3));
+    glassGeo.setAttribute('aAlpha', new THREE.Float32BufferAttribute(glassAlpha, 1));
+
+    const glassMat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uColor: { value: hexToVec3(CONFIG.glassColor) }
+      },
+      vertexShader: `
+        attribute float aAlpha;
+        uniform vec3 uColor;
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          vec4 mv = modelViewMatrix * vec4(position, 1.0);
+          gl_Position = projectionMatrix * mv;
+          gl_PointSize = 13.0 / -mv.z;
+          vColor = uColor;
+          vAlpha = aAlpha;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          vec2 uv = gl_PointCoord - 0.5;
+          float d = length(uv);
+          if (d > 0.5) discard;
+          float intensity = pow(1.0 - d * 2.0, 2.8);
+          gl_FragColor = vec4(vColor * 1.6, intensity * vAlpha * 0.7);
+        }
+      `
+    });
+
+    const glassMesh = new THREE.Points(glassGeo, glassMat);
+    flaskGroup.add(glassMesh);
+
+    const baseDiskCount = CONFIG.baseDiskCount;
+    const basePos = new Float32Array(baseDiskCount * 3);
+    const baseMeta = new Float32Array(baseDiskCount * 2);
+
+    for (let i = 0; i < baseDiskCount; i++) {
+      const i3 = i * 3;
+      const i2 = i * 2;
+      const angle = Math.random() * Math.PI * 2;
+
+      // Soft rounded base floor mapping
+      const rRatio = Math.sqrt(Math.random());
+      const maxBaseFloorR = baseR - bottomRadiusCurvature * 0.3;
+      const r = rRatio * maxBaseFloorR;
+
+      // Subtle upward curve toward the edges for a natural glass dish shape
+      const subtleCurveY = minY + (1.0 - Math.cos((r / maxBaseFloorR) * (Math.PI * 0.3))) * 0.12;
+
+      basePos[i3]     = r * Math.cos(angle);
+      basePos[i3 + 1] = subtleCurveY + (Math.random() - 0.5) * 0.015;
+      basePos[i3 + 2] = r * Math.sin(angle);
+
+      baseMeta[i2]     = rRatio;
+      baseMeta[i2 + 1] = 0.8; // Bỏ vòng sáng nhấn ở mép ngoài đế
+    }
+
+    const baseGeo = new THREE.BufferGeometry();
+    baseGeo.setAttribute('position', new THREE.Float32BufferAttribute(basePos, 3));
+    baseGeo.setAttribute('aMeta', new THREE.Float32BufferAttribute(baseMeta, 2));
+
+    const baseMat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: {
+        uTime: { value: 0 },
+        uColorRim: { value: hexToVec3(CONFIG.baseGlowColor) },
+        uColorCore: { value: hexToVec3(CONFIG.liquidColorA) }
+      },
+      vertexShader: `
+        uniform float uTime;
+        uniform vec3 uColorRim;
+        uniform vec3 uColorCore;
+        attribute vec2 aMeta;
+        varying vec3 vColor;
+        varying float vAlpha;
+
+        void main() {
+          vec3 pos = position;
+
+          // Subtle pulsating glow loop
+          float pulse = sin(uTime * 1.8 + aMeta.x * 3.14) * 0.015 * aMeta.x;
+          pos.xz *= (1.0 + pulse);
+
+          vec4 mv = modelViewMatrix * vec4(pos, 1.0);
+          gl_Position = projectionMatrix * mv;
+
+          float baseSize = aMeta.x > 0.85 ? 18.0 : 13.0;
+          gl_PointSize = baseSize / -mv.z;
+
+          vColor = mix(uColorCore, uColorRim, smoothstep(0.2, 0.9, aMeta.x));
+          vAlpha = aMeta.y * 0.85;
+        }
+      `,
+      fragmentShader: `
+        varying vec3 vColor;
+        varying float vAlpha;
+        void main() {
+          vec2 uv = gl_PointCoord - 0.5;
+          float d = length(uv);
+          if (d > 0.5) discard;
+          float strength = pow(1.0 - d * 2.0, 2.2);
+          gl_FragColor = vec4(vColor * 1.8, strength * vAlpha);
+        }
+      `
+    });
+
+    const baseMesh = new THREE.Points(baseGeo, baseMat);
+    flaskGroup.add(baseMesh);
+
+    const POINTER = {
+      ndc: new THREE.Vector2(),
+      world: new THREE.Vector3(),
+      activity: 0,
+      active: false,
+      lastMove: performance.now()
+    };
+
+    window.addEventListener('mousemove', e => {
+      POINTER.ndc.x = (e.clientX / window.innerWidth) * 2 - 1;
+      POINTER.ndc.y = -((e.clientY / window.innerHeight) * 2 - 1);
+      POINTER.active = true;
+      POINTER.lastMove = performance.now();
+    }, { passive: true });
+
+    window.addEventListener('mouseout', () => {
+      POINTER.active = false;
+    }, { passive: true });
+
+    const _ndc = new THREE.Vector3(), _dir = new THREE.Vector3(), _target = new THREE.Vector3();
+    function updatePointer() {
+      _target.set(0, 0, 0);
+      if (POINTER.active) {
+        _ndc.set(POINTER.ndc.x, POINTER.ndc.y, 0.5).unproject(camera);
+        _dir.copy(_ndc).sub(camera.position).normalize();
+        const denom = _dir.z;
+        if (Math.abs(denom) > 1e-4) {
+          const t = -camera.position.z / denom;
+          if (t > 0 && Number.isFinite(t)) _target.copy(camera.position).addScaledVector(_dir, t);
+        }
+      }
+      POINTER.world.lerp(_target, 0.12);
+      const idle = (performance.now() - POINTER.lastMove) / 1000;
+      const want = (POINTER.active && idle < 3) ? 1 : 0;
+      POINTER.activity += (want - POINTER.activity) * 0.06;
+    }
+
+    const Lerp = (a, b, t) => a + (b - a) * t;
+    const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+    let scrollTarget = 0, scrollSmooth = 0, scrollCurrent = 0;
+    const mouseSmooth = { x: 0, y: 0 };
+
+    function updateScroll() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      scrollTarget = max > 0 ? clamp(window.scrollY / max, 0, 1) : 0;
+    }
+    window.addEventListener('scroll', updateScroll, { passive: true });
+    updateScroll();
+
+    window.addEventListener('resize', () => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setSize(w, h);
+      composer.setSize(w, h);
+
+      updateScroll();
+    });
+
+    let t0 = performance.now() / 1000;
+
+    function render() {
+      requestAnimationFrame(render);
+
+      const t = performance.now() / 1000;
+      const dt = Math.min(0.05, t - t0);
+      t0 = t;
+
+      scrollSmooth  = Lerp(scrollSmooth, scrollTarget, 0.10);
+      scrollCurrent = Lerp(scrollCurrent, scrollSmooth, 0.06);
+
+      mouseSmooth.x = Lerp(mouseSmooth.x, POINTER.ndc.x, 0.06);
+      mouseSmooth.y = Lerp(mouseSmooth.y, POINTER.ndc.y, 0.06);
+
+      updatePointer();
+
+      // Camera motion & parallax
+      camera.position.set(mouseSmooth.x * CONFIG.parallax, mouseSmooth.y * CONFIG.parallax, 7.5 - scrollCurrent * CONFIG.scrollDive);
+      camera.lookAt(0, 0, 0);
+
+      // Smooth rotation and scaling on scroll
+      flaskGroup.scale.setScalar(1 + scrollCurrent * CONFIG.scrollGrow);
+      flaskGroup.rotation.y += dt * (0.35 + scrollCurrent * CONFIG.scrollSpin);
+      flaskGroup.rotation.x = Math.sin(t * 0.8) * 0.08;
+
+      // Uniform updates
+      liquidMat.uniforms.uTime.value = t;
+      liquidMat.uniforms.uCursor.value.copy(POINTER.world);
+      liquidMat.uniforms.uActivity.value = POINTER.activity;
+
+      baseMat.uniforms.uTime.value = t;
+
+      composer.render();
+    }
+
+    render();
+  </script>
+</body>
+</html>
