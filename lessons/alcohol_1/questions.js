@@ -3,7 +3,7 @@ window.lessonQuestions = [
   {
 
     type:"single",
-q:"Alkane là các hydrocarbon",
+q:"Xin chào alcohol 1",
 opt:["mạch vòng","mạch hở","mạch hở, chỉ có liên kết đơn C-C và C-H","mạch vòng, chứa liên kết C-C, C=C và C-H"],
 a:2
 },
