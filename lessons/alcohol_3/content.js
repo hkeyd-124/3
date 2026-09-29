@@ -6,7 +6,7 @@ window.lessonContent = {
       id:"pdf",
       type:"pdf",
       title:"PDF",
-      src:"./lessons/organic_2/lesson.pdf",
+      src:"./assets/images/default-avatar.png",
       penalty:0
     }
 
