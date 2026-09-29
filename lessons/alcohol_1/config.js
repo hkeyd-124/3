@@ -1,6 +1,6 @@
 window.lessonConfig = {
 
-  id:"organic_2",
+  id:"alcohol_1",
 
   title:"Alkane",
   
