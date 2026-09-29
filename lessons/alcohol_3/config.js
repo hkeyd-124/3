@@ -2,7 +2,7 @@ window.lessonConfig = {
 
   id:"organic_2",
 
-  title:"Alkane",
+  title:"tính chất vật lí của alcohol",
   
   maxScore:450,
   
