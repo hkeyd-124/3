@@ -12,6 +12,9 @@
 
 <title>HackChem SPA</title>
 
+<!-- MOBILE UI LAYER (additive — desktop unaffected) -->
+<link rel="stylesheet" href="css/mobile.css">
+
 <style>
 
 *{
@@ -1353,5 +1356,44 @@ transition:.2s;
 </div>
   
   
+<!-- =========================
+     MOBILE BOTTOM NAVIGATION
+     Hidden on desktop (inline style + css/mobile.css).
+     Every item calls the EXISTING global router functions.
+========================= -->
+<nav class="hc-mobile-nav" id="hcMobileNav" style="display:none;">
+
+  <button class="hc-mnav-item hc-mnav-home"
+          onclick="loadHome()">
+    <span class="hc-mnav-icon">🏠</span>
+    <span class="hc-mnav-label">Home</span>
+  </button>
+
+  <button class="hc-mnav-item hc-mnav-courses"
+          onclick="loadTab('courses')">
+    <span class="hc-mnav-icon">📘</span>
+    <span class="hc-mnav-label">Courses</span>
+  </button>
+
+  <button class="hc-mnav-item hc-mnav-resources"
+          onclick="loadTab('resources')">
+    <span class="hc-mnav-icon">📚</span>
+    <span class="hc-mnav-label">Resources</span>
+  </button>
+
+  <button class="hc-mnav-item hc-mnav-ai"
+          onclick="loadTab('ai')">
+    <span class="hc-mnav-icon">🤖</span>
+    <span class="hc-mnav-label">AI</span>
+  </button>
+
+  <button class="hc-mnav-item hc-mnav-leaderboard"
+          onclick="loadTab('leaderboard')">
+    <span class="hc-mnav-icon">🏆</span>
+    <span class="hc-mnav-label">Rank</span>
+  </button>
+
+</nav>
+
 </body>
 </html>
