@@ -1,0 +1,490 @@
+/* =========================================================
+   HackChem — MOBILE UI LAYER  (ADDITIVE ONLY)
+   ---------------------------------------------------------
+   Loaded by: home.html, index.html
+   Scope    : every rule lives inside a max-width media query,
+              so desktop (> 768px) is completely unaffected.
+   Contains : presentation only. No business logic, no JS,
+              no DOM contract / id / class renames.
+   ---------------------------------------------------------
+   Desktop UI  = untouched (original inline <style> blocks)
+   Mobile UI   = this file + the .hc-mobile-nav markup
+   Shared logic= js/*.js, courses/*.js  (100% unchanged)
+   ========================================================= */
+
+/* Bottom nav is hidden by default; home.html also carries an
+   inline style="display:none" so it can never leak to desktop
+   even if this stylesheet fails to load. */
+.hc-mobile-nav { display: none; }
+
+
+/* =========================================================
+   MOBILE  (<= 768px)
+   ========================================================= */
+@media (max-width: 768px) {
+
+  /* -------------------------------------------------------
+     1. GLOBAL SHELL
+     ------------------------------------------------------- */
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  body {
+    flex-direction: column;
+    overflow: auto;
+    /* room for the fixed bottom navigation */
+    padding-bottom: 78px;
+  }
+
+  /* -------------------------------------------------------
+     2. SIDEBAR  ->  compact horizontal header strip
+        (all secondary actions stay reachable: Faucet,
+         Link Wallet, Link Email)
+     ------------------------------------------------------- */
+  .sidebar {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 12px;
+
+    border-right: none;
+    border-bottom: 1px solid #eee;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: #fff;
+  }
+
+  .sidebar::-webkit-scrollbar { display: none; }
+
+  .sidebar .logo {
+    flex: 0 0 auto;
+    font-size: 15px;
+    margin: 0 6px 0 0;
+    white-space: nowrap;
+  }
+
+  .sidebar .menu-item {
+    flex: 0 0 auto;
+    margin: 0;
+    padding: 9px 13px;
+    font-size: 13px;
+    border-radius: 999px;
+    background: #f1f5f9;
+    white-space: nowrap;
+    text-align: center;
+  }
+
+  .sidebar .menu-item:hover { transform: none; }
+
+  .sidebar .menu-item.active {
+    background: #111;
+    color: #fff;
+  }
+
+  /* The 5 primary tabs are served by the bottom nav on mobile,
+     so their sidebar duplicates are hidden to avoid a
+     double navigation bar. */
+  #menu-home,
+  #menu-courses,
+  #menu-resources,
+  #menu-ai,
+  #menu-leaderboard {
+    display: none;
+  }
+
+  /* -------------------------------------------------------
+     3. MAIN
+     ------------------------------------------------------- */
+  .main {
+    width: 100%;
+    padding: 14px;
+    overflow: visible;
+  }
+
+  /* -------------------------------------------------------
+     4. HERO + CARDS
+     ------------------------------------------------------- */
+  .hero {
+    padding: 22px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .hero h1 { font-size: 24px; }
+  .hero p  { font-size: 14px; }
+
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card {
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .card-icon { font-size: 28px; }
+  .card h3   { font-size: 17px; }
+  .card p    { font-size: 13.5px; }
+
+  /* -------------------------------------------------------
+     5. PROFILE CARD  (rendered by js/profile.js)
+     ------------------------------------------------------- */
+  #profileCard {
+    padding: 20px !important;
+    border-radius: 22px !important;
+    gap: 16px !important;
+  }
+
+  #profileCard img#profileAvatar {
+    width: 60px !important;
+    height: 60px !important;
+  }
+
+  /* -------------------------------------------------------
+     6. MOBILE BOTTOM NAVIGATION
+        Markup lives in home.html; every item calls the
+        EXISTING global functions (loadHome / loadTab).
+     ------------------------------------------------------- */
+  .hc-mobile-nav {
+    display: flex !important;
+
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9000;
+
+    background: rgba(255, 255, 255, .96);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+
+    border-top: 1px solid #e5e7eb;
+    box-shadow: 0 -6px 24px rgba(0, 0, 0, .06);
+
+    padding: 6px 4px calc(6px + env(safe-area-inset-bottom));
+  }
+
+  .hc-mnav-item {
+    flex: 1 1 0;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+
+    padding: 7px 2px;
+
+    border: none;
+    background: transparent;
+    border-radius: 14px;
+
+    cursor: pointer;
+    font-family: inherit;
+    color: #64748b;
+
+    transition: .18s;
+  }
+
+  .hc-mnav-icon  { font-size: 19px; line-height: 1; }
+  .hc-mnav-label { font-size: 10.5px; font-weight: 700; }
+
+  .hc-mnav-item:active { transform: scale(.94); }
+
+  /* Active state is derived from the EXISTING .active class that
+     js/router.js already puts on the sidebar items — no new JS. */
+  body:has(#menu-home.active)        .hc-mnav-home,
+  body:has(#menu-courses.active)     .hc-mnav-courses,
+  body:has(#menu-resources.active)   .hc-mnav-resources,
+  body:has(#menu-ai.active)          .hc-mnav-ai,
+  body:has(#menu-leaderboard.active) .hc-mnav-leaderboard {
+    color: #111;
+    background: #f1f5f9;
+  }
+
+  /* -------------------------------------------------------
+     7. TAB PAGES  (injected into #spaContainer by router.js)
+     ------------------------------------------------------- */
+  .courses-page,
+  .resources-page {
+    padding: 14px;
+    height: auto;
+    overflow: visible;
+  }
+
+  .leaderboard-page,
+  .ai-page { padding: 14px; }
+
+  .courses-container,
+  .resources-container,
+  .lb-container,
+  .ai-container { max-width: 100%; }
+
+  .courses-header,
+  .resources-header,
+  .lb-header,
+  .ai-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .courses-title,
+  .resources-title,
+  .lb-title,
+  .ai-title { font-size: 22px; }
+
+  .back-btn,
+  .lb-home,
+  .ai-home {
+    align-self: flex-start;
+    padding: 9px 15px;
+    font-size: 13px;
+  }
+
+  /* --- courses --- */
+  .course-topic {
+    padding: 14px;
+    font-size: 14px;
+    border-radius: 12px;
+  }
+
+  .course-lesson {
+    margin-left: 12px;
+    padding: 12px;
+    font-size: 13.5px;
+    border-radius: 11px;
+  }
+
+  .percent-circle {
+    width: 46px;
+    height: 46px;
+    font-size: 12px;
+    flex: 0 0 auto;
+  }
+
+  /* --- resources --- */
+  .topic {
+    padding: 14px;
+    font-size: 13.5px;
+    border-radius: 12px;
+  }
+
+  .lesson {
+    padding: 12px;
+    font-size: 13.5px;
+    border-radius: 11px;
+  }
+
+  .lesson-list { margin-left: 10px; }
+
+  /* --- leaderboard: remove the 900px min-width horizontal scroll --- */
+  .lb-card {
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .lb-filters {
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .lb-select {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .lb-table-header,
+  .lb-row {
+    min-width: 0 !important;
+    grid-template-columns: 44px 1fr 62px 54px !important;
+    padding: 9px 10px !important;
+    gap: 4px;
+  }
+
+  .lb-table-header { font-size: 12px; }
+
+  .lb-rank  { font-size: 20px; }
+  .lb-name  { font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-score { font-size: 15px; }
+
+  .lb-badge {
+    padding: 5px 9px;
+    font-size: 12px;
+    border-radius: 9px;
+  }
+
+  #leaderboardList { max-height: none; }
+
+  /* --- ai --- */
+  .ai-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .ai-card {
+    padding: 20px;
+    border-radius: 18px;
+  }
+
+  .ai-icon       { font-size: 32px; margin-bottom: 10px; }
+  .ai-card-title { font-size: 19px; }
+  .ai-card-desc  { font-size: 13.5px; }
+
+  /* AI quiz: the 2-column topic/difficulty grid -> 1 column */
+  #aiQuizView [style*="grid-template-columns:1fr 1fr"] {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* AI tutor: shorter message area so the input stays visible */
+  #aiMessages { height: 42vh !important; }
+
+  /* -------------------------------------------------------
+     8. MODALS  (inline-styled in home.html)
+        Fixed pixel widths -> fluid on small screens.
+     ------------------------------------------------------- */
+  #linkEmailModal > div,
+  #changeNameModal > div,
+  #coverModal > div,
+  #checkinModal > div,
+  #faucetModal > div {
+    width: calc(100vw - 32px) !important;
+    max-width: 100% !important;
+    max-height: 88vh;
+    overflow-y: auto;
+    padding: 22px !important;
+    border-radius: 22px !important;
+  }
+
+  #coverPresetGrid { gap: 10px !important; }
+
+  .coverPreset { height: 68px !important; }
+
+  /* -------------------------------------------------------
+     9. NOTIFICATION DROPDOWN  (styles injected by
+        js/notifications/notificationUI.js)
+     ------------------------------------------------------- */
+  #notificationDropdown {
+    position: fixed !important;
+    top: 62px !important;
+    left: 10px !important;
+    right: 10px !important;
+    width: auto !important;
+    max-height: 70vh !important;
+  }
+
+  /* -------------------------------------------------------
+     10. TOUCH TARGETS
+     ------------------------------------------------------- */
+  .menu-item,
+  .card,
+  .course-topic,
+  .course-lesson,
+  .topic,
+  .lesson,
+  .ai-card,
+  .back-btn,
+  .lb-home,
+  .ai-home { min-height: 44px; }
+}
+
+
+/* =========================================================
+   SMALL PHONES  (<= 400px)
+   ========================================================= */
+@media (max-width: 400px) {
+
+  .hero h1 { font-size: 21px; }
+
+  .hc-mnav-label { font-size: 9.5px; }
+  .hc-mnav-icon  { font-size: 17px; }
+
+  .lb-table-header,
+  .lb-row {
+    grid-template-columns: 38px 1fr 54px 46px !important;
+    padding: 8px 8px !important;
+  }
+
+  .lb-name  { font-size: 12.5px; }
+  .lb-score { font-size: 14px; }
+}
+
+
+/* =========================================================
+   LOGIN PAGE  (index.html)
+   index.html already ships its own mobile block; these rules
+   only add polish and are additive.
+   ========================================================= */
+@media (max-width: 768px) {
+
+  .container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .left {
+    width: 100%;
+    padding: 28px 20px 40px;
+  }
+
+  .right {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .atom {
+    width: 320px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: .3;
+  }
+
+  .login-card {
+    width: 100%;
+    padding: 22px;
+    border-radius: 20px;
+  }
+
+  h1 { font-size: 34px; }
+
+  .subtitle {
+    font-size: 17px;
+    max-width: 100%;
+  }
+
+  .input-box,
+  .divider { width: 100%; }
+
+  .contact {
+    position: relative;
+    left: auto;
+    bottom: auto;
+    margin-top: 48px;
+    align-items: flex-start;
+  }
+
+  .modal-box {
+    width: calc(100vw - 32px);
+    max-width: 100%;
+    padding: 24px;
+  }
+}
