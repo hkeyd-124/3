@@ -628,8 +628,11 @@ try{
     true;
   improveBtn.style.display =
     "none";
-  mintBtn.innerText =
-    "⏳ Đang tạo chứng chỉ...";
+  mintBtn.innerHTML =
+  `<span class="mint-loading">
+     <span class="mint-spinner"></span>
+     <span>Đang cấp chứng chỉ<span class="mint-dots"></span></span>
+   </span>`;
   const ok =
     await this.verifyWallet();
   if(!ok){
