@@ -256,6 +256,53 @@ body{
   justify-content:space-between;
 }
 
+
+.mint-loading{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+.mint-spinner{
+  width:14px;
+  height:14px;
+  border:2px solid currentColor;
+  border-right-color:transparent;
+  border-radius:50%;
+  animation:mintSpin .7s linear infinite;
+}
+
+.mint-dots::after{
+  content:"";
+  animation:mintDots 1.4s steps(4,end) infinite;
+}
+
+@keyframes mintSpin{
+  to{
+    transform:rotate(360deg);
+  }
+}
+
+@keyframes mintDots{
+  0%{
+    content:"";
+  }
+  25%{
+    content:".";
+  }
+  50%{
+    content:"..";
+  }
+  75%{
+    content:"...";
+  }
+  100%{
+    content:"";
+  }
+}
+  
+  
 </style>
 
 </head>
