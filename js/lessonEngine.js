@@ -712,7 +712,7 @@ try{
   mintBtn.disabled =
     false;
   mintBtn.innerText =
-    "✅ Đã mint thành công - Đóng";
+    "✅ Đã nhận chứng chỉ #${result.tokenId} - Đóng";
   mintBtn.onclick = ()=>{
     modal.style.display =
       "none";
