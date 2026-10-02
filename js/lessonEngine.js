@@ -709,14 +709,14 @@ try{
   await this.saveCloudProgress();
   await this.renderCertificateButton();
   // SUCCESS UI
-  mintBtn.disabled =
-    false;
-  mintBtn.innerText =
-    "✅ Đã nhận chứng chỉ #${result.tokenId} - Đóng";
-  mintBtn.onclick = ()=>{
-    modal.style.display =
-      "none";
-  };
+mintBtn.disabled =
+  false;
+mintBtn.innerText =
+  `✅ Đã nhận chứng chỉ #${this.mintedTokenId} - Đóng`;
+mintBtn.onclick = ()=>{
+  modal.style.display =
+    "none";
+};
 }catch(err){
   console.error(
     "MINT ERROR",
