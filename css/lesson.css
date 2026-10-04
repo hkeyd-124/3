@@ -1,0 +1,315 @@
+/* =========================================================
+   HackChem — LESSON UI  (MOBILE LAYER, ADDITIVE ONLY)
+   ---------------------------------------------------------
+   Loaded by : lesson.html   (one <link> in <head>)
+   Scope     : EVERY rule lives inside a @media (max-width:768px)
+               block. At > 768px this file contributes NOTHING,
+               so the desktop lesson UI is unchanged.
+   Contains  : presentation only.
+               - no JS
+               - no id / class renames
+               - no DOM contract changes
+   ---------------------------------------------------------
+   DOM CONTRACT (owned by js/lessonEngine.js — DO NOT RENAME):
+     ids     : toolBar, leftContent, navBar, questionText, options,
+               xpFill, scoreValue, bestScoreValue, rankValue,
+               retryBtn, certificateBtn, certificateModal,
+               certificateContent, mintCertificateModal,
+               mintCertificateBox, mintCertificatePreview,
+               mintNowBtn, improveBtn
+     classes : tool-btn, nav-item, selected, correct, wrong
+     globals : checkAnswer(), goBack(), showHint(), retryLesson()
+   All of the above are preserved untouched.
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* -------------------------------------------------------
+     0. BOX MODEL + NO HORIZONTAL SCROLL
+     ------------------------------------------------------- */
+  html, body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .header-bar,
+  .container,
+  .left-panel,
+  .right-panel,
+  .bottom-bar,
+  .tool-bar,
+  .score-box,
+  .best-box,
+  .rank-box {
+    box-sizing: border-box;
+  }
+
+  /* -------------------------------------------------------
+     1. HEADER  (fixed, 56px)
+     ------------------------------------------------------- */
+  .header-bar {
+    height: 56px;
+    padding: 0 8px;
+    gap: 6px;
+  }
+
+  .header-bar > button {
+    flex: 0 0 auto;
+    padding: 8px 10px;
+    font-size: 13px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+
+  .score-group {
+    margin-left: auto;
+    gap: 5px;
+    padding-right: 0;
+    min-width: 0;
+  }
+
+  .score-box,
+  .best-box,
+  .rank-box {
+    min-width: 0;
+    padding: 4px 7px;
+    font-size: 11px;
+    line-height: 1.25;
+    border-radius: 7px;
+    white-space: nowrap;
+  }
+
+  /* -------------------------------------------------------
+     2. SHELL — stack the two panels vertically
+     ------------------------------------------------------- */
+  .container {
+    flex-direction: column;
+    height: auto;
+    min-height: 100vh;
+    margin-top: 0;
+    padding-top: 56px;      /* clears the fixed header */
+    padding-bottom: 68px;   /* clears the fixed bottom bar */
+  }
+
+  /* -------------------------------------------------------
+     3. LEFT PANEL — PDF viewer
+     ------------------------------------------------------- */
+  .left-panel {
+    width: 100%;
+    height: 38vh;
+    min-height: 190px;
+    border-right: none;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .tool-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  .tool-btn {
+    flex: 0 0 auto;
+    min-height: 40px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+
+  #leftContent {
+    flex: 1;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* -------------------------------------------------------
+     4. RIGHT PANEL — question area
+     ------------------------------------------------------- */
+  .right-panel {
+    width: 100%;
+    padding: 12px;
+    overflow: visible;
+  }
+
+  /* nav row (navBar + retry + certificate) — allow wrapping */
+  .right-panel > div:first-child {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* -------------------------------------------------------
+     5. QUESTION GRID  (15 items, 5 per row)
+     ------------------------------------------------------- */
+  #navBar {
+    flex: 1 1 100%;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 38px;
+    padding: 0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    /* default (unanswered) look — the engine overrides this with
+       inline styles for the current / correct / wrong states */
+    background: #30B0A4;
+    color: #fff;
+    border-color: #30B0A4;
+  }
+
+  #retryBtn,
+  #certificateBtn {
+    flex: 1 1 auto;
+    height: auto !important;
+    min-height: 40px;
+    border-radius: 8px;
+    font-size: 13px;
+  }
+
+  /* -------------------------------------------------------
+     6. XP BAR
+     ------------------------------------------------------- */
+  .xp-bar {
+    height: 10px;
+    margin: 12px 0;
+  }
+
+  /* -------------------------------------------------------
+     7. QUESTION + OPTIONS
+     ------------------------------------------------------- */
+  #questionText {
+    font-size: 17px;
+    line-height: 1.5;
+    margin: 12px 0;
+  }
+
+  .options {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .options button {
+    width: 100%;
+    min-height: 48px;
+    padding: 14px;
+    text-align: left;
+    border-radius: 10px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  /* true/false rows are built by the engine with inline styles,
+     so the mobile spacing needs !important to win */
+  #options > div {
+    gap: 12px !important;
+  }
+
+  #options > div > div {
+    gap: 8px !important;
+  }
+
+  #options > div > div > div > button {
+    min-width: 46px;
+    min-height: 44px;
+    border-radius: 8px;
+    font-weight: 600;
+  }
+
+  /* -------------------------------------------------------
+     8. BOTTOM BAR — Gợi ý / Kiểm tra
+     ------------------------------------------------------- */
+  .bottom-bar {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    gap: 10px;
+  }
+
+  .bottom-bar button {
+    flex: 1;
+    min-height: 48px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  /* -------------------------------------------------------
+     9. MODALS — certificate + mint
+     ------------------------------------------------------- */
+  #mintCertificateBox {
+    width: auto;
+    max-width: calc(100vw - 24px);
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  #mintCertificateBox h2 {
+    font-size: 17px;
+    line-height: 1.35;
+  }
+
+  #mintCertificateBox p {
+    font-size: 13px;
+  }
+
+  #mintCertificatePreview {
+    margin: 14px auto;
+  }
+
+  /* the engine sets canvas.style.width = "500px" inline,
+     so !important is required to keep it inside the viewport */
+  #mintCertificatePreview canvas,
+  #certificateContent canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  #mintNowBtn,
+  #improveBtn {
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 14px;
+  }
+
+  #certificateContent {
+    max-width: calc(100vw - 24px);
+    max-height: 88vh;
+  }
+}
+
+/* ---------------------------------------------------------
+   Very small phones (<= 400px) — tighten the header further
+   --------------------------------------------------------- */
+@media (max-width: 400px) {
+
+  .score-box,
+  .best-box,
+  .rank-box {
+    padding: 3px 5px;
+    font-size: 10px;
+  }
+
+  .header-bar > button {
+    padding: 7px 8px;
+    font-size: 12px;
+  }
+
+  #navBar {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+  }
+
+  .nav-item {
+    height: 34px;
+    font-size: 12px;
+  }
+}
