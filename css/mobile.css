@@ -2,8 +2,8 @@
    HackChem — MOBILE UI LAYER  (ADDITIVE ONLY)
    ---------------------------------------------------------
    Loaded by: home.html, index.html
-   Scope    : every rule lives inside a max-width media query,
-              so desktop (> 768px) is completely unaffected.
+   Scope    : every rule lives inside a media query, so
+              desktop (> 900px) is completely unaffected.
    Contains : presentation only. No business logic, no JS,
               no DOM contract / id / class renames.
    ---------------------------------------------------------
@@ -452,22 +452,18 @@
    TABLET / SMALL-DESKTOP DEAD ZONE  (769px - 900px)
    ---------------------------------------------------------
    home.html ships an inline @media(max-width:900px) that shrinks
-   .sidebar to 90px, while this file's mobile layout only starts at
+   .sidebar to 90px, but this file's mobile layout only starts at
    768px.  Between 769px and 900px nothing restored the width, so
    the brand text was clipped to "HACKC".
-   This block ONLY un-clips the brand inside that gap - it changes
-   no other element and adds no layout of its own.
-   Must stay AFTER the inline <style> in home.html to win the
-   cascade (same specificity, later wins).
+   Restore the sidebar to its normal 260px within that gap.
+   The 28px brand (222px wide) then fits in 260 - 20 padding.
+   Only .sidebar is touched; the rest of the <=900px styling
+   stays exactly as home.html already defines it.
    ========================================================= */
 @media (min-width: 769px) and (max-width: 900px) {
 
-  .sidebar .logo {
-    font-size: 13px;
-    line-height: 1.25;
-    text-align: center;
-    white-space: normal;
-    overflow-wrap: break-word;
+  .sidebar {
+    width: 260px;
   }
 }
 
