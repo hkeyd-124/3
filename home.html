@@ -12,9 +12,6 @@
 
 <title>HackChem SPA</title>
 
-<!-- MOBILE UI LAYER (additive — desktop unaffected) -->
-<link rel="stylesheet" href="css/mobile.css">
-
 <style>
 
 *{
@@ -222,6 +219,15 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
 
   
 </style>
+
+<!-- MOBILE UI LAYER (additive — desktop unaffected)
+     MUST stay AFTER the inline <style> above. mobile.css and the inline
+     block share the same specificity, so the later one wins: with the
+     <link> first, the inline @media(max-width:900px) overrode mobile.css
+     and .sidebar stayed 90px wide on phones -> the brand text was clipped
+     to "HACKC" and the Link Wallet / Link Email buttons were pushed
+     off-screen. -->
+<link rel="stylesheet" href="css/mobile.css">
 </head>
 
 <body>
@@ -1391,6 +1397,27 @@ transition:.2s;
           onclick="loadTab('leaderboard')">
     <span class="hc-mnav-icon">🏆</span>
     <span class="hc-mnav-label">Rank</span>
+  </button>
+
+  <!-- =========================
+       Link Email / Link Wallet
+       Mirrors the desktop sidebar buttons: SAME existing handlers
+       (showLinkEmailModal / linkWallet), no new logic.  They hide
+       themselves once linked via the :has() rules in css/mobile.css,
+       exactly like the desktop sidebar ones do.  Deliberately these
+       are NOT hc-mnav-home/courses/... so the active-tab :has()
+       highlight never targets them.
+  ========================= -->
+  <button class="hc-mnav-item hc-mnav-email"
+          onclick="showLinkEmailModal()">
+    <span class="hc-mnav-icon">📧</span>
+    <span class="hc-mnav-label">Email</span>
+  </button>
+
+  <button class="hc-mnav-item hc-mnav-wallet"
+          onclick="linkWallet()">
+    <span class="hc-mnav-icon">🔗</span>
+    <span class="hc-mnav-label">Wallet</span>
   </button>
 
 </nav>
