@@ -305,6 +305,13 @@ body{
   
 </style>
 
+<!-- MOBILE UI LAYER (additive) — every rule is inside a
+     max-width media query, so desktop is unaffected.
+     Loaded AFTER the inline <style> so it wins the cascade
+     at equal specificity. Presentation only: no JS, no
+     id/class renames, no DOM-contract changes. -->
+<link rel="stylesheet" href="./css/lesson.css">
+
 </head>
 
 <body>
