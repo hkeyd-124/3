@@ -2,8 +2,8 @@
    HackChem — MOBILE UI LAYER  (ADDITIVE ONLY)
    ---------------------------------------------------------
    Loaded by: home.html, index.html
-   Scope    : every rule lives inside a max-width media query,
-              so desktop (> 768px) is completely unaffected.
+   Scope    : every rule lives inside a media query, so
+              desktop (> 900px) is completely unaffected.
    Contains : presentation only. No business logic, no JS,
               no DOM contract / id / class renames.
    ---------------------------------------------------------
@@ -46,6 +46,12 @@
   .sidebar {
     width: 100%;
     display: flex;
+
+    /* Wrap instead of scrolling sideways: every action pill (Faucet,
+       Link Wallet, Link Email) must be VISIBLE, never parked off-screen.
+       In practice only one link button is unlinked at a time, so the
+       strip normally stays a single row. */
+    flex-wrap: wrap;
     align-items: center;
     gap: 8px;
 
@@ -54,18 +60,14 @@
     border-right: none;
     border-bottom: 1px solid #eee;
 
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
+    overflow-x: visible;
+    overflow-y: visible;
 
     position: sticky;
     top: 0;
     z-index: 50;
     background: #fff;
   }
-
-  .sidebar::-webkit-scrollbar { display: none; }
 
   .sidebar .logo {
     flex: 0 0 auto;
@@ -202,6 +204,27 @@
   .hc-mnav-label { font-size: 10.5px; font-weight: 700; }
 
   .hc-mnav-item:active { transform: scale(.94); }
+
+  /* -------------------------------------------------------
+     6b. LINK EMAIL / LINK WALLET  (in the bottom tab bar)
+         These mirror the desktop sidebar buttons.  They are
+         visible by default and must disappear once the account
+         is linked - the exact behaviour updateLinkButtons()
+         already applies to #linkEmailBtn / #linkWalletBtn
+         (it sets inline display:none).
+         Pure CSS mirror, so js/authLink.js stays untouched.
+         :has() is already used above for the active-tab
+         highlight, so this adds no new dependency.
+     ------------------------------------------------------- */
+  body:has(#linkEmailBtn[style*="none"])  .hc-mnav-email,
+  body:has(#linkWalletBtn[style*="none"]) .hc-mnav-wallet {
+    display: none;
+  }
+
+  /* Two extra pills can appear, so tighten the row a little
+     to keep all seven labels readable on a 360px phone. */
+  .hc-mnav-item  { padding: 7px 0; min-width: 0; }
+  .hc-mnav-label { font-size: 10px; }
 
   /* Active state is derived from the EXISTING .active class that
      js/router.js already puts on the sidebar items — no new JS. */
@@ -422,6 +445,26 @@
 
   .lb-name  { font-size: 12.5px; }
   .lb-score { font-size: 14px; }
+}
+
+
+/* =========================================================
+   TABLET / SMALL-DESKTOP DEAD ZONE  (769px - 900px)
+   ---------------------------------------------------------
+   home.html ships an inline @media(max-width:900px) that shrinks
+   .sidebar to 90px, but this file's mobile layout only starts at
+   768px.  Between 769px and 900px nothing restored the width, so
+   the brand text was clipped to "HACKC".
+   Restore the sidebar to its normal 260px within that gap.
+   The 28px brand (222px wide) then fits in 260 - 20 padding.
+   Only .sidebar is touched; the rest of the <=900px styling
+   stays exactly as home.html already defines it.
+   ========================================================= */
+@media (min-width: 769px) and (max-width: 900px) {
+
+  .sidebar {
+    width: 260px;
+  }
 }
 
 
