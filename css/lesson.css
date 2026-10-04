@@ -2,13 +2,20 @@
    HackChem — LESSON UI  (MOBILE LAYER, ADDITIVE ONLY)
    ---------------------------------------------------------
    Loaded by : lesson.html   (one <link> in <head>)
-   Scope     : EVERY rule lives inside a @media (max-width:768px)
-               block. At > 768px this file contributes NOTHING,
+   Scope     : EVERY rule lives inside a @media block.
+               At > 768px this file contributes NOTHING,
                so the desktop lesson UI is unchanged.
    Contains  : presentation only.
                - no JS
                - no id / class renames
                - no DOM contract changes
+   ---------------------------------------------------------
+   GOLD STANDARD
+   The desktop-browser-extension view (~330px wide) is the
+   reference. Every value below is a FIXED px value taken
+   from that reference — deliberately NOT clamp()/vw, because
+   vw would make a 430px phone render differently from a
+   330px extension. Fixed px = the two views match.
    ---------------------------------------------------------
    DOM CONTRACT (owned by js/lessonEngine.js — DO NOT RENAME):
      ids     : toolBar, leftContent, navBar, questionText, options,
@@ -22,6 +29,24 @@
    All of the above are preserved untouched.
    ========================================================= */
 
+/* ---------------------------------------------------------
+   Shared mobile tokens.
+   Declared OUTSIDE the media queries on purpose: custom
+   properties are inert until something reads them, and the
+   only readers below are inside @media blocks — so desktop
+   still renders exactly as before.
+   --------------------------------------------------------- */
+:root {
+  /* height of the fixed bottom action bar (Gợi ý / Kiểm tra) */
+  --hc-bottombar-h: 48px;
+  --hc-bottombar-gap: 12px;
+  /* total space the fixed bottom bar steals from the viewport */
+  --hc-bottombar-space: calc(
+    var(--hc-bottombar-h) + var(--hc-bottombar-gap) + env(safe-area-inset-bottom, 0px)
+  );
+  --hc-header-h: 56px;
+}
+
 @media (max-width: 768px) {
 
   /* -------------------------------------------------------
@@ -30,6 +55,8 @@
   html, body {
     max-width: 100%;
     overflow-x: hidden;
+    /* stop iOS rubber-band from revealing the page behind */
+    overscroll-behavior-x: none;
   }
 
   .header-bar,
@@ -45,11 +72,11 @@
   }
 
   /* -------------------------------------------------------
-     1. HEADER  (fixed, 56px)
+     1. HEADER  (fixed)
      ------------------------------------------------------- */
   .header-bar {
-    height: 56px;
-    padding: 0 8px;
+    height: calc(var(--hc-header-h) + env(safe-area-inset-top, 0px));
+    padding: env(safe-area-inset-top, 0px) 8px 0;
     gap: 6px;
   }
 
@@ -85,10 +112,18 @@
   .container {
     flex-direction: column;
     height: auto;
+    /* 100vh is the LARGE viewport on iOS Safari (it includes the
+       area behind the dynamic toolbars) → the page ends up taller
+       than what the user can actually see. 100dvh tracks the real
+       visible height. The vh line stays first as a fallback for
+       browsers without dvh support. */
     min-height: 100vh;
+    min-height: 100dvh;
     margin-top: 0;
-    padding-top: 56px;      /* clears the fixed header */
-    padding-bottom: 68px;   /* clears the fixed bottom bar */
+    padding-top: calc(var(--hc-header-h) + env(safe-area-inset-top, 0px));
+    /* THE FIX: clear the fixed bottom bar so the last answer
+       option is never trapped underneath it. */
+    padding-bottom: calc(var(--hc-bottombar-space) + 12px);
   }
 
   /* -------------------------------------------------------
@@ -97,6 +132,7 @@
   .left-panel {
     width: 100%;
     height: 38vh;
+    height: 38dvh;
     min-height: 190px;
     border-right: none;
     border-bottom: 1px solid #ddd;
@@ -229,13 +265,13 @@
   .bottom-bar {
     left: 12px;
     right: 12px;
-    bottom: 12px;
+    bottom: calc(var(--hc-bottombar-gap) + env(safe-area-inset-bottom, 0px));
     gap: 10px;
   }
 
   .bottom-bar button {
     flex: 1;
-    min-height: 48px;
+    min-height: var(--hc-bottombar-h);
     border-radius: 10px;
     font-size: 15px;
     font-weight: 600;
@@ -283,13 +319,17 @@
   #certificateContent {
     max-width: calc(100vw - 24px);
     max-height: 88vh;
+    max-height: 88dvh;
   }
 }
 
 /* ---------------------------------------------------------
-   Very small phones (<= 400px) — tighten the header further
+   PHONE RANGE (<= 480px) — covers the 330px extension AND
+   the 430px iPhone 14 Pro Max with the SAME values, so the
+   two views are visually identical.
+   These are the exact values the extension reference uses.
    --------------------------------------------------------- */
-@media (max-width: 400px) {
+@media (max-width: 480px) {
 
   .score-box,
   .best-box,
@@ -311,5 +351,72 @@
   .nav-item {
     height: 34px;
     font-size: 12px;
+  }
+}
+
+/* ---------------------------------------------------------
+   LARGE PHONE / SMALL TABLET (481px – 768px)
+   Only spacing — no font-size changes, so the layout stays
+   structurally identical to the phone range.
+   --------------------------------------------------------- */
+@media (min-width: 481px) and (max-width: 768px) {
+
+  #navBar {
+    gap: 8px;
+  }
+
+  .nav-item {
+    height: 40px;
+  }
+
+  .right-panel {
+    padding: 14px;
+  }
+}
+
+/* ---------------------------------------------------------
+   LANDSCAPE PHONES — the PDF panel must not eat the screen.
+   Only applies when the viewport is short AND narrow.
+   --------------------------------------------------------- */
+@media (max-width: 768px) and (orientation: landscape) and (max-height: 500px) {
+
+  .left-panel {
+    height: 60vh;
+    height: 60dvh;
+    min-height: 150px;
+  }
+
+  .container {
+    padding-bottom: calc(var(--hc-bottombar-space) + 8px);
+  }
+
+  #questionText {
+    margin: 8px 0;
+  }
+}
+
+/* ---------------------------------------------------------
+   SHORT LANDSCAPE VIEWPORTS (any width)
+   A phone held sideways is wider than 768px, so it keeps the
+   desktop side-by-side layout — which is correct. But the
+   fixed bottom bar would then sit on top of the scrollable
+   question panel. Give that panel room to scroll clear.
+   Desktop monitors are never this short, so they are
+   unaffected.
+   --------------------------------------------------------- */
+@media (orientation: landscape) and (max-height: 500px) {
+
+  /* the desktop shell pins .container to 100vh and offsets it by
+     the 60px header, so at short heights the bottom of the shell
+     falls below the fold and the fixed bar lands on the content.
+     Let the shell grow instead. */
+  .container {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .right-panel {
+    padding-bottom: calc(var(--hc-bottombar-space) + 12px);
   }
 }
