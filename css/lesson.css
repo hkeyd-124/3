@@ -71,6 +71,19 @@
     box-sizing: border-box;
   }
 
+  /* Flex items default to min-width:auto, which refuses to shrink
+     below their content width and is the classic cause of a
+     horizontal scrollbar on a narrow screen. Let every shell box
+     shrink to the viewport. */
+  .container,
+  .left-panel,
+  .right-panel,
+  #leftContent,
+  .right-panel > div:first-child {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   /* -------------------------------------------------------
      1. HEADER  (fixed)
      ------------------------------------------------------- */
@@ -158,6 +171,23 @@
     flex: 1;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
+    /* The engine injects <iframe height="100%">. A percentage height
+       only resolves against a containing block that has a DEFINITE
+       height. #leftContent is a flex item, so its computed height
+       stays auto and the percentage silently fails, so the iframe
+       then falls back to its 150px default and leaves a large blank
+       area under the PDF. Anchoring the iframe to the panel removes
+       the dependency on percentage-height resolution altogether. */
+    position: relative;
+  }
+
+  #leftContent iframe {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
   }
 
   /* -------------------------------------------------------
