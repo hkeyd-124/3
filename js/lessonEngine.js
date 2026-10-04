@@ -23,6 +23,8 @@ window.lessonEngine = {
   mintedScore:null,
   mintedRank:null,
   mintedAt:null,
+  mintedName:null,
+  mintedAvatar:null,
   mintedTokenId:null,
   metadataURI:null,
   config:null,
@@ -389,10 +391,14 @@ const canvas =
   await generateCertificatePreview({
 
     name:
-      window.currentUserData?.name || "Unknown",
+      this.mintedName
+      || window.currentUserData?.name
+      || "Unknown",
 
     avatar:
-      window.currentUserData?.avatar || null,
+      this.mintedAvatar
+      || window.currentUserData?.avatar
+      || null,
 
     lesson:
       lessonConfig.title,
@@ -404,7 +410,17 @@ const canvas =
       lessonConfig.maxScore,
 
     tier:
-      displayTier
+      displayTier,
+
+    date:
+      this.certificateMinted
+      && this.mintedAt
+      ? new Date(
+          this.mintedAt
+        ).toLocaleDateString(
+          "vi-VN"
+        )
+      : null
 
   });
     
@@ -587,10 +603,12 @@ showMintCertificateModal:async function(){
 const canvas =
 await generateCertificatePreview({
   name:
-    window.currentUserData?.name
+    this.mintedName
+    || window.currentUserData?.name
     || "Unknown",
   avatar:
-    window.currentUserData?.avatar
+    this.mintedAvatar
+    || window.currentUserData?.avatar
     || null,
   lesson:
     lessonConfig.title,
@@ -723,6 +741,12 @@ try{
   this.mintedAt =
     new Date()
     .toISOString();
+  this.mintedName =
+    window.currentUserData?.name
+    || null;
+  this.mintedAvatar =
+    window.currentUserData?.avatar
+    || null;
   this.mintedTokenId =
     mintResult.tokenId;
   this.metadataURI =
@@ -1707,6 +1731,12 @@ this.mintedRank =
 this.mintedAt =
  data.mintedAt || null;
 
+this.mintedName =
+ data.mintedName || null;
+
+this.mintedAvatar =
+ data.mintedAvatar || null;
+
 this.mintedTokenId =
  data.mintedTokenId || null;
 
@@ -1774,6 +1804,10 @@ this.mintedRank =
  data.mintedRank || null;
 this.mintedAt =
  data.mintedAt || null;
+this.mintedName =
+ data.mintedName || null;
+this.mintedAvatar =
+ data.mintedAvatar || null;
 this.mintedTokenId =
  data.mintedTokenId || null;
 this.metadataURI =
@@ -1852,6 +1886,10 @@ mintedRank:
  this.mintedRank,
 mintedAt:
  this.mintedAt,
+mintedName:
+ this.mintedName,
+mintedAvatar:
+ this.mintedAvatar,
 mintedTokenId:
  this.mintedTokenId,
 metadataURI:
@@ -1959,6 +1997,10 @@ async function(data){
   this.mintedRank,
         mintedAt:
  this.mintedAt,
+        mintedName:
+ this.mintedName,
+        mintedAvatar:
+ this.mintedAvatar,
         mintedTokenId:
  this.mintedTokenId,
         metadataURI:
