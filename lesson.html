@@ -566,6 +566,11 @@ window.serverTimestamp =
 <script src="https://cdn.jsdelivr.net/npm/ethers@6/dist/ethers.umd.min.js"></script>
 <script src="./js/lessonHash.js"></script>
 <script type="module"src="./js/profile.js"></script>
+<!-- PDF viewer (additive, optional). Renders every page to a canvas
+     so the whole document scrolls on Safari iOS, and adds the
+     zoom / download / bookmark toolbar. If this file is missing,
+     lessonEngine.js falls back to its original <iframe>. -->
+<script src="./js/pdfViewer.js"></script>
 <script src="./js/lessonEngine.js"></script>
 
 <script>

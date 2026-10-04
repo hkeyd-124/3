@@ -222,6 +222,25 @@ await this.loadCloudProgress();
 
     if(tool.type==="pdf"){
 
+      /* PDF VIEWER DELEGATION (additive, isolated).
+         Safari iOS renders only the FIRST page of a PDF inside an
+         <iframe> and will not scroll to the rest. When the optional
+         js/pdfViewer.js module is present it renders every page to a
+         canvas instead. If that module is missing or declines, the
+         original <iframe> below runs unchanged — a pure fallback,
+         not a behaviour change. No engine state (score, answers,
+         progress, certificate) is read or written here. */
+      if(
+        window.hcPdfViewer
+        &&
+        window.hcPdfViewer.render(
+          left,
+          tool.src
+        )
+      ){
+        return;
+      }
+
       left.innerHTML = `
 
         <iframe

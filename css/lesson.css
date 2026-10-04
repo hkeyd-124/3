@@ -112,6 +112,8 @@
   .container {
     flex-direction: column;
     height: auto;
+    min-width: 0;
+    max-width: 100%;
     /* 100vh is the LARGE viewport on iOS Safari (it includes the
        area behind the dynamic toolbars) → the page ends up taller
        than what the user can actually see. 100dvh tracks the real
@@ -131,9 +133,12 @@
      ------------------------------------------------------- */
   .left-panel {
     width: 100%;
-    height: 38vh;
-    height: 38dvh;
-    min-height: 190px;
+    min-width: 0;
+    max-width: 100%;
+    /* widened from 38vh so the PDF gets more room (requested) */
+    height: 46vh;
+    height: 46dvh;
+    min-height: 200px;
     border-right: none;
     border-bottom: 1px solid #ddd;
   }
@@ -156,8 +161,31 @@
 
   #leftContent {
     flex: 1;
+    min-width: 0;
+    position: relative;
     overflow: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* PDF <iframe> FALLBACK — anchor it to the panel so the
+     percentage height resolves. A flex item's computed height is
+     `auto`, which makes height:100% silently fall back to the
+     150px default and leaves a large blank area. */
+  #leftContent > iframe {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  /* -------------------------------------------------------
+     3b. PDF VIEWER (js/pdfViewer.js) — fills the left panel
+     ------------------------------------------------------- */
+  #leftContent > .hcpv {
+    height: 100%;
+    min-height: 0;
   }
 
   /* -------------------------------------------------------
@@ -165,7 +193,10 @@
      ------------------------------------------------------- */
   .right-panel {
     width: 100%;
-    padding: 12px;
+    min-width: 0;
+    max-width: 100%;
+    /* tightened so the PDF panel above gets more vertical room */
+    padding: 10px;
     overflow: visible;
   }
 
@@ -182,23 +213,24 @@
     flex: 1 1 100%;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
+    gap: 5px;
   }
 
   .nav-item {
     display: flex;
     align-items: center;
     justify-content: center;
-    height: 38px;
+    height: 32px;
     padding: 0;
-    border-radius: 8px;
-    font-size: 13px;
+    border-radius: 7px;
+    font-size: 12px;
     font-weight: 600;
-    /* default (unanswered) look — the engine overrides this with
-       inline styles for the current / correct / wrong states */
-    background: #30B0A4;
-    color: #fff;
-    border-color: #30B0A4;
+    /* UNANSWERED = WHITE (requested). The engine still overrides
+       this with inline styles for the current (amber) / correct
+       (green) / wrong (red) states — those are untouched. */
+    background: #fff;
+    color: #333;
+    border: 1px solid #cfcfcf;
   }
 
   #retryBtn,
@@ -214,17 +246,17 @@
      6. XP BAR
      ------------------------------------------------------- */
   .xp-bar {
-    height: 10px;
-    margin: 12px 0;
+    height: 8px;
+    margin: 8px 0;
   }
 
   /* -------------------------------------------------------
      7. QUESTION + OPTIONS
      ------------------------------------------------------- */
   #questionText {
-    font-size: 17px;
-    line-height: 1.5;
-    margin: 12px 0;
+    font-size: 15px;
+    line-height: 1.45;
+    margin: 8px 0;
   }
 
   .options {
@@ -234,12 +266,13 @@
 
   .options button {
     width: 100%;
-    min-height: 48px;
-    padding: 14px;
+    /* 42px still clears the 40px touch-target floor */
+    min-height: 42px;
+    padding: 10px 12px;
     text-align: left;
-    border-radius: 10px;
-    font-size: 15px;
-    line-height: 1.4;
+    border-radius: 9px;
+    font-size: 14px;
+    line-height: 1.35;
   }
 
   /* true/false rows are built by the engine with inline styles,
@@ -349,8 +382,8 @@
   }
 
   .nav-item {
-    height: 34px;
-    font-size: 12px;
+    height: 30px;
+    font-size: 11px;
   }
 }
 
@@ -370,7 +403,7 @@
   }
 
   .right-panel {
-    padding: 14px;
+    padding: 12px;
   }
 }
 
