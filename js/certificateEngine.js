@@ -228,6 +228,9 @@ ctx.fillStyle =
 
 const today =
 
+  data.date
+  ||
+
   new Date()
   .toLocaleDateString(
     "vi-VN"
