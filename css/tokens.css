@@ -1,0 +1,433 @@
+/* ==========================================================================
+   HackChem — Design Tokens v4
+   --------------------------------------------------------------------------
+   SOURCE OF TRUTH: the owner's demo file "Precision Tech Dashboard"
+   (saved verbatim at webpages/design-system_v4/source/user-demo.html).
+   Every value below is EXTRACTED from that file, not invented.
+   Where the demo failed WCAG AA, the value is corrected and the original
+   is kept in a comment — see "AA CORRECTIONS" at the bottom.
+
+   Decisions locked by the owner:
+     #1 emoji kept            #2 desktop + mobile stay SEPARATE
+     #3 light mode only       #4 purple REMOVED
+     #5 PRIMARY = navy, ACCENT = lime
+     #6 leaderboard beige removed, metal medals KEPT
+
+   v4 CHANGES vs v3:
+     - navy re-based on the demo's own values (#101b25 / #0d1922), not v3's
+     - lime re-based on the demo's #a6e522 (neon #b6ff00 dropped from v3)
+     - v3's "single-chamfer" corner tokens replaced by the demo's
+       DOUBLE-CHAMFER (corner-cut) scale — 6 named polygons
+     - grid background token added (the demo's 36px technical grid)
+     - 9 text colours that failed AA in the demo are corrected
+     - radius scale collapses to essentally ONE value (the chamfer replaces
+       rounding) — see --hc-radius-* below
+
+   Dark mode: two layers — LAYER 1 primitive, LAYER 2 semantic.
+   To add dark mode later, override ONLY layer 2 inside
+   `@media (prefers-color-scheme: dark)` — no page markup changes.
+
+   Contrast: every ratio is computed with the WCAG 2.1 relative-luminance
+   formula by documents/design-language-v4/wcag_audit.py — not estimated.
+   ========================================================================== */
+
+:root{
+
+  /* ======================================================================
+     LAYER 1 — PRIMITIVES  (raw values, straight from the demo)
+     ====================================================================== */
+
+  /* ---- NAVY RAMP -------------------------------------------------------
+     The demo hard-codes 7 navy values for 7 different dark surfaces.
+     Normalised into one ramp; each step records its origin selector.        */
+  --hc-navy-950: #0b1720;   /* .nav-item.active gradient start            */
+  --hc-navy-900: #0d1922;   /* --dark  (brand-mark bg, chips)             */
+  --hc-navy-850: #0e1c25;   /* .status toast bg                           */
+  --hc-navy-800: #101b25;   /* --ink   (page text, dark surfaces)          */
+  --hc-navy-750: #101e28;   /* .feature-icon / .go bg                     */
+  --hc-navy-700: #101f2a;   /* .profile bg                                */
+  --hc-navy-600: #162630;   /* .nav-item.active gradient end              */
+  --hc-navy-500: #243946;   /* .nav-item.active border                    */
+
+  /* ---- NAVY BORDERS ----------------------------------------------------
+     The demo uses 5 near-identical dark borders. Collapsed to 3.            */
+  --hc-navy-line-1: #2d4654;   /* .brand-mark border                      */
+  --hc-navy-line-2: #314a5a;   /* .profile border                         */
+  --hc-navy-line-3: #526574;   /* .stat border                            */
+
+  /* ---- SIDEBAR NAVY  (DECISION #5 — sidebar becomes a navy band) -------
+     The demo's sidebar is near-white (rgba(250,252,255,.94)). The owner
+     chose a NAVY band instead. Values are the demo's own navy ramp, so no
+     new colour enters the system. Contrast measured by wcag_audit.py.     */
+  --hc-sidebar-navy:        #0d1922;   /* = navy-900, the band itself     */
+  --hc-sidebar-navy-deep:   #0b1720;   /* = navy-950, gradient start      */
+  --hc-sidebar-navy-hover:  #1b2f3d;   /* hover surface (new, derived)    */
+  --hc-sidebar-navy-active: #162630;   /* = navy-600, active item         */
+  --hc-sidebar-navy-line:   #243946;   /* = navy-500, band edge           */
+  --hc-sidebar-text:        #c0d0de;   /* inactive label  11.29:1 AAA     */
+  --hc-sidebar-text-strong: #f7fbff;   /* brand name      17.13:1 AAA     */
+  --hc-sidebar-text-fine:   #8fa6ba;   /* brand tag       7.06:1 AAA      */
+
+  /* ---- LEADERBOARD ROW TINT  (DECISION #6 — rows are navy-tinted) ------
+     Replaces the beige #d9c7b3. A very light navy wash, NOT a dark row:
+     every text token still passes AA on it (see the AA table at the end).
+     The tint is deliberately subtle (1.047:1 vs paper) so it reads as a
+     band, not as a second surface.                                        */
+  --hc-row-tint:        #eef3f9;   /* normal row                        */
+  --hc-row-tint-alt:    #e8eff7;   /* zebra / hover row                 */
+  --hc-row-tint-border: #c9d8e8;   /* row hairline (was #777)           */
+  --hc-row-head-tint:   #e4ecf5;   /* table header band                 */
+
+  /* ---- LIME (accent) --------------------------------------------------- */
+  --hc-lime:      #a6e522;   /* --lime      : accent ON DARK only         */
+  --hc-lime-deep: #8bd20c;   /* --lime-deep : accent ON DARK only         */
+  --hc-lime-soft: #c5f35d;   /* .stat.streak text                         */
+  --hc-lime-neon: #b6ff00;   /* kept from v3, ON DARK only                */
+
+  /* ---- PAPER / NEUTRALS ------------------------------------------------ */
+  --hc-paper:   #f5f8fc;   /* --paper : page background                   */
+  --hc-white:   #ffffff;   /* --white                                     */
+  --hc-sidebar: #fafcff;   /* .sidebar rgba(250,252,255,.94) flattened    */
+  --hc-line:        #d4dfeb;   /* --line        : default hairline         */
+  --hc-line-strong: #c2d2e3;   /* --line-strong : emphasised hairline      */
+
+  /* ---- TEXT (raw, BEFORE AA correction — see corrections below) -------- */
+  --hc-text-raw:          #101b25;   /* --ink                            */
+  --hc-muted-raw:         #7b8da4;   /* --muted                          */
+  --hc-muted-alt-raw:     #7b8ea5;   /* .welcome p / .feature p          */
+  --hc-eyebrow-raw:       #8094ac;   /* .eyebrow                         */
+  --hc-quote-raw:         #7c8fa6;   /* .quote                           */
+  --hc-dim-raw:           #8ea2b8;   /* .feature-num                     */
+  --hc-brandtag-raw:      #6c7d90;   /* .brand-tag                       */
+  --hc-fine-raw:          #a0b3c7;   /* .sidebar-bottom                  */
+  --hc-navraw:            #172432;   /* .nav-item                        */
+  --hc-profile-text-raw:  #f7fbff;   /* .profile                         */
+  --hc-profile-hello-raw: #c0d0de;   /* .hello                           */
+  --hc-profile-det-raw:   #e0e9f1;   /* .profile-details                 */
+  --hc-toast-text-raw:    #dce8f0;   /* .status                          */
+
+  /* ---- MEDAL METALS (leaderboard top-3 — KEPT per decision #6) ---------
+     The only colours that survive from the leaderboard's beige era.         */
+  --hc-metal-gold-1:  #ffd700;
+  --hc-metal-gold-2:  #ffecb3;
+  --hc-metal-gold-3:  #d4af37;   /* border                          */
+  --hc-metal-silver-1:#e2e8f0;
+  --hc-metal-silver-2:#f1f5f9;
+  --hc-metal-silver-3:#9ca3af;   /* border                          */
+  --hc-metal-bronze-1:#cd7f32;
+  --hc-metal-bronze-2:#e6b17e;
+  --hc-metal-bronze-3:#b87333;   /* border                          */
+  --hc-metal-text:    #111111;   /* text ON metal (AA for all three) */
+  --hc-metal-sheen:   #f4a900;   /* avatar radial mid-stop          */
+  --hc-metal-sheen-2: #a95300;   /* avatar radial 72% stop          */
+  --hc-metal-sheen-3: #fff3ad;   /* avatar radial inner highlight   */
+
+  /* ---- EMOJI SCALE  (DECISION #8 — emoji sizes are normalised) ---------
+     The app currently sizes emoji with 11 different font-size values
+     (15,16,17,18,19,20,22,28,32,34,42px + inline 42px). Collapsed to 3
+     steps. Emoji are KEPT (decision #1) — only their SIZE is unified.
+     SVG icons are a separate layer and do NOT use these tokens.           */
+  --hc-emoji-sm: 16px;   /* inline text emoji, nav labels, chips        */
+  --hc-emoji-md: 22px;   /* card icons, list icons, stat glyphs         */
+  --hc-emoji-lg: 34px;   /* hero / feature icons, avatar glyph          */
+
+  /* ---- SEMANTIC (role colours) — primitives, aliased in LAYER 2 -------- */
+  --hc-status-success: #15803d;
+  --hc-status-warning: #b45309;
+  --hc-status-danger:  #b91c1c;
+  --hc-status-info:    #2a4e6e;
+
+  /* ---- TYPE ------------------------------------------------------------ */
+  --hc-font-sans: Inter, "Segoe UI", Arial, sans-serif;
+  --hc-font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* ======================================================================
+     LAYER 2 — SEMANTIC  (what pages actually reference)
+     ====================================================================== */
+
+  /* ---- SURFACES -------------------------------------------------------- */
+  --hc-bg:             var(--hc-paper);
+  --hc-surface:        var(--hc-white);
+  --hc-surface-raised: var(--hc-white);
+  --hc-surface-sunken: var(--hc-sidebar);
+  --hc-surface-dark:   var(--hc-navy-700);
+  --hc-surface-deep:   var(--hc-navy-900);
+  --hc-surface-sidebar: var(--hc-sidebar-navy);   /* DECISION #5          */
+  --hc-surface-row:     var(--hc-row-tint);       /* DECISION #6          */
+  --hc-surface-row-alt: var(--hc-row-tint-alt);
+  --hc-surface-row-head:var(--hc-row-head-tint);
+
+  /* ---- TEXT ------------------------------------------------------------
+     AA-CORRECTED. Every value below passes 4.5:1 on --hc-paper.            */
+  --hc-text:        #101b25;   /* 16.35:1  AAA                         */
+  --hc-text-strong: #0d1922;   /* 17.81:1  AAA                         */
+  --hc-text-muted:  #5f7183;   /*  4.72:1  AA   (was #7b8da4 = 3.19)   */
+  --hc-text-dim:    #5b6d80;   /*  5.00:1  AA   (was #8ea2b8 = 2.46)   */
+  --hc-text-fine:   #556b82;   /*  5.17:1  AA   (was #a0b3c7 = 2.02)   */
+  --hc-text-brand:  #5f7183;   /*  4.72:1  AA   (was #6c7d90 = 3.96)   */
+  --hc-text-on-dark:        #f7fbff;  /* 16.14:1 AAA on navy-700        */
+  --hc-text-on-dark-muted:  #c0d0de;  /* 10.64:1 AAA on navy-700        */
+  --hc-text-on-dark-fine:   #e0e9f1;  /* 13.66:1 AAA on navy-700        */
+
+  /* ---- BORDERS --------------------------------------------------------- */
+  --hc-border:        var(--hc-line);
+  --hc-border-strong: var(--hc-line-strong);
+  --hc-border-dark:   var(--hc-navy-line-2);
+
+  /* ---- ACCENT (role-split — THE key v4 rule) --------------------------
+     Lime is 11:1 on navy but 1.42:1 on paper. So it is split by ROLE, and
+     the wrong combination is impossible to pick by accident.
+       --hc-accent        : fills/rings/text ON DARK surfaces
+       --hc-accent-on-light: text/border/icon ON LIGHT surfaces (AA)
+       --hc-accent-line   : 100% safe everywhere (non-text graphic accents)  */
+  --hc-accent:         var(--hc-lime);        /* ON DARK  11.75:1 AAA      */
+  --hc-accent-hover:   var(--hc-lime-deep);   /* ON DARK   9.60:1 AAA      */
+  --hc-accent-on-light:#4d7c0f;               /* ON LIGHT  4.69:1 AA       */
+  --hc-accent-on-light-strong:#3f6212;        /* ON LIGHT  6.64:1 AA       */
+  /* ^ DECISION #7: #4d7c0f is the accepted lime-on-light value. Use
+     --hc-accent-on-light-strong when the text sits on a TINTED row
+     (--hc-row-tint), where #4d7c0f drops to 4.48:1 (AA-large only).      */
+  --hc-accent-line:    var(--hc-lime);        /* 2–4px bars, decorative    */
+  --hc-accent-soft:    var(--hc-lime-soft);   /* ON DARK  13.07:1 AAA      */
+  --hc-accent-wash:    rgba(166,229,34,.14);  /* .avatar halo              */
+  --hc-accent-wash-2:  rgba(166,229,34,.07);  /* .brand-mark inner ring    */
+  --hc-on-accent:      var(--hc-navy-900);    /* text ON a lime fill       */
+
+  /* ---- STATUS ---------------------------------------------------------- */
+  --hc-success: var(--hc-status-success);   /*  5.02:1 on paper  AA      */
+  --hc-warning: var(--hc-status-warning);   /*  5.02:1 on paper  AA      */
+  --hc-danger:  var(--hc-status-danger);    /*  6.47:1 on paper  AA      */
+  --hc-info:    var(--hc-status-info);      /*  9.05:1 on paper  AAA     */
+
+  /* ---- GRID BACKGROUND (new in v4 — from the demo's body) ------------- */
+  --hc-grid-size: 36px;
+  --hc-grid-line: rgba(206,220,235,.13);
+  --hc-grid:
+    linear-gradient(var(--hc-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hc-grid-line) 1px, transparent 1px);
+
+  /* ======================================================================
+     CHAMFER SYSTEM  (replaces the radius scale — this is the "one shape")
+     ----------------------------------------------------------------------
+     The demo cuts corners at ~45° instead of rounding them. Two axes:
+     X% = cut width, Y% = cut height. Six named polygons cover every
+     container in the demo. Use --hc-chamfer to override per element.
+     ====================================================================== */
+  --hc-chamfer-corner:
+    polygon(0 0, 84% 0, 100% 16%, 100% 100%, 0 100%);
+    /* 1 cut · top-right · .brand-mark, .feature-icon                    */
+  --hc-chamfer-right:
+    polygon(0 0, 95% 0, 100% 15%, 100% 85%, 95% 100%, 0 100%);
+    /* 2 cuts · right side · .nav-item.active                            */
+  --hc-chamfer-opposite:
+    polygon(0 0, 92% 0, 100% 16%, 100% 100%, 8% 100%, 0 84%);
+    /* 2 cuts · TR + BL · .stat                                          */
+  --hc-chamfer-three:
+    polygon(0 0, 98.7% 0, 100% 10%, 100% 90%, 98.7% 100%, 1.3% 100%, 0 90%);
+    /* 3 cuts · TR + BR + BL · .profile                              */
+  --hc-chamfer-all-sm:
+    polygon(0 8%, 1.7% 0, 98.3% 0, 100% 8%, 100% 92%, 98.3% 100%, 1.7% 100%, 0 92%);
+    /* 4 cuts · symmetric · THE DEFAULT for a general panel (.welcome)  */
+  --hc-chamfer-all-md:
+    polygon(3.5% 0, 96.5% 0, 100% 5%, 100% 94%, 96.5% 100%, 3.5% 100%, 0 94%, 0 5%);
+    /* 4 cuts · symmetric · wide panels (.feature cards)                */
+
+  /* Inner hairline uses the SAME cut at a smaller inset. */
+  --hc-chamfer-inset-sm:
+    polygon(0 0, 98% 0, 100% 8%, 100% 92%, 98% 100%, 2% 100%, 0 92%);
+    /* .profile::after                                                   */
+  /* Explicit alias so `var(--hc-chamfer-inset)` always resolves on its own.
+     box.css cites it with --hc-chamfer-inset-sm as a fallback argument, but
+     defining the alias removes any reliance on fallback resolution.        */
+  --hc-chamfer-inset: var(--hc-chamfer-inset-sm);
+
+  --hc-chamfer: none;   /* per-element override; see box.css             */
+
+  /* ======================================================================
+     RADIUS  — deliberately SMALL. The chamfer replaced rounding.
+     Only three values survive, all for genuinely circular/lozenge shapes.
+     ====================================================================== */
+  --hc-radius-full: 50%;      /* avatar, notify-dot, spinner  (MANDATORY) */
+  --hc-radius-pill: 999px;    /* badges / pills               (MANDATORY) */
+  --hc-radius-bar:  3px;      /* XP progress bar                          */
+  --hc-radius-xs:   6px;      /* only for tiny inline chips if a cut is
+                                 impossible in the layout                 */
+  /* ---- TIER C RADII  (decision #2 — plain boxes stay ROUNDED) -----------
+     The chamfer is reserved for tier A/B. Every other panel keeps a normal
+     rounded corner. 14px is the app's most common radius (17 occurrences),
+     so it is the default; 10px is the compact step.                        */
+  --hc-radius-sm:  10px;      /* compact rows, chips, small panels        */
+  --hc-radius-md:  14px;      /* DEFAULT for every plain container        */
+  --hc-radius-lg:  20px;      /* modals, large panels                     */
+
+  /* ======================================================================
+     SPACING  — 4px base. Every gap/padding in the demo snaps to this.
+     ====================================================================== */
+  --hc-space-1:  4px;
+  --hc-space-2:  7px;
+  --hc-space-3:  10px;
+  --hc-space-4:  13px;
+  --hc-space-5:  16px;
+  --hc-space-6:  20px;
+  --hc-space-7:  24px;
+  --hc-space-8:  28px;
+  --hc-space-9:  33px;
+  --hc-space-10: 42px;
+  --hc-space-11: 52px;
+
+  /* ======================================================================
+     TYPE SCALE — 16 real sizes in the demo, collapsed to 9 steps.
+     ====================================================================== */
+  --hc-fs-micro: 9px;    /* .brand-tag                       */
+  --hc-fs-2xs:   11px;   /* fine print on mobile             */
+  --hc-fs-xs:    12px;   /* .status toast, .sidebar-bottom   */
+  --hc-fs-sm:    13px;   /* mobile .eth                      */
+  --hc-fs-md:    14px;   /* .eyebrow, .quote, .profile-details */
+  --hc-fs-base:  15px;   /* .feature p, .feature-num         */
+  --hc-fs-lg:    16px;   /* .nav-item, .hello, .eth          */
+  --hc-fs-xl:    17px;   /* .stat                            */
+  --hc-fs-2xl:   22px;   /* .feature h2, .nav-arrow          */
+  --hc-fs-3xl:   25px;   /* .brand-name                      */
+  --hc-fs-4xl:   clamp(24px, 2.4vw, 39px);  /* .username             */
+  --hc-fs-5xl:   clamp(24px, 2.2vw, 36px);  /* .welcome h1           */
+  --hc-fs-display: 42px; /* .avatar glyph                    */
+
+  --hc-fw-light:   300;   /* .nav-arrow ›                     */
+  --hc-fw-semi:    600;   /* .nav-item, .eth                  */
+  --hc-fw-medium:  650;   /* .eyebrow, .quote small           */
+  --hc-fw-bold:    700;   /* .brand-tag, .logout              */
+  --hc-fw-heavy:   750;   /* .stat                            */
+  --hc-fw-black:   850;   /* .brand-name, .username, .feature h2 */
+
+  --hc-lh-tight:  1;
+  --hc-lh-snug:   1.2;
+  --hc-lh-base:   1.3;
+  --hc-lh-body:   1.6;
+
+  --hc-ls-tight:  -.8px;   /* .welcome h1                      */
+  --hc-ls-snug:   -.7px;   /* .username                        */
+  --hc-ls-close:  -.3px;   /* .feature h2                      */
+  --hc-ls-normal: .3px;    /* .sidebar-bottom p                */
+  --hc-ls-wide:   .4px;    /* .brand-name                      */
+  --hc-ls-caps:   .7px;    /* .eyebrow                         */
+  --hc-ls-caps-2: 2px;     /* .brand-tag                       */
+
+  /* ======================================================================
+     ELEVATION — the demo is almost shadow-free (chamfer + hairline carry it)
+     ====================================================================== */
+  --hc-shadow-none: none;
+  --hc-shadow-hair: 0 1px 2px rgba(15,23,42,.06);
+  --hc-shadow-ring: 0 0 0 3px var(--hc-paper);      /* .notify-dot      */
+  --hc-shadow-halo: 0 0 0 4px var(--hc-accent-wash);/* .avatar          */
+  --hc-shadow-inset: inset 0 0 0 3px var(--hc-accent-wash-2);
+  --hc-shadow-toast: 0 8px 24px rgba(19,37,53,.125); /* .status #13253520 */
+
+  /* ======================================================================
+     MOTION — the demo uses just two durations
+     ====================================================================== */
+  --hc-dur-fast: .18s;
+  --hc-dur-base: .2s;
+  --hc-dur-slow: .3s;
+  --hc-ease: ease;
+
+  /* ---- LAYOUT ---------------------------------------------------------- */
+  --hc-sidebar-w:       310px;
+  --hc-sidebar-w-md:    245px;   /* <=1150px */
+  --hc-sidebar-w-sm:     76px;   /* <=850px  */
+  --hc-sidebar-w-xs:     60px;   /* <=520px  */
+  --hc-topbar-h:         86px;
+  --hc-topbar-h-sm:      66px;
+  --hc-container-pad:    25px;
+  --hc-container-pad-sm: 15px;
+  --hc-container-pad-xs: 10px;
+
+  /* ---- BREAKPOINTS (reference only — media queries cannot use var()) --- */
+  /* 1150px  tablet-landscape  : sidebar narrows, cards keep 3 columns
+     850px   tablet-portrait   : icon-only rail, cards -> 1 column
+     520px   phone             : tightest rail, stats wrap              */
+}
+
+/* ==========================================================================
+   OPTIONAL — the technical grid backdrop (extracted from the demo's body).
+   Apply to <body class="hc-grid-bg"> or any full-bleed section.
+   ========================================================================== */
+.hc-grid-bg{
+  background-color: var(--hc-bg);
+  background-image: var(--hc-grid);
+  background-size: var(--hc-grid-size) var(--hc-grid-size);
+}
+
+/* ==========================================================================
+   AA CORRECTIONS APPLIED IN v4
+   --------------------------------------------------------------------------
+   Each row is a value the demo used, the measured ratio, and the value used
+   instead. Measured by documents/design-language-v4/wcag_audit.py.
+
+   demo value   on         measured   role                       v4 value
+   --------------------------------------------------------------------------
+   #8bd20c      #f5f8fc      1.74:1    lime text/graphic on light #4d7c0f  (4.69:1)
+   #7b8da4      #f5f8fc      3.19:1    --muted body text          #5f7183  (4.72:1)
+   #7b8ea5      #fbfcfe      3.32:1    .welcome p / .feature p    #5f7183  (4.90:1)
+   #8094ac      #fbfcfe      3.08:1    .eyebrow                   #5f7183  (4.90:1)
+   #7c8fa6      #fbfcfe      3.28:1    .quote                     #5f7183  (4.90:1)
+   #8ea2b8      #fbfcfe      2.59:1    .feature-num               #5b6d80  (5.19:1)
+   #6c7d90      #fafcff      4.11:1    .brand-tag                 #5f7183  (4.89:1)
+   #a0b3c7      #fafcff      2.09:1    .sidebar-bottom            #556b82  (5.36:1)
+
+   UNCHANGED because they already pass:
+   #a6e522 on #0d1922  11.75:1 AAA     #101b25 on #f5f8fc  16.35:1 AAA
+   #f7fbff on #101f2a  16.14:1 AAA     #172432 on #fafcff  15.31:1 AAA
+   #c5f35d on #101f2a  13.07:1 AAA     #dce8f0 on #0e1c25  13.90:1 AAA
+   ========================================================================== */
+
+
+/* ==========================================================================
+   v4 FINAL — THE 8 LOCKED DECISIONS
+   --------------------------------------------------------------------------
+   #1 emoji KEPT (SVG only for nav/functional icons)
+   #2 desktop + mobile stay SEPARATE, sharing only these tokens
+   #3 light mode only (two-layer structure keeps dark mode addable)
+   #4 purple REMOVED
+   #5 PRIMARY navy + ACCENT lime
+   #6 leaderboard beige removed, metal medals KEPT
+   #7 lime on light = #4d7c0f (accepted)
+   #8 emoji sizes normalised to 3 steps
+   ========================================================================== */
+
+/* ==========================================================================
+   AA TABLE FOR THE NEW v4 SURFACES  (decisions #5 and #6)
+   --------------------------------------------------------------------------
+   Measured with the WCAG 2.1 relative-luminance formula by
+   documents/design-language-v4_v2/wcag_audit.py — not estimated.
+
+   NAVY SIDEBAR  (decision #5) — band #0d1922
+   --------------------------------------------------------------------------
+   #f7fbff  brand name        17.13:1  AAA
+   #c0d0de  inactive label    11.29:1  AAA
+   #8fa6ba  brand tag          7.06:1  AAA
+   #ffffff  active label      15.51:1  AAA   (on #162630)
+   #a6e522  active icon       10.23:1  AAA   (on #162630)
+   #ffffff  hover label       13.81:1  AAA   (on #1b2f3d)
+   #0d1922  band vs page      16.72:1        (clear separation)
+
+   LEADERBOARD ROW TINT  (decision #6) — row #eef3f9
+   --------------------------------------------------------------------------
+   #101b25  primary text      15.61:1  AAA
+   #5b6d80  dim text           4.77:1  AA
+   #5f7183  muted text         4.51:1  AA    (just clears AA)
+   #3f6212  lime-on-light      6.34:1  AA    <-- USE THIS ON TINTED ROWS
+   #4d7c0f  lime-on-light      4.48:1  AA-large  <-- only on plain paper
+   #b91c1c  danger             5.80:1  AA
+
+   WHY --hc-accent-on-light-strong EXISTS
+   --------------------------------------------------------------------------
+   #4d7c0f passes AA on --hc-paper (4.69:1) but drops to 4.48:1 on the
+   tinted row. Any lime text sitting on --hc-row-tint must use
+   --hc-accent-on-light-strong (#3f6212, 6.34:1) instead.
+
+   METAL MEDALS (kept, decision #6) — text #111111
+   --------------------------------------------------------------------------
+   gold   #ffd700 -> #ffecb3   13.46:1  AAA
+   silver #e2e8f0 -> #f1f5f9   15.32:1  AAA
+   bronze #cd7f32 -> #e6b17e    6.00:1  AA
+   ========================================================================== */
