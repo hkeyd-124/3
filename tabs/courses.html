@@ -1,33 +1,54 @@
 <div class="courses-page">
 
+<!-- =========================================================
+     HackChem — Design System v4 · PHASE 2 PILOT
+     Page: tabs/courses.html  (fragment injected into #spaContainer)
+     ---------------------------------------------------------
+     Loaded by: home.html via router.js loadTab('courses')
+     Stylesheets: relative internal paths (NOT cross-folder CDN —
+                  that returns 403, see PHASE 1 report).
+     DOM contract: UNCHANGED. Every class/id the JS touches is
+                  kept exactly as before:
+                    #coursesList, .lesson-btn, .boss-btn,
+                    .percent-circle, #topicPercent_*, #lessonPercent_*,
+                    #boss_*, #topic_<n>, .course-topic, .course-lesson
+     JS: UNCHANGED (courses/courses.js is not touched).
+     ========================================================= -->
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/box.css">
+
 <style>
 
+/* ---------------------------------------------------------
+   PAGE SHELL
+   --------------------------------------------------------- */
 .courses-page{
-    padding:20px;
+    padding:var(--hc-space-6);
     /* scroll area */
     height:calc(100vh - 120px);
     overflow-y:scroll;
     overflow-x:hidden;
 }
-  
+
 .courses-page::-webkit-scrollbar{
     width:10px;
 }
 
 .courses-page::-webkit-scrollbar-track{
-    background:#e5e7eb;
-    border-radius:999px;
+    background:var(--hc-line);
+    border-radius:var(--hc-radius-pill);
 }
 
 .courses-page::-webkit-scrollbar-thumb{
-    background:#555;
-    border-radius:999px;
+    background:var(--hc-navy-500);
+    border-radius:var(--hc-radius-pill);
 }
 
 .courses-page::-webkit-scrollbar-thumb:hover{
-    background:#333;
+    background:var(--hc-navy-700);
 }
-  
+
 .courses-container{
   max-width:900px;
   margin:auto;
@@ -37,69 +58,152 @@
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:20px;
+  margin-bottom:var(--hc-space-6);
 }
 
 .courses-title{
-  font-size:28px;
-  font-weight:bold;
+  font-size:var(--hc-fs-3xl);
+  font-weight:var(--hc-fw-black);
+  letter-spacing:var(--hc-ls-close);
+  color:var(--hc-text);
 }
 
+/* TIER C — plain rounded control (decision #2: no chamfer here) */
 .back-btn{
-  padding:10px 18px;
-  background:#111;
-  color:white;
-  border-radius:12px;
+  padding:var(--hc-space-3) var(--hc-space-5);
+  background:var(--hc-navy-900);
+  color:var(--hc-white);
+  border-radius:var(--hc-radius-md);
   cursor:pointer;
+  font-weight:var(--hc-fw-semi);
+  transition:background var(--hc-dur-base) var(--hc-ease);
 }
 
-/* TOPIC */
+.back-btn:hover{
+  background:var(--hc-navy-600);
+}
 
+/* ---------------------------------------------------------
+   TIER B — TOPIC CARD  (decision #2: chamfered "tab card")
+   ---------------------------------------------------------
+   WHY THIS POLYGON IS NOT --hc-chamfer-all-md
+   -------------------------------------------
+   The v4 chamfer tokens are pure PERCENTAGES, so the cut scales
+   with the box. --hc-chamfer-all-md (3.5% / 5%) was measured on
+   the demo's .feature card (300x230) where it yields a ~10x11px
+   cut. On a SHORT, WIDE list row (900x89) the same percentages
+   give a 31px horizontal cut but only a 4px vertical one — the
+   corner is no longer 45 degrees and the inner hairline, which
+   sits on a smaller box, no longer runs parallel to the outer
+   edge. That misalignment is visible as a "ghost border".
+
+   FIX: mix units. A fixed 10px horizontal cut + 11% vertical
+   cut yields ~10x10px on BOTH the 900px desktop row and the
+   325px mobile row, so the cut stays square at every width.
+   The inner hairline reuses the SAME polygon, so the two cuts
+   are parallel by construction.
+
+   NOTE: this row-tuned profile is declared LOCALLY here on
+   purpose — PHASE 2 is limited to one page + two <link>s.
+   Promote it to tokens.css as --hc-chamfer-row in a later phase.
+   --------------------------------------------------------- */
 .course-topic{
-  border:2px solid #333;
-  padding:16px;
-  border-radius:14px;
-  margin-bottom:14px;
+  --row-cut-x:10px;
+  --row-cut-y:11%;
+  position:relative;
+  border:1px solid var(--hc-border-strong);
+  padding:var(--hc-space-5);
+  margin-bottom:var(--hc-space-4);
   display:flex;
   justify-content:space-between;
   align-items:center;
   cursor:pointer;
-  background:white;
+  background:var(--hc-surface);
+  color:var(--hc-text);
+  font-weight:var(--hc-fw-semi);
+  clip-path:polygon(
+    0 var(--row-cut-y),
+    var(--row-cut-x) 0,
+    calc(100% - var(--row-cut-x)) 0,
+    100% var(--row-cut-y),
+    100% calc(100% - var(--row-cut-y)),
+    calc(100% - var(--row-cut-x)) 100%,
+    var(--row-cut-x) 100%,
+    0 calc(100% - var(--row-cut-y))
+  );
+  transition:transform var(--hc-dur-base) var(--hc-ease),
+             background var(--hc-dur-base) var(--hc-ease);
 }
 
-/* LESSON */
+/* inner hairline — same polygon, inset 5px, so the cuts stay parallel.
+   position:absolute => NOT a flex item => space-between is untouched. */
+.course-topic::before{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1px solid var(--hc-border);
+  clip-path:polygon(
+    0 var(--row-cut-y),
+    var(--row-cut-x) 0,
+    calc(100% - var(--row-cut-x)) 0,
+    100% var(--row-cut-y),
+    100% calc(100% - var(--row-cut-y)),
+    calc(100% - var(--row-cut-x)) 100%,
+    var(--row-cut-x) 100%,
+    0 calc(100% - var(--row-cut-y))
+  );
+  pointer-events:none;
+}
 
+.course-topic:hover{
+  transform:translateY(-2px);
+  background:var(--hc-surface);
+}
+
+/* ---------------------------------------------------------
+   TIER C — LESSON ROW  (decision #2: plain rounded, no chamfer)
+   --------------------------------------------------------- */
 .course-lesson{
+  position:relative;
   margin-left:30px;
-  margin-top:12px;
-  border:2px solid #333;
-  padding:14px;
-  border-radius:12px;
+  margin-top:var(--hc-space-3);
+  border:1px solid var(--hc-border);
+  padding:var(--hc-space-4);
+  border-radius:var(--hc-radius-md);
   display:flex;
   justify-content:space-between;
   align-items:center;
   cursor:pointer;
-  background:white;
-  transition:0.2s;
+  background:var(--hc-surface);
+  color:var(--hc-text);
+  transition:var(--hc-dur-base);
 }
 
 .course-lesson:hover{
   transform:translateX(5px);
-  background:#f1f5f9;
+  background:var(--hc-row-tint);
 }
 
-/* PROGRESS */
-
+/* ---------------------------------------------------------
+   PROGRESS BADGE — EXCLUDED from the chamfer system
+   ---------------------------------------------------------
+   .percent-circle is a 50% circle (a SHAPE, not a container).
+   Its fill colour is written by courses.js setCourseColor()
+   (#F44336 / #FF9800 / #FFC107 / #4CAF50) — that is progress
+   semantics and is OUT OF SCOPE for this pilot. Only the CSS
+   fallback below is tokenised.
+   --------------------------------------------------------- */
 .percent-circle{
   width:55px;
   height:55px;
-  border-radius:50%;
+  border-radius:var(--hc-radius-full);
   display:flex;
   align-items:center;
   justify-content:center;
-  font-weight:bold;
-  background:#ccc;
-  color:white;
+  font-weight:var(--hc-fw-bold);
+  background:var(--hc-navy-500);
+  color:var(--hc-white);
+  flex:0 0 auto;
 }
 
 </style>
