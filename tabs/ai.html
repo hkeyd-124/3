@@ -1,9 +1,35 @@
 <div class="ai-page">
 
+<!-- =========================================================
+     HackChem — Design System v4 · PHASE 2
+     Page: tabs/ai.html  (fragment injected into #spaContainer)
+     ---------------------------------------------------------
+     Loaded by: home.html via router.js loadTab('ai')
+     Stylesheets: relative internal paths (NOT cross-folder CDN —
+                  that returns 403, see PHASE 1 report).
+     DOM contract: UNCHANGED. Every class/id the JS touches is
+                  kept exactly as before:
+                    #aiHomeView, #aiTutorView, #aiQuizView,
+                    #aiMessages, #aiInput, #aiSendBtn,
+                    #generateQuizBtn, #quizTopic, #quizDifficulty,
+                    #quizResult, #quizQuestion, #quizAnswers,
+                    #quizScore, #quizFeedback, #nextQuizBtn,
+                    .ai-page, .ai-container, .ai-header, .ai-title,
+                    .ai-home, .ai-grid, .ai-card, .ai-icon,
+                    .ai-card-title, .ai-card-desc
+     JS: UNCHANGED (js/ai/aiChat.js + js/ai/aiQuiz.js not touched).
+     ========================================================= -->
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/box.css">
+
 <style>
 
+/* ---------------------------------------------------------
+   PAGE SHELL
+   --------------------------------------------------------- */
 .ai-page{
-  padding:20px;
+  padding:var(--hc-space-6);
 }
 
 .ai-container{
@@ -15,57 +41,124 @@
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:25px;
+  margin-bottom:var(--hc-space-7);
 }
 
 .ai-title{
-  font-size:32px;
-  font-weight:bold;
+  font-size:var(--hc-fs-3xl);
+  font-weight:var(--hc-fw-black);
+  letter-spacing:var(--hc-ls-close);
+  color:var(--hc-text);
 }
 
+/* TIER C — plain rounded control (decision #2: no chamfer here) */
 .ai-home{
-  padding:10px 18px;
-  background:#111;
-  color:white;
-  border-radius:14px;
+  padding:var(--hc-space-3) var(--hc-space-5);
+  background:var(--hc-navy-900);
+  color:var(--hc-white);
+  border-radius:var(--hc-radius-md);
   cursor:pointer;
-  font-weight:bold;
+  font-weight:var(--hc-fw-semi);
+  transition:background var(--hc-dur-base) var(--hc-ease);
+}
+
+.ai-home:hover{
+  background:var(--hc-navy-600);
 }
 
 .ai-grid{
   display:grid;
   grid-template-columns:
     repeat(auto-fit,minmax(320px,1fr));
-  gap:20px;
+  gap:var(--hc-space-6);
 }
 
+/* ---------------------------------------------------------
+   TIER B — AI CARD  (decision #2: chamfered "tab card")
+   ---------------------------------------------------------
+   WHY THE CUT IS A FIXED 10px ON BOTH AXES
+   ----------------------------------------
+   The v4 chamfer tokens are pure PERCENTAGES, so the cut scales
+   with the box. --hc-chamfer-all-md (3.5% / 5%) was measured on
+   the demo's .feature card (300x230) where it yields ~10x11px.
+   An .ai-card here is ~490x200, so the same percentages give a
+   17px horizontal cut but only a 10px vertical one — the corner
+   is no longer 45 degrees. The design language is "cut at ~45",
+   so a fixed 10px on BOTH axes is used instead: it stays square
+   at every card size. The inner hairline reuses the SAME
+   polygon, so the two cuts are parallel by construction.
+
+   NOTE: this card-tuned profile is declared LOCALLY here on
+   purpose — PHASE 2 is limited to one page + two <link>s.
+   Promote it to tokens.css as --hc-chamfer-card in a later phase.
+
+   The old `box-shadow: 0 5px 20px rgba(0,0,0,.05)` is dropped:
+   clip-path clips an element's own shadow away, and the demo is
+   deliberately shadow-free (tokens.css: "chamfer + hairline
+   carry it"). The hairline below replaces it.
+   --------------------------------------------------------- */
 .ai-card{
-  background:white;
-  border-radius:24px;
-  padding:30px;
+  --card-cut:10px;
+  position:relative;
+  background:var(--hc-surface);
+  border:1px solid var(--hc-border-strong);
+  padding:var(--hc-space-8);
   cursor:pointer;
-  transition:.2s;
-  box-shadow:
-    0 5px 20px rgba(0,0,0,.05);
+  clip-path:polygon(
+    0 var(--card-cut),
+    var(--card-cut) 0,
+    calc(100% - var(--card-cut)) 0,
+    100% var(--card-cut),
+    100% calc(100% - var(--card-cut)),
+    calc(100% - var(--card-cut)) 100%,
+    var(--card-cut) 100%,
+    0 calc(100% - var(--card-cut))
+  );
+  transition:transform var(--hc-dur-base) var(--hc-ease),
+             background var(--hc-dur-base) var(--hc-ease);
+}
+
+/* inner hairline — same polygon, inset 5px, so the cuts stay parallel */
+.ai-card::before{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1px solid var(--hc-border);
+  clip-path:polygon(
+    0 var(--card-cut),
+    var(--card-cut) 0,
+    calc(100% - var(--card-cut)) 0,
+    100% var(--card-cut),
+    100% calc(100% - var(--card-cut)),
+    calc(100% - var(--card-cut)) 100%,
+    var(--card-cut) 100%,
+    0 calc(100% - var(--card-cut))
+  );
+  pointer-events:none;
 }
 
 .ai-card:hover{
   transform:translateY(-5px);
+  background:var(--hc-surface);
 }
 
+/* DECISION #8 — emoji normalised to the 3-step scale (was 42px) */
 .ai-icon{
-  font-size:42px;
-  margin-bottom:15px;
+  font-size:var(--hc-emoji-lg);
+  line-height:1;
+  margin-bottom:var(--hc-space-4);
 }
 
 .ai-card-title{
-  font-size:24px;
-  font-weight:bold;
-  margin-bottom:10px;
+  font-size:var(--hc-fs-2xl);
+  font-weight:var(--hc-fw-black);
+  letter-spacing:var(--hc-ls-close);
+  margin-bottom:var(--hc-space-3);
+  color:var(--hc-text);
 }
 
 .ai-card-desc{
-  color:#666;
+  color:var(--hc-text-muted);
   line-height:1.6;
 }
 
@@ -175,16 +268,16 @@
 
 <div
   style="
-  background:white;
-  border-radius:24px;
-  padding:20px;
-  box-shadow:0 5px 20px rgba(0,0,0,.05);
+  background:var(--hc-surface);
+  border:1px solid var(--hc-border);
+  border-radius:var(--hc-radius-lg);
+  padding:var(--hc-space-6);
   ">
 
   <div
     style="
-    margin-bottom:15px;
-    color:#666;
+    margin-bottom:var(--hc-space-4);
+    color:var(--hc-text-muted);
     ">
 
     💬 Ask anything about chemistry
@@ -197,11 +290,11 @@
     style="
     height:50vh;
     overflow-y:auto;
-    border:1px solid #eee;
-    border-radius:16px;
-    padding:15px;
-    margin-bottom:15px;
-    background:#fafafa;
+    border:1px solid var(--hc-border);
+    border-radius:var(--hc-radius-md);
+    padding:var(--hc-space-4);
+    margin-bottom:var(--hc-space-4);
+    background:var(--hc-paper);
     ">
 
   </div>
@@ -220,9 +313,11 @@
 
       style="
       flex:1;
-      padding:14px;
-      border-radius:14px;
-      border:1px solid #ddd;
+      padding:var(--hc-space-4);
+      border-radius:var(--hc-radius-md);
+      border:1px solid var(--hc-border-strong);
+      background:var(--hc-surface);
+      color:var(--hc-text);
       ">
 
     <button
@@ -230,12 +325,13 @@
       id="aiSendBtn"
 
       style="
-      padding:14px 24px;
+      padding:var(--hc-space-4) var(--hc-space-7);
       border:none;
-      border-radius:14px;
-      background:#111;
-      color:white;
+      border-radius:var(--hc-radius-md);
+      background:var(--hc-navy-900);
+      color:var(--hc-white);
       cursor:pointer;
+      font-weight:var(--hc-fw-semi);
       ">
 
       Send
@@ -274,10 +370,10 @@
 
   <div
     style="
-    background:white;
-    border-radius:24px;
-    padding:20px;
-    box-shadow:0 5px 20px rgba(0,0,0,.05);
+    background:var(--hc-surface);
+    border:1px solid var(--hc-border);
+    border-radius:var(--hc-radius-lg);
+    padding:var(--hc-space-6);
     ">
 
    <div
@@ -294,9 +390,10 @@
 
     <div
       style="
-      font-size:20px;
-      font-weight:bold;
-      margin-bottom:10px;
+      font-size:var(--hc-fs-xl);
+      font-weight:var(--hc-fw-bold);
+      margin-bottom:var(--hc-space-3);
+      color:var(--hc-text);
       ">
 
       Select Topic
@@ -308,8 +405,11 @@
 
       style="
       width:100%;
-      padding:14px;
-      border-radius:12px;
+      padding:var(--hc-space-4);
+      border-radius:var(--hc-radius-sm);
+      border:1px solid var(--hc-border-strong);
+      background:var(--hc-surface);
+      color:var(--hc-text);
       ">
 
       <option value="organic">
@@ -338,9 +438,10 @@
 
     <div
       style="
-      font-size:20px;
-      font-weight:bold;
-      margin-bottom:10px;
+      font-size:var(--hc-fs-xl);
+      font-weight:var(--hc-fw-bold);
+      margin-bottom:var(--hc-space-3);
+      color:var(--hc-text);
       ">
 
       Select Difficulty
@@ -352,8 +453,11 @@
 
       style="
       width:100%;
-      padding:14px;
-      border-radius:12px;
+      padding:var(--hc-space-4);
+      border-radius:var(--hc-radius-sm);
+      border:1px solid var(--hc-border-strong);
+      background:var(--hc-surface);
+      color:var(--hc-text);
       ">
 
       <option value="easy">
@@ -380,12 +484,13 @@
 
       style="
       width:100%;
-      padding:14px;
+      padding:var(--hc-space-4);
       border:none;
-      border-radius:14px;
-      background:#111;
-      color:white;
+      border-radius:var(--hc-radius-md);
+      background:var(--hc-navy-900);
+      color:var(--hc-white);
       cursor:pointer;
+      font-weight:var(--hc-fw-semi);
       ">
 
       Generate Quiz
@@ -397,20 +502,21 @@
 
   style="
   display:none;
-  margin-top:20px;
-  padding:20px;
-  border-radius:16px;
-  background:#f8fafc;
-  border:1px solid #e5e7eb;
+  margin-top:var(--hc-space-6);
+  padding:var(--hc-space-6);
+  border-radius:var(--hc-radius-md);
+  background:var(--hc-row-tint);
+  border:1px solid var(--hc-border);
   ">
 
   <div
     id="quizQuestion"
 
     style="
-    font-size:18px;
-    font-weight:bold;
-    margin-bottom:20px;
+    font-size:var(--hc-fs-lg);
+    font-weight:var(--hc-fw-bold);
+    margin-bottom:var(--hc-space-6);
+    color:var(--hc-text);
     ">
 
   </div>
@@ -424,8 +530,9 @@
   id="quizScore"
 
   style="
-  margin-top:15px;
-  font-weight:bold;
+  margin-top:var(--hc-space-4);
+  font-weight:var(--hc-fw-bold);
+  color:var(--hc-text);
   ">
 
   Score: 0
@@ -437,8 +544,8 @@
 
   style="
   display:none;
-  margin-top:15px;
-  font-weight:bold;
+  margin-top:var(--hc-space-4);
+  font-weight:var(--hc-fw-bold);
   ">
 
 </div>
@@ -449,14 +556,15 @@
 
   style="
   display:none;
-  margin-top:15px;
+  margin-top:var(--hc-space-4);
   width:100%;
-  padding:12px;
+  padding:var(--hc-space-3);
   border:none;
-  border-radius:12px;
-  background:#111;
-  color:white;
+  border-radius:var(--hc-radius-sm);
+  background:var(--hc-navy-900);
+  color:var(--hc-white);
   cursor:pointer;
+  font-weight:var(--hc-fw-semi);
   ">
 
   Next Question
