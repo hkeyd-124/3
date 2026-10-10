@@ -1,0 +1,604 @@
+/* ==========================================================================
+   HackChem — Container System v4  ("one shape for every panel")
+   --------------------------------------------------------------------------
+   SOURCE OF TRUTH: webpages/design-system_v4/source/user-demo.html
+   Every polygon below is copied VERBATIM from that file (line number noted).
+
+   THE ONE RULE
+   ------------
+   Every framed surface in HackChem is a CHAMFERED RECTANGLE cut at ~45°,
+   never a rounded rectangle. Pick a cut profile from the six in tokens.css,
+   add chrome (hairline / brackets / dark skin) with a modifier, and stop.
+
+   THE BORDER PROBLEM — SOLVED
+   ---------------------------
+   `clip-path` clips the element's own border away. The demo works around
+   this with a NESTED LAYER:
+       outer element  -> carries the visible 1px border
+       inner ::before -> inset by Npx, same polygon, carries the hairline
+   `.hc-box--hairline` and `.hc-box--framed` implement exactly that.
+
+   USAGE
+   -----
+     <section class="hc-box hc-box--sm hc-box--hairline">
+       <div class="hc-box__head">…</div>
+       <div class="hc-box__body">…</div>
+       <div class="hc-box__foot">…</div>
+     </section>
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. BASE
+   ========================================================================== */
+.hc-box{
+  position: relative;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border-strong);
+  /* default profile = the demo's symmetric 8-point cut (.welcome, line 122) */
+  clip-path: var(--hc-chamfer, var(--hc-chamfer-all-sm));
+  padding: var(--hc-space-6);
+  color: var(--hc-text);
+  font-family: var(--hc-font-sans);
+  transition: transform var(--hc-dur-base) var(--hc-ease),
+              background var(--hc-dur-base) var(--hc-ease);
+}
+.hc-box *,
+.hc-box *::before,
+.hc-box *::after{ box-sizing: border-box; }
+
+
+/* ==========================================================================
+   2. CUT PROFILES  — choose the corner-cut geometry
+   ========================================================================== */
+.hc-box--corner  { clip-path: var(--hc-chamfer, var(--hc-chamfer-corner));   }
+.hc-box--right   { clip-path: var(--hc-chamfer, var(--hc-chamfer-right));    }
+.hc-box--opposite{ clip-path: var(--hc-chamfer, var(--hc-chamfer-opposite)); }
+.hc-box--three   { clip-path: var(--hc-chamfer, var(--hc-chamfer-three));    }
+.hc-box--sm      { clip-path: var(--hc-chamfer, var(--hc-chamfer-all-sm));   }   /* default */
+.hc-box--md      { clip-path: var(--hc-chamfer, var(--hc-chamfer-all-md));   }   /* wide panels */
+.hc-box--flat    { clip-path: var(--hc-chamfer, none); border-radius: var(--hc-radius-xs); }
+
+/* Per-element override: --hc-chamfer: polygon(...) on any .hc-box */
+
+
+/* ==========================================================================
+   3. HAIRLINE INNER FRAME  (the demo's nested-layer border trick)
+   --------------------------------------------------------------------------
+   The OUTER border stays on .hc-box. This adds the inner hairline that the
+   demo uses at .profile::after (line 88-91), .welcome::before (line 124)
+   and .feature::before (line 142).
+   ========================================================================== */
+.hc-box--hairline::before{
+  content: "";
+  position: absolute;
+  inset: var(--hc-hairline-inset, 9px);
+  border: 1px solid var(--hc-hairline-color, var(--hc-border));
+  clip-path: var(--hc-chamfer-inset, var(--hc-chamfer-inset-sm));
+  pointer-events: none;
+  z-index: 1;
+}
+.hc-box--hairline > *{ position: relative; z-index: 2; }
+.hc-box--hairline-tight::before{ --hc-hairline-inset: 5px; }
+
+
+/* ==========================================================================
+   4. CORNER BRACKETS  (the demo's .corner L-marks, lines 92-97)
+   --------------------------------------------------------------------------
+   Add 4 <i class="hc-bracket tl"></i> children, or use --brackets with
+   .hc-box__brackets markup. 22x22px, 2px, lime, inset 9px, opacity .9.
+   ========================================================================== */
+.hc-bracket{
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-color: var(--hc-accent);
+  border-style: solid;
+  opacity: .9;
+  pointer-events: none;
+  z-index: 3;
+}
+.hc-bracket.tl{ top:9px;    left:9px;  border-width: 2px 0 0 2px; }
+.hc-bracket.tr{ top:9px;    right:9px; border-width: 2px 2px 0 0; }
+.hc-bracket.bl{ bottom:9px; left:9px;  border-width: 0 0 2px 2px; }
+.hc-bracket.br{ bottom:9px; right:9px; border-width: 0 2px 2px 0; }
+/* smaller variant for compact cards */
+.hc-bracket--sm{ width:14px; height:14px; }
+.hc-bracket--sm.tl{ border-width: 2px 0 0 2px; }
+.hc-bracket--sm.tr{ border-width: 2px 2px 0 0; }
+.hc-bracket--sm.bl{ border-width: 0 0 2px 2px; }
+.hc-bracket--sm.br{ border-width: 0 2px 2px 0; }
+
+
+/* ==========================================================================
+   5. SKINS  — colour + weight modifiers
+   ========================================================================== */
+
+/* 5.1 DARK — the demo's .profile (line 74-82) */
+.hc-box--dark{
+  background: var(--hc-surface-dark);
+  border-color: var(--hc-border-dark);
+  color: var(--hc-text-on-dark);
+}
+.hc-box--dark.hc-box--hairline::before{
+  --hc-hairline-color: rgba(208,227,240,.17);
+}
+
+/* 5.2 DEEP — the demo's .brand-mark / .feature-icon / .go (navy 900/750) */
+.hc-box--deep{
+  background: var(--hc-surface-deep);
+  border-color: var(--hc-navy-line-1);
+  color: var(--hc-accent);
+}
+
+/* 5.3 DARK GRADIENT — the demo's .nav-item.active (line 57) */
+.hc-box--active{
+  background: linear-gradient(105deg, var(--hc-navy-950), var(--hc-navy-600));
+  border-color: var(--hc-navy-500);
+  color: var(--hc-white);
+}
+/* the 4px lime rail on the left edge */
+.hc-box--railed::before{
+  content: "";
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: var(--hc-accent);
+  z-index: 2;
+}
+
+/* 5.4 GLASS — translucent light surface (the demo's .feature, line 138) */
+.hc-box--glass{
+  background: rgba(255,255,255,.83);
+  border-color: var(--hc-border-strong);
+}
+.hc-box--glass-soft{ background: rgba(255,255,255,.80); }   /* .welcome */
+
+/* 5.5 RAISED — subtle float on hover (the demo's .feature:hover) */
+.hc-box--raised{ box-shadow: var(--hc-shadow-hair); }
+.hc-box--interactive{ cursor: pointer; }
+.hc-box--interactive:hover{
+  transform: translateY(-4px);
+  background: var(--hc-surface);
+  box-shadow: var(--hc-shadow-hair);
+}
+
+/* 5.6 ACCENT-WASHED — lime-tinted panel for "active/featured" content */
+.hc-box--accent{
+  border-color: var(--hc-accent);
+  background: var(--hc-surface);
+}
+.hc-box--accent-rail{ border-left: 2px solid var(--hc-accent); }
+
+
+/* ==========================================================================
+   6. SIZE / DENSITY
+   ========================================================================== */
+.hc-box--pad-sm{ padding: var(--hc-space-5); }
+.hc-box--pad-md{ padding: var(--hc-space-6); }   /* default 20px */
+.hc-box--pad-lg{ padding: var(--hc-space-8); }
+.hc-box--pad-xl{ padding: var(--hc-space-9) var(--hc-space-10); }
+
+
+/* ==========================================================================
+   7. INTERNAL REGIONS  (head / body / foot)
+   ========================================================================== */
+.hc-box__head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hc-space-5);
+  min-height: 48px;
+  padding: var(--hc-space-3) var(--hc-space-6);
+  border-bottom: 1px solid var(--hc-border);
+  font-size: var(--hc-fs-base);
+  font-weight: var(--hc-fw-semi);
+  color: var(--hc-text);
+}
+.hc-box__body{
+  padding: var(--hc-space-6);
+}
+.hc-box__foot{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--hc-space-5);
+  padding: var(--hc-space-3) var(--hc-space-6);
+  border-top: 1px solid var(--hc-border);
+  background: var(--hc-surface-sunken);
+  font-size: var(--hc-fs-md);
+  color: var(--hc-text-muted);
+}
+/* When head/body/foot regions are used the outer padding must not double up.
+   Uses an explicit modifier (not :has()) so it also works on older iOS Safari. */
+.hc-box--regions{ padding: 0; }
+/* progressive enhancement for markup that forgets the modifier */
+@supports selector(:has(*)){
+  .hc-box:has(> .hc-box__head),
+  .hc-box:has(> .hc-box__body),
+  .hc-box:has(> .hc-box__foot){ padding: 0; }
+}
+
+/* dark skin region borders */
+.hc-box--dark .hc-box__head{ border-bottom-color: rgba(208,227,240,.17); }
+.hc-box--dark .hc-box__foot{
+  border-top-color: rgba(208,227,240,.17);
+  background: rgba(8,20,29,.68);
+  color: var(--hc-text-on-dark-muted);
+}
+
+
+/* ==========================================================================
+   8. COMPOSITE PATTERNS  (the four demo screens, ready to reuse)
+   ========================================================================== */
+
+/* 8.1 TAB / FEATURE CARD — demo .feature (line 137-146) */
+.hc-card{
+  position: relative;
+  min-height: 230px;
+  padding: 25px 31px 23px;
+  border: 1px solid var(--hc-border-strong);
+  background: rgba(255,255,255,.83);
+  clip-path: var(--hc-chamfer-all-md);
+  transition: transform var(--hc-dur-base) var(--hc-ease),
+              background var(--hc-dur-base) var(--hc-ease);
+}
+.hc-card:hover{ transform: translateY(-4px); background: var(--hc-surface); }
+.hc-card__top{ display:flex; justify-content:space-between; align-items:flex-start; }
+.hc-card__icon{
+  width: 57px; height: 57px;
+  display: grid; place-items: center;
+  background: var(--hc-navy-750);
+  color: var(--hc-accent);
+  border: 1px solid #2e4855;
+  clip-path: var(--hc-chamfer-corner);
+}
+.hc-card__icon svg{ width: 32px; height: 32px; stroke: currentColor; }
+.hc-card__num{ color: var(--hc-text-dim); font-size: var(--hc-fs-base); }
+.hc-card__num::after{
+  content:""; display:block; height:2px; width:19px;
+  background: var(--hc-accent); margin: 8px 0 0 auto;
+}
+.hc-card h2{ margin: 19px 0 8px; font-size: var(--hc-fs-2xl); letter-spacing: var(--hc-ls-close); }
+.hc-card p{ margin: 0; color: var(--hc-text-muted); font-size: var(--hc-fs-base); }
+.hc-card__bottom{ display:flex; align-items:center; gap: var(--hc-space-5); margin-top: var(--hc-space-7); }
+.hc-track{ height: 2px; flex: 1; background: #e0e8f0; position: relative; }
+.hc-track::before{
+  content:""; width: 42px; height: 2px; position: absolute; left:0; top:0;
+  background: var(--hc-accent-on-light);
+}
+.hc-go{
+  width: 35px; height: 35px; display: grid; place-items: center;
+  color: var(--hc-accent); background: var(--hc-navy-750);
+  border: 1px solid #314b59;
+}
+.hc-go svg{ width: 19px; height: 19px; }
+
+/* 8.2 SIDEBAR NAV ITEM — demo .nav-item (line 49-62) */
+.hc-nav{
+  display: flex; align-items: center; gap: 15px;
+  height: 58px; padding: 0 17px;
+  color: var(--hc-navraw); text-decoration: none;
+  font-weight: var(--hc-fw-semi); font-size: var(--hc-fs-lg);
+  border: 1px solid transparent; position: relative;
+  transition: var(--hc-dur-fast) var(--hc-ease);
+}
+.hc-nav svg{ width: 23px; height: 23px; flex: none; stroke: currentColor; }
+.hc-nav:hover{ border-color: var(--hc-border); background: var(--hc-surface); transform: translateX(2px); }
+.hc-nav.is-active{
+  color: var(--hc-white);
+  background: linear-gradient(105deg, var(--hc-navy-950), var(--hc-navy-600));
+  border-color: var(--hc-navy-500);
+  clip-path: var(--hc-chamfer-right);
+}
+.hc-nav.is-active::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+  background: var(--hc-accent);
+}
+.hc-nav.is-active svg{ color: var(--hc-accent); }
+.hc-nav__arrow{ margin-left: auto; color: var(--hc-accent); font-size: var(--hc-fs-2xl); font-weight: var(--hc-fw-light); }
+
+/* 8.3 STAT CHIP — demo .stat (line 108-113) */
+.hc-stat{
+  min-width: 125px; height: 54px; padding: 0 18px;
+  display: flex; justify-content: center; align-items: center; gap: 12px;
+  border: 1px solid var(--hc-navy-line-3);
+  background: rgba(8,20,29,.68);
+  font-weight: var(--hc-fw-heavy); font-size: var(--hc-fs-xl);
+  color: var(--hc-text-on-dark);
+  clip-path: var(--hc-chamfer-opposite);
+}
+.hc-stat--streak{
+  border: 2px solid var(--hc-accent);
+  color: var(--hc-accent-soft);
+  min-width: 145px;
+}
+
+
+/* ==========================================================================
+   9. LISTS  (the demo has no list, added for app use)
+   ========================================================================== */
+.hc-list{ display: grid; gap: var(--hc-space-3); margin: 0; padding: 0; list-style: none; }
+.hc-list__item{
+  display: flex; align-items: center; gap: var(--hc-space-4);
+  min-height: 56px; padding: var(--hc-space-3) var(--hc-space-6);
+  border: 1px solid var(--hc-border);
+  background: var(--hc-surface);
+  color: var(--hc-text);
+}
+.hc-list__item--active{ border-color: var(--hc-accent-on-light); }
+.hc-list__item--dark{
+  background: var(--hc-surface-deep);
+  border-color: var(--hc-navy-line-1);
+  color: var(--hc-text-on-dark);
+}
+
+
+/* ==========================================================================
+   10. MODAL / DIALOG
+   --------------------------------------------------------------------------
+   The modal is the ONE place a slightly larger cut is used so it reads as a
+   distinct layer above cards.
+   ========================================================================== */
+.hc-modal{
+  position: relative;
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border-strong);
+  clip-path: var(--hc-chamfer-all-md);
+  padding: 0;
+  color: var(--hc-text);
+  max-width: min(720px, 92vw);
+}
+.hc-modal__head{
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--hc-space-5);
+  padding: var(--hc-space-5) var(--hc-space-8);
+  border-bottom: 1px solid var(--hc-border);
+}
+.hc-modal__head h2{ margin: 0; font-size: var(--hc-fs-2xl); letter-spacing: var(--hc-ls-close); }
+.hc-modal__body{ padding: var(--hc-space-8); }
+.hc-modal__foot{
+  display: flex; justify-content: flex-end; gap: var(--hc-space-3);
+  padding: var(--hc-space-5) var(--hc-space-8);
+  border-top: 1px solid var(--hc-border);
+  background: var(--hc-surface-sunken);
+}
+.hc-modal--dark{
+  background: var(--hc-surface-dark);
+  border-color: var(--hc-border-dark);
+  color: var(--hc-text-on-dark);
+}
+.hc-modal--dark .hc-modal__head{ border-bottom-color: rgba(208,227,240,.17); }
+.hc-modal--dark .hc-modal__foot{
+  border-top-color: rgba(208,227,240,.17);
+  background: rgba(8,20,29,.68);
+}
+
+
+/* ==========================================================================
+   11. TOAST — demo .status (line 155) */
+.hc-toast{
+  position: fixed; right: 20px; bottom: 18px;
+  background: var(--hc-navy-850);
+  color: var(--hc-toast-text-raw);
+  padding: 10px 14px;
+  font-size: var(--hc-fs-xs);
+  border-left: 3px solid var(--hc-accent);
+  box-shadow: var(--hc-shadow-toast);
+  opacity: 0; transform: translateY(8px);
+  transition: var(--hc-dur-base);
+  pointer-events: none; z-index: 5;
+}
+.hc-toast.is-show{ opacity: 1; transform: translateY(0); }
+
+
+/* ==========================================================================
+   12. DO-NOT-CHAMFER  — shapes where a cut would be wrong
+   --------------------------------------------------------------------------
+   These MUST keep their own geometry. Declared here so the exclusion is
+   written down rather than remembered.
+   ========================================================================== */
+.hc-no-chamfer,
+.hc-avatar,        /* 50% circle                                  */
+.hc-spinner,       /* 50% circle                                  */
+.hc-badge,         /* 999px pill                                  */
+.hc-dot            /* 50% indicator                               */
+{ clip-path: none !important; }
+
+.hc-avatar{ border-radius: var(--hc-radius-full); }
+.hc-spinner{ border-radius: var(--hc-radius-full); }
+.hc-badge{ border-radius: var(--hc-radius-pill); }
+.hc-bar{ border-radius: var(--hc-radius-bar); }
+
+
+/* ==========================================================================
+   13. REDUCED MOTION  (absent from every existing HackChem stylesheet)
+   ========================================================================== */
+@media (prefers-reduced-motion: reduce){
+  .hc-box,
+  .hc-card,
+  .hc-nav,
+  .hc-toast,
+  .hc-box--interactive{
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
+
+/* ==========================================================================
+   14. v4 FINAL — TIERED CONTAINER HIERARCHY  (decisions #2 and #3)
+   --------------------------------------------------------------------------
+   The owner did NOT want the chamfer on every box. Three tiers:
+
+     TIER A — CHAMFERED + BRACKETS   profile, banner
+     TIER B — CHAMFERED              tab cards, feature cards
+     TIER C — PLAIN ROUNDED          every other panel, modal, list, table
+
+   Tier C uses --hc-radius-md (14px) — the single most common radius already
+   in the app (17 occurrences), so migrating to it changes the fewest pixels.
+   ========================================================================== */
+
+/* ---- TIER A : profile / banner ------------------------------------------
+   Chamfered on 3 corners + 4 lime L-brackets. This is the loudest tier and
+   is reserved for the two hero surfaces only.                              */
+.hc-box--hero{
+  clip-path: var(--hc-chamfer, var(--hc-chamfer-three));
+  background: var(--hc-surface-dark);
+  border-color: var(--hc-border-dark);
+  color: var(--hc-text-on-dark);
+  padding: var(--hc-space-8) var(--hc-space-9) var(--hc-space-8) var(--hc-space-11);
+}
+.hc-box--hero.hc-box--hairline::before{
+  --hc-hairline-color: rgba(208,227,240,.17);
+  --hc-hairline-inset: 9px;
+}
+/* banner variant: symmetric 4-corner cut, light surface */
+.hc-box--banner{
+  clip-path: var(--hc-chamfer, var(--hc-chamfer-all-sm));
+  background: rgba(255,255,255,.80);
+  border-color: var(--hc-border-strong);
+  padding: var(--hc-space-8) var(--hc-space-9);
+}
+.hc-box--banner.hc-box--hairline::before{ --hc-hairline-inset: 10px; }
+
+/* ---- TIER B : tab / feature cards --------------------------------------- */
+.hc-box--tab{
+  clip-path: var(--hc-chamfer, var(--hc-chamfer-all-md));
+  background: rgba(255,255,255,.83);
+  border-color: var(--hc-border-strong);
+  padding: 25px 31px 23px;
+}
+.hc-box--tab:hover{ transform: translateY(-4px); background: var(--hc-surface); }
+
+/* ---- TIER C : everything else — PLAIN ROUNDED, no cut ------------------- */
+.hc-box--plain{
+  clip-path: none;
+  border-radius: var(--hc-radius-md);
+  background: var(--hc-surface);
+  border: 1px solid var(--hc-border);
+  padding: var(--hc-space-6);
+}
+.hc-box--plain.hc-box--hairline::before{ display: none; }   /* no inner frame */
+.hc-box--plain.hc-box--raised{ box-shadow: var(--hc-shadow-hair); }
+
+
+/* ==========================================================================
+   15. NAVY SIDEBAR  (decision #5)
+   --------------------------------------------------------------------------
+   The demo's sidebar is near-white; the owner chose a navy band. Every
+   colour below is from the demo's own navy ramp — no new hue.
+   Contrast: inactive 11.29:1, active 15.51:1, active icon 10.23:1 (all AAA).
+   ========================================================================== */
+.hc-sidebar{
+  background: var(--hc-surface-sidebar);
+  border-right: 1px solid var(--hc-sidebar-navy-line);
+  color: var(--hc-sidebar-text);
+  padding: var(--hc-space-7) var(--hc-space-6) var(--hc-space-7);
+  display: flex;
+  flex-direction: column;
+}
+.hc-sidebar__brand-name{ color: var(--hc-sidebar-text-strong); }
+.hc-sidebar__brand-tag{ color: var(--hc-sidebar-text-fine); }
+
+/* nav item inside the navy band */
+.hc-sidebar .hc-nav{
+  color: var(--hc-sidebar-text);
+  border-color: transparent;
+}
+.hc-sidebar .hc-nav:hover{
+  background: var(--hc-sidebar-navy-hover);
+  border-color: var(--hc-sidebar-navy-line);
+  color: var(--hc-sidebar-text-strong);
+}
+.hc-sidebar .hc-nav.is-active{
+  background: linear-gradient(105deg, var(--hc-sidebar-navy-deep), var(--hc-sidebar-navy-active));
+  border-color: var(--hc-sidebar-navy-line);
+  color: var(--hc-white);
+}
+.hc-sidebar .hc-nav.is-active svg{ color: var(--hc-accent); }
+.hc-sidebar .hc-nav__arrow{ color: var(--hc-accent); }
+
+/* the 4px lime rail that marks the active item */
+.hc-sidebar .hc-nav.is-active::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:4px;
+  background: var(--hc-accent);
+}
+
+
+/* ==========================================================================
+   16. LEADERBOARD  (decision #6)
+   --------------------------------------------------------------------------
+   Beige (#d6c2ae / #d9c7b3) is GONE. Rows are a very light navy wash.
+   The metal medals for top-3 are KEPT exactly as they were.
+   ========================================================================== */
+.hc-lb{ background: var(--hc-surface); border-radius: var(--hc-radius-md); padding: var(--hc-space-7); }
+.hc-lb__head{
+  display: grid; align-items: center;
+  font-weight: var(--hc-fw-bold);
+  color: var(--hc-text);
+  background: var(--hc-surface-row-head);
+  border-radius: var(--hc-radius-sm);
+  padding: var(--hc-space-3) var(--hc-space-6);
+  margin-bottom: var(--hc-space-4);
+}
+.hc-lb__row{
+  display: grid; align-items: center;
+  padding: var(--hc-space-3) var(--hc-space-6);
+  margin-bottom: 6px;
+  border-radius: var(--hc-radius-md);
+  border: 1px solid var(--hc-row-tint-border);
+  background: var(--hc-surface-row);
+  color: var(--hc-text);
+  transition: transform var(--hc-dur-base) var(--hc-ease);
+}
+.hc-lb__row:hover{ transform: translateY(-2px); box-shadow: var(--hc-shadow-hair); }
+.hc-lb__row--alt{ background: var(--hc-surface-row-alt); }
+/* lime text on a tinted row must use the STRONG value (6.34:1, not 4.48:1) */
+.hc-lb__row .hc-lb__accent{ color: var(--hc-accent-on-light-strong); }
+
+/* --- METAL MEDALS — KEPT (decision #6) ---------------------------------- */
+.hc-lb__row--gold{
+  background: linear-gradient(135deg, var(--hc-metal-gold-1), var(--hc-metal-gold-2));
+  border: 2px solid var(--hc-metal-gold-3);
+  color: var(--hc-metal-text);
+}
+.hc-lb__row--silver{
+  background: linear-gradient(135deg, var(--hc-metal-silver-1), var(--hc-metal-silver-2));
+  border: 2px solid var(--hc-metal-silver-3);
+  color: var(--hc-metal-text);
+}
+.hc-lb__row--bronze{
+  background: linear-gradient(135deg, var(--hc-metal-bronze-1), var(--hc-metal-bronze-2));
+  border: 2px solid var(--hc-metal-bronze-3);
+  color: var(--hc-metal-text);
+}
+.hc-lb__row--me{ box-shadow: 0 0 0 2px var(--hc-metal-gold-1); }
+
+
+/* ==========================================================================
+   17. EMOJI SCALE  (decision #8)
+   --------------------------------------------------------------------------
+   Emoji are KEPT (decision #1). Only their SIZE is normalised, from 11
+   different values down to 3. SVG icons are a separate layer and must NOT
+   use these classes.
+   ========================================================================== */
+.hc-emoji-sm{ font-size: var(--hc-emoji-sm); line-height: 1; }
+.hc-emoji-md{ font-size: var(--hc-emoji-md); line-height: 1; }
+.hc-emoji-lg{ font-size: var(--hc-emoji-lg); line-height: 1; }
+/* emoji that sit inside a text run should inherit the run's size */
+.hc-emoji-inline{ font-size: 1em; line-height: 1; }
+
+
+/* ==========================================================================
+   18. DO-NOT-TOUCH REGIONS  (hard locks — see the report)
+   --------------------------------------------------------------------------
+   These are declared so the exclusion is written down, not remembered.
+   ========================================================================== */
+#certificateCanvas,          /* NFT certificate canvas — locked at mint (PR #9) */
+.hc-locked,
+.hc-pdf-frame,               /* PDF viewer frame — DOM contract (PR #8)         */
+.hc-pdf-bookmark{
+  clip-path: none !important;
+  border-radius: 0 !important;
+}
