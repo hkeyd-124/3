@@ -94,14 +94,22 @@
     color: #fff;
   }
 
-  /* The 5 primary tabs are served by the bottom nav on mobile,
+  /* The 6 primary tabs are served by the bottom nav on mobile,
      so their sidebar duplicates are hidden to avoid a
-     double navigation bar. */
+     double navigation bar.
+     #menu-faucet is included here: the Faucet row used to be the ONE
+     .menu-item with no id, so this list could not reach it. It stayed
+     visible in the top strip AND, because .menu-item{display:flex}
+     lives in home.html's @media(min-width:769px) block, it fell back to
+     display:block on phones — its .hc-nav-ico went display:inline and
+     the 24x24 viewBox SVG blew up to 300x300, making the row 333px tall
+     (measured at 393px). It now lives in the bottom bar instead. */
   #menu-home,
   #menu-courses,
   #menu-resources,
   #menu-ai,
-  #menu-leaderboard {
+  #menu-leaderboard,
+  #menu-faucet {
     display: none;
   }
 
@@ -158,7 +166,7 @@
      6. MOBILE BOTTOM NAVIGATION
         Markup lives in home.html; every item calls the
         EXISTING global functions (loadHome / loadTab).
-     ------------------------------------------------------- */
+     ------------------------------------------------- */
   .hc-mobile-nav {
     display: flex !important;
 
@@ -222,7 +230,7 @@
   }
 
   /* Two extra pills can appear, so tighten the row a little
-     to keep all seven labels readable on a 360px phone. */
+     to keep all eight labels readable on a 360px phone. */
   .hc-mnav-item  { padding: 7px 0; min-width: 0; }
   .hc-mnav-label { font-size: 10px; }
 
@@ -232,14 +240,15 @@
   body:has(#menu-courses.active)     .hc-mnav-courses,
   body:has(#menu-resources.active)   .hc-mnav-resources,
   body:has(#menu-ai.active)          .hc-mnav-ai,
-  body:has(#menu-leaderboard.active) .hc-mnav-leaderboard {
+  body:has(#menu-leaderboard.active) .hc-mnav-leaderboard,
+  body:has(#menu-faucet.active)      .hc-mnav-faucet {
     color: #111;
     background: #f1f5f9;
   }
 
   /* -------------------------------------------------------
      7. TAB PAGES  (injected into #spaContainer by router.js)
-     ------------------------------------------------------- */
+     ------------------------------------------------- */
   .courses-page,
   .resources-page {
     padding: 14px;
@@ -380,7 +389,7 @@
   /* -------------------------------------------------------
      8. MODALS  (inline-styled in home.html)
         Fixed pixel widths -> fluid on small screens.
-     ------------------------------------------------------- */
+     ------------------------------------------------- */
   #linkEmailModal > div,
   #changeNameModal > div,
   #coverModal > div,
@@ -401,7 +410,7 @@
   /* -------------------------------------------------------
      9. NOTIFICATION DROPDOWN  (styles injected by
         js/notifications/notificationUI.js)
-     ------------------------------------------------------- */
+     ------------------------------------------------- */
   #notificationDropdown {
     position: fixed !important;
     top: 62px !important;
