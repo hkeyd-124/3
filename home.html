@@ -45,11 +45,17 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
    SIDEBAR
 ========================= */
 
-/* DECISION #5 — the sidebar is a NAVY BAND.
-   Every colour below is a token from css/tokens.css (the demo's own navy
-   ramp), so no new hue enters the system. Contrast on the band:
-   inactive label 11.29:1 AAA, active label 15.51:1 AAA, active icon
-   10.23:1 AAA, brand name 17.13:1 AAA.
+/* REVISION 3 — the rail is a LIGHT band again. The owner reviewed the
+   preview and asked for it: only the SELECTED row keeps the navy + lime
+   treatment. Measured from the owner's mockup (rev3/want.png):
+     rail band        #f9fcff   == --hc-sidebar (the demo's own value)
+     active row       #0b1720 -> #162630  == --hc-navy-950 -> --hc-navy-600
+     active border    #243946   == --hc-navy-500
+     active icon      #a6e522   == --hc-accent
+     active left bar  4px lime  (measured x66..69 of the mockup)
+     active cut       right edge, TR + BR, ~11px
+   DECISION #7 still holds: the raw lime only ever sits on the navy row.
+   Contrast on the light band: label #101b25 on #f9fcff = 16.0:1 AAA.
 
    NOTE — the 5 nav rows now carry the demo's SVG icon set (REQUEST 1).
    The glyphs inherit colour via stroke:currentColor, so the rows only
@@ -65,13 +71,13 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
    unreadable. Scoping keeps the mobile layer byte-identical to before. */
 @media(min-width:769px){
   .sidebar{
-    background:var(--hc-surface-sidebar);
-    border-right:1px solid var(--hc-sidebar-navy-line);
-    color:var(--hc-sidebar-text);
+    background:var(--hc-sidebar);
+    border-right:1px solid var(--hc-line);
+    color:var(--hc-text);
   }
 
   .logo{
-    color:var(--hc-sidebar-text-strong);
+    color:var(--hc-text-strong);
   }
 
   /* flex row so the SVG icon + label + chevron sit on one baseline */
@@ -82,14 +88,20 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
   }
 
   .menu-item:hover{
-    background:var(--hc-sidebar-navy-hover);
-    color:var(--hc-sidebar-text-strong);
+    background:var(--hc-row-tint);
+    color:var(--hc-text-strong);
   }
 
+  /* REVISION 3 — the ONE navy surface left in the rail. The 4px lime bar
+     sits on the left edge; the right edge is chamfered (TR + BR) so the row
+     reads as a tab, matching the mockup. */
   .menu-item.active{
-    background:linear-gradient(105deg,var(--hc-sidebar-navy-deep),var(--hc-sidebar-navy-active));
-    border:1px solid var(--hc-sidebar-navy-line);
+    --hc-chamfer:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,0 100%);
+    background:linear-gradient(105deg,var(--hc-navy-950),var(--hc-navy-600));
+    border:1px solid var(--hc-navy-500);
+    border-left:4px solid var(--hc-accent);
     color:var(--hc-white);
+    clip-path:var(--hc-chamfer);
   }
 
   /* DECISION #7 — the active row is navy, so its icon and chevron may
@@ -376,7 +388,46 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
     linear-gradient(var(--hc-accent),var(--hc-accent)) 100% 100%/22px 2px no-repeat,
     linear-gradient(var(--hc-accent),var(--hc-accent)) 100% 100%/2px 22px no-repeat;
 }
-  
+
+/* =========================================================
+   REVISION 3 — REQUEST 3.2  (streak + point chips)
+   ---------------------------------------------------------
+   The two chips are rendered by js/profile.js (lines 456 and 490) with
+   INLINE styles, so a stylesheet cannot restyle them without either
+   editing that file (out of scope) or overriding the inline declaration.
+   `!important` is the only CSS-only way to beat an inline style — no DOM
+   change, no JS change, no class change.
+
+   Measured from the owner's mockup (rev3/want.png):
+     chip surface  #0b1720 -> #162630  == --hc-navy-950 -> --hc-navy-600
+     chip border   #a6e522             == --hc-accent (lime hairline)
+     chip cut      chamfered 45 deg, ~10px
+   The chips are selected with :has() on their own unique child ids
+   (#pointValue / #streak), so no markup has to change. */
+#profileCard div:has(> #pointValue),
+#profileCard div:has(> #streak){
+  --hc-chamfer:polygon(0 10px,10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px));
+  background:linear-gradient(105deg,var(--hc-navy-950),var(--hc-navy-600)) !important;
+  border:1px solid var(--hc-accent) !important;
+  border-radius:0 !important;
+  clip-path:var(--hc-chamfer);
+}
+
+/* the point chip carries only its number -> white */
+#profileCard div:has(> #pointValue){
+  color:var(--hc-white) !important;
+}
+
+/* the streak chip also carries the word "ngày" -> lime, number white */
+#profileCard div:has(> #streak){
+  color:var(--hc-accent) !important;
+}
+
+#profileCard #pointValue,
+#profileCard #streak{
+  color:var(--hc-white) !important;
+}
+
 /* =========================
    ANIMATION
 ========================= */
