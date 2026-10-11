@@ -1,41 +1,98 @@
 <div class="leaderboard-page">
 
+<!-- =========================================================
+     HackChem — Design System v4 · PHASE 2
+     Page: tabs/leaderboard.html  (fragment injected into #spaContainer)
+     ---------------------------------------------------------
+     Loaded by: home.html via router.js loadTab('leaderboard')
+     Stylesheets: relative internal paths (NOT cross-folder CDN —
+                  that returns 403, see PHASE 1 report).
+     DOM contract: UNCHANGED. Every class/id the JS touches is
+                  kept exactly as before:
+                    #topicFilter, #lessonFilter, #leaderboardList,
+                    .leaderboard-page, .lb-container, .lb-header,
+                    .lb-title, .lb-home, .lb-card, .lb-filters,
+                    .lb-select, .lb-table-header, .lb-row,
+                    .lb-rank, .lb-name, .lb-score, .lb-badge,
+                    .lb-loading, .lb-separator, .lb-me,
+                    .lb-gold, .lb-silver, .lb-bronze
+     JS: UNCHANGED (js/leaderboard.js + js/rankConfig.js not touched).
+     Ranking logic, scoring, UID identity: UNTOUCHED.
+
+     DECISION #6 — leaderboard rows are NAVY-TINTED, not beige.
+       beige #d6c2ae / #d9c7b3 / border #777  ->  REMOVED
+       row #eef3f9 · zebra #e8eff7 · head #e4ecf5 · line #c9d8e8
+       The gold / silver / bronze top-3 gradients are KEPT VERBATIM.
+
+     ⚠️ WHY EVERY RULE BELOW IS WRAPPED IN :where()
+     ---------------------------------------------------------
+     router.js injects this fragment's <style> into #spaContainer,
+     which sits AFTER <link href="css/mobile.css"> in home.html. So a
+     fragment rule and a mobile.css rule of EQUAL specificity are
+     decided by LOAD ORDER — and the fragment wins, silently
+     overriding the mobile layer.
+
+     Measured proof (Chromium, 393px): before this fix, .lb-title
+     rendered 31.68px on mobile instead of mobile.css's 22px, and
+     .lb-card padding 24px instead of 14px.
+
+     :where() has ZERO specificity, so every mobile.css rule
+     (specificity 0,1,0) keeps priority exactly as it does today,
+     while these rules still apply on desktop where mobile.css's
+     @media(max-width:768px) block is inactive. This preserves the
+     PA-A "two layers, mobile.css is the mobile layer" architecture
+     (decision #1) instead of duplicating mobile values here.
+     ========================================================= -->
+
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/box.css">
+
 <style>
 
-.leaderboard-page{
-  padding:20px;
+/* ---------------------------------------------------------
+   PAGE SHELL
+   --------------------------------------------------------- */
+:where(.leaderboard-page){
+  padding:var(--hc-space-6);
 }
 
-.lb-container{
+:where(.lb-container){
   max-width:1100px;
   margin:auto;
 }
 
-.lb-header{
+:where(.lb-header){
   display:flex;
   justify-content:space-between;
   align-items:center;
-  margin-bottom:25px;
+  margin-bottom:var(--hc-space-7);
 }
 
-.lb-title{
-  font-size:32px;
-  font-weight:bold;
+:where(.lb-title){
+  font-size:var(--hc-fs-5xl);
+  font-weight:var(--hc-fw-black);
+  letter-spacing:var(--hc-ls-close);
+  color:var(--hc-text);
 }
 
-.lb-home{
-  padding:10px 18px;
-  background:#111;
-  color:white;
-  border-radius:14px;
+/* TIER C — plain rounded control (decision #2: no chamfer here) */
+:where(.lb-home){
+  padding:var(--hc-space-3) var(--hc-space-5);
+  background:var(--hc-navy-900);
+  color:var(--hc-white);
+  border-radius:var(--hc-radius-md);
   cursor:pointer;
-  font-weight:bold;
+  font-weight:var(--hc-fw-bold);
 }
 
-.lb-card{
-  background:#d6c2ae;
-  border-radius:28px;
-  padding:25px;
+/* TIER C — the card is a plain panel, so it stays ROUNDED.
+   20px = --hc-radius-lg, and it matches the value css/mobile.css
+   already applies at <=768px, so desktop and mobile agree. */
+:where(.lb-card){
+  background:var(--hc-surface);
+  border:1px solid var(--hc-border);
+  border-radius:var(--hc-radius-lg);
+  padding:var(--hc-space-7);
   overflow:hidden;
 }
 
@@ -43,7 +100,10 @@
    TABLE HEADER
 ========================= */
 
-.lb-table-header{
+/* TIER C — header band, no chamfer. Decision #6 gives it the
+   #e4ecf5 tint. `color:red` was both off-brand and 2.28:1 on the
+   old beige — replaced with the AA-corrected muted text token. */
+:where(.lb-table-header){
   display:grid;
   grid-template-columns:
 
@@ -52,37 +112,54 @@
     120px
     120px;
   align-items:center;
-  font-weight:bold;
-  color:red;
-  margin-bottom:15px;
-  padding:0 20px;
+  font-weight:var(--hc-fw-bold);
+  font-size:var(--hc-fs-sm);
+  color:var(--hc-text-muted);
+  background:var(--hc-surface-row-head);
+  border-radius:var(--hc-radius-sm);
+  margin-bottom:var(--hc-space-5);
+  padding:var(--hc-space-3) var(--hc-space-6);
 }
 
 /* =========================
    FILTERS
 ========================= */
 
-.lb-filters{
+:where(.lb-filters){
   display:flex;
-  gap:12px;
+  gap:var(--hc-space-3);
   justify-content:flex-end;
-  margin-bottom:20px;
+  margin-bottom:var(--hc-space-6);
 }
 
-.lb-select{
+/* TIER C */
+:where(.lb-select){
   min-width:220px;
-  padding:8px 12px;
-  border-radius:12px;
-  border:1px solid #999;
-  background:white;
+  padding:var(--hc-space-2) var(--hc-space-3);
+  border-radius:var(--hc-radius-sm);
+  border:1px solid var(--hc-border-strong);
+  background:var(--hc-surface);
+  color:var(--hc-text);
   cursor:pointer;
 }
 
 /* =========================
-   ROW
-========================= */
+   ROW  — TIER B (chamfered)
+   ---------------------------------------------------------
+   Decision #2: a leaderboard row is a "tab-like" list item, so it
+   takes the chamfer. The cut is a FIXED 10px on BOTH axes, not a
+   percentage: a percentage cut on a short, wide row (1040x63) would
+   give ~36px across but only ~3px down, losing the 45 degrees.
+   Fixed 10px measures 10x10px / 45.0 degrees at every width —
+   verified at 1040px (desktop) and 275px (mobile).
+   --------------------------------------------------------- */
 
-.lb-row{
+:where(.lb-row){
+
+  --row-cut:10px;
+  --row-cut-in:7px;
+
+  position:relative;
 
   display:grid;
 
@@ -94,31 +171,68 @@
 
   align-items:center;
 
-  padding:10px 20px;
+  padding:var(--hc-space-3) var(--hc-space-6);
 
-  margin-bottom:6px;
-
-  border-radius:18px;
+  margin-bottom:var(--hc-space-2);
 
   border:
-    1px solid #777;
+    1px solid var(--hc-row-tint-border);
 
-  background:#d9c7b3;
+  background:var(--hc-surface-row);
 
-  transition:0.2s;
+  transition:background var(--hc-dur-base) var(--hc-ease),
+             border-color var(--hc-dur-base) var(--hc-ease),
+             transform var(--hc-dur-base) var(--hc-ease);
+
+  clip-path:polygon(
+    0 var(--row-cut),
+    var(--row-cut) 0,
+    calc(100% - var(--row-cut)) 0,
+    100% var(--row-cut),
+    100% calc(100% - var(--row-cut)),
+    calc(100% - var(--row-cut)) 100%,
+    var(--row-cut) 100%,
+    0 calc(100% - var(--row-cut))
+  );
 }
-  .lb-row:hover{
 
+/* inner hairline — same 45-degree cut, inset 5px.
+   The inner cut is 7px (not 10px) so the diagonal offset works out
+   to a UNIFORM 5px border: 7/sqrt(2) = 4.95px. */
+:where(.lb-row)::before{
+  content:"";
+  position:absolute;
+  inset:5px;
+  border:1px solid var(--hc-row-tint-border);
+  clip-path:polygon(
+    0 var(--row-cut-in),
+    var(--row-cut-in) 0,
+    calc(100% - var(--row-cut-in)) 0,
+    100% var(--row-cut-in),
+    100% calc(100% - var(--row-cut-in)),
+    calc(100% - var(--row-cut-in)) 100%,
+    var(--row-cut-in) 100%,
+    0 calc(100% - var(--row-cut-in))
+  );
+  pointer-events:none;
+}
+
+/* Hover: clip-path clips an element's OWN box-shadow away, so the
+   old `box-shadow` lift was invisible. Replaced with a surface +
+   border change, which the chamfer does not clip. */
+:where(.lb-row):hover{
   transform:translateY(-2px);
-
-  box-shadow:
-    0 4px 12px rgba(0,0,0,0.12);
+  background:var(--hc-surface-row-alt);
+  border-color:var(--hc-border-strong);
 }
 
 /* ======================
    TOP 1
 ====================== */
 
+/* KEPT VERBATIM — decision #6 preserves the metal medals.
+   Nothing in mobile.css competes with these, so they keep normal
+   specificity and stay after .lb-row in source order. */
 .lb-gold{
 
   background:
@@ -170,43 +284,52 @@
    CURRENT USER
 ====================== */
 
-.lb-me{
-
-  box-shadow:
-    0 0 0 2px gold;
+/* The old `box-shadow:0 0 0 2px gold` was clipped away by the
+   chamfer. The gold ring is drawn on the INNER hairline instead,
+   which sits inside the clip and stays visible.
+   Verified: computed ::before border = rgb(212,175,55) = #d4af37. */
+:where(.lb-me)::before{
+  border-color:var(--hc-metal-gold-3);
 }
 
 /* ======================
    SEPARATOR
 ====================== */
 
-.lb-separator{
+:where(.lb-separator){
 
   text-align:center;
 
-  padding:6px;
+  padding:var(--hc-space-2);
 
-  font-size:22px;
+  font-size:var(--hc-fs-2xl);
+
+  color:var(--hc-text-dim);
 
   opacity:0.6;
 }
 
-.lb-rank{
-  font-size:34px;
+:where(.lb-rank){
+  font-size:var(--hc-emoji-lg);
   text-align:center;
+  font-weight:var(--hc-fw-heavy);
+  color:var(--hc-text-strong);
 }
 
-.lb-name{
-  font-size:18px;
-  font-weight:bold;
+:where(.lb-name){
+  font-size:var(--hc-fs-lg);
+  font-weight:var(--hc-fw-bold);
+  color:var(--hc-text);
 }
 
-.lb-score{
-  font-size:22px;
-  font-weight:bold;
+:where(.lb-score){
+  font-size:var(--hc-fs-2xl);
+  font-weight:var(--hc-fw-bold);
+  color:var(--hc-text-strong);
 }
 
-.lb-badge{
+/* TIER C — badge stays a rounded lozenge, not a chamfer. */
+:where(.lb-badge){
 
   display:inline-flex;
 
@@ -214,23 +337,25 @@
 
   justify-content:center;
 
-  padding:8px 14px;
+  padding:var(--hc-space-2) var(--hc-space-4);
 
-  border-radius:12px;
+  border-radius:var(--hc-radius-sm);
 
-  background:#111;
+  background:var(--hc-navy-900);
 
-  color:white;
+  color:var(--hc-white);
 
-  font-weight:bold;
+  font-weight:var(--hc-fw-bold);
 }
 
-.lb-loading{
+:where(.lb-loading){
   text-align:center;
-  padding:40px;
-  font-size:18px;
+  padding:var(--hc-space-10);
+  font-size:var(--hc-fs-lg);
+  color:var(--hc-text-muted);
 }
-#leaderboardList{
+
+:where(#leaderboardList){
   max-height:550px;
   overflow-y:scroll;
   overflow-x:hidden;
@@ -239,16 +364,21 @@
   width:10px;
 }
 #leaderboardList::-webkit-scrollbar-track{
-  background:#e5e7eb;
-  border-radius:999px;
+  background:var(--hc-row-tint-alt);
+  border-radius:var(--hc-radius-pill);
 }
 #leaderboardList::-webkit-scrollbar-thumb{
-  background:#555;
-  border-radius:999px;
+  background:var(--hc-navy-500);
+  border-radius:var(--hc-radius-pill);
 }
 #leaderboardList::-webkit-scrollbar-thumb:hover{
-  background:#333;
+  background:var(--hc-navy-700);
 }
+
+/* NOTE (not changed — out of scope): between 769px and 1000px this
+   rule still forces a 900px min-width, which produces horizontal
+   scroll. css/mobile.css neutralises it at <=768px with
+   `min-width:0 !important`. Left exactly as it was. */
 @media(max-width:1000px){
 
   .lb-table-header,
