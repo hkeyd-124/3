@@ -260,16 +260,108 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
   background:rgba(255,255,255,.80);
   padding:var(--hc-space-8) var(--hc-space-9);
   margin-bottom:var(--hc-space-7);
+  /* --- REVISION 4: the banner is now the demo's TWO-COLUMN welcome block
+     (user-demo.html .welcome, lines 169-182). Left = eyebrow + headline +
+     tagline. Right = molecule mark + HackChem slogan. Only the presentation
+     changes: no id, class, data-* or script order is touched. */
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:var(--hc-space-7);
+  min-height:160px;
+}
+
+/* LEFT COLUMN — demo .welcome-main (user-demo.html lines 176-177):
+   a 4px lime rail on the left edge, then the three text lines indented 25px.
+   The rail is the demo's `background: var(--lime)` = #a6e522, i.e. the token
+   --hc-accent (lime is safe ON this light glass only as a GRAPHIC, which is
+   exactly how the demo uses it here — never as text). */
+.hero-main{
+  position:relative;
+  padding-left:25px;
+}
+
+.hero-main::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:1px;
+  bottom:1px;
+  width:4px;
+  background:var(--hc-accent);
+}
+
+/* LINE 1 — was h1's emoji + "Welcome to HackChem"; now the demo's eyebrow.
+   Colour: the mockup samples #8094ac, but tokens.css records that value as
+   too low-contrast (#8ea2b8 = 2.46:1) and replaced it with --hc-text-dim /
+   --hc-text-muted. The design-system v4 page renders THIS SAME banner with
+   var(--hc-text-muted), so that is the normative value used here. */
+.hero-eyebrow{
+  color:var(--hc-text-muted);
+  font-size:var(--hc-fs-md);
+  letter-spacing:var(--hc-ls-caps);
+  font-weight:var(--hc-fw-medium);
+  margin-bottom:9px;
 }
 
 .hero h1{
   font-size:var(--hc-fs-5xl);
   letter-spacing:var(--hc-ls-tight);
+  line-height:1.2;
+  margin:0;
 }
 
+/* "Hóa học" in lime. The mockup samples #8bd20c (the demo's --lime-deep),
+   but DECISION #7 is LOCKED: lime TEXT on a light surface must be
+   --hc-accent-on-light (#4d7c0f, 4.69:1 AA) because #8bd20c / #a6e522 fail
+   contrast on light. Same value the v4 design-system page uses here.
+   Rollback to the mockup = swap this one line to var(--hc-accent-hover). */
+.hero h1 span{
+  color:var(--hc-accent-on-light);
+}
+
+/* LINE 3 — tagline. */
 .hero p{
-  margin-top:var(--hc-space-3);
+  margin:8px 0 0;
   color:var(--hc-text-muted);
+  font-size:var(--hc-fs-lg);
+}
+
+/* RIGHT COLUMN — demo .quote (user-demo.html lines 182-185): molecule mark
+   + slogan, sitting at the far edge and vertically centred against the text.
+   font-style:italic is the demo's, which is why this block reads as a quote. */
+.hero-quote{
+  display:flex;
+  align-items:center;
+  gap:var(--hc-space-5);
+  max-width:330px;
+  color:var(--hc-text-dim);
+  font-size:var(--hc-fs-md);
+  line-height:1.6;
+  font-style:italic;
+}
+
+/* THE ONE SVG RECOLOURED TO GREEN. Demo .quote svg (line 183) is 42x42 with
+   `stroke: var(--lime-deep)`; #8bd20c is sampled directly from the mockup's
+   molecule mark (img3 x1095-1139, y85-127 -> #8bd20c, 136 pure pixels) and IS
+   the token --hc-accent-hover. This is a decorative graphic at 42px, not
+   body text, so the ON-LIGHT text rule of DECISION #7 does not apply. */
+.hero-quote svg{
+  width:42px;
+  height:42px;
+  flex:none;
+  fill:none;
+  stroke:var(--hc-accent-hover);
+  stroke-width:1.6;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.hero-quote small{
+  display:block;
+  font-style:normal;
+  margin-top:5px;
+  font-weight:var(--hc-fw-medium);
 }
 
 /* =========================
@@ -471,6 +563,23 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
     padding:15px;
   }
 
+  /* Banner stacks when the 2-column layout stops fitting. Mirrors the demo's
+     own breakpoint rule (.welcome { flex-direction:column } — user-demo.html
+     line 234). Lives in home.html's EXISTING inline @media(max-width:900px)
+     block, so it adds no new file and no new breakpoint value (decision #1).
+     mobile.css (.hero padding / h1 size) still loads AFTER this block and
+     therefore still keeps the last word, exactly as before. */
+  .hero{
+    flex-direction:column;
+    align-items:flex-start;
+    padding:27px 25px;
+    gap:var(--hc-space-6);
+  }
+
+  .hero-quote{
+    max-width:none;
+  }
+
   .hero h1{
     font-size:24px;
   }
@@ -651,13 +760,29 @@ margin-bottom:12px;
 
       <i class="hc-bracket tl"></i><i class="hc-bracket tr"></i><i class="hc-bracket bl"></i><i class="hc-bracket br"></i>
 
-      <h1>
-        👋 Welcome to HackChem
-      </h1>
+      <div class="hero-main">
 
-      <p>
-        Production Single Layer SPA Architecture
-      </p>
+        <div class="hero-eyebrow">
+          WELCOME TO HACKCHEM
+        </div>
+
+        <h1>
+          Hành trình chinh phục <span>Hóa học</span>
+        </h1>
+
+        <p>
+          Học tập - Thực hành - Phát triển tư duy
+        </p>
+
+      </div>
+
+      <div class="hero-quote">
+
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path d="m24 5 8 5v9l-8 5-8-5v-9zM11 27l7 4v8l-7 4-7-4v-8zM37 27l7 4v8l-7 4-7-4v-8z"/><path d="m16 19-5 8m16-3 10 3M18 35h12"/></svg>
+
+        <div>“Hóa học không chỉ là công thức,<br>mà là chìa khóa mở ra thế giới.”<small>— HackChem</small></div>
+
+      </div>
 
     </div>
 
