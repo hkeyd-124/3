@@ -21,8 +21,8 @@
 }
 
 body{
-  font-family:Arial;
-  background:#f5f7fb;
+  font-family:var(--hc-font-sans);
+  background:var(--hc-bg);
   display:flex;
   min-height:100vh;
   overflow:hidden;
@@ -30,9 +30,9 @@ body{
   
 .coverPreset{
 height:90px;
-border-radius:18px;
+border-radius:var(--hc-radius-lg);
 cursor:pointer;
-transition:.2s;
+transition:var(--hc-dur-base) var(--hc-ease);
 border:3px solid transparent;
 }
   
@@ -45,37 +45,63 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
    SIDEBAR
 ========================= */
 
+/* DECISION #5 — the sidebar is a NAVY BAND.
+   Every colour below is a token from css/tokens.css (the demo's own navy
+   ramp), so no new hue enters the system. Contrast on the band:
+   inactive label 11.29:1 AAA, active label 15.51:1 AAA, active icon
+   10.23:1 AAA, brand name 17.13:1 AAA.
+
+   SCOPED TO >=769px ON PURPOSE. Below 769px css/mobile.css turns this same
+   .sidebar into a white horizontal strip and sets `background:#fff` but NOT
+   `color`. An unscoped colour rule therefore painted near-white text on that
+   white strip (measured: bg rgb(255,255,255) + color rgb(192,208,222)) —
+   unreadable. Scoping keeps the mobile layer byte-identical to before. */
+@media(min-width:769px){
+  .sidebar{
+    background:var(--hc-surface-sidebar);
+    border-right:1px solid var(--hc-sidebar-navy-line);
+    color:var(--hc-sidebar-text);
+  }
+
+  .logo{
+    color:var(--hc-sidebar-text-strong);
+  }
+
+  .menu-item:hover{
+    background:var(--hc-sidebar-navy-hover);
+    color:var(--hc-sidebar-text-strong);
+  }
+
+  .menu-item.active{
+    background:linear-gradient(105deg,var(--hc-sidebar-navy-deep),var(--hc-sidebar-navy-active));
+    border:1px solid var(--hc-sidebar-navy-line);
+    color:var(--hc-white);
+  }
+}
+
 .sidebar{
   width:260px;
-  background:white;
-  border-right:1px solid #eee;
-  padding:20px;
+  padding:var(--hc-space-6);
   overflow:auto;
 }
 
 .logo{
-  font-size:28px;
-  font-weight:bold;
-  margin-bottom:35px;
+  font-size:var(--hc-fs-3xl);
+  font-weight:var(--hc-fw-black);
+  margin-bottom:var(--hc-space-9);
 }
 
 .menu-item{
-  padding:14px;
-  border-radius:14px;
+  padding:var(--hc-space-4);
+  border-radius:var(--hc-radius-md);
   cursor:pointer;
-  margin-bottom:12px;
-  transition:0.2s;
-  font-weight:bold;
+  margin-bottom:var(--hc-space-4);
+  transition:var(--hc-dur-base) var(--hc-ease);
+  font-weight:var(--hc-fw-bold);
 }
 
 .menu-item:hover{
-  background:#f1f5f9;
   transform:translateX(4px);
-}
-
-.menu-item.active{
-  background:#111;
-  color:white;
 }
 
 /* =========================
@@ -84,65 +110,94 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
 
 .main{
   flex:1;
-  padding:25px;
+  padding:var(--hc-space-7);
   overflow:auto;
 }
 
 /* =========================
-   HERO
-========================= */
+   HERO  (TIER A — banner)
+   Chamfered on 4 corners + 4 lime L-brackets, per the v4 spec table:
+     Banner (welcome) -> chamfer 4 corners + brackets -> .hc-box--banner
+   The chamfer/bracket geometry itself comes from css/box.css; only the
+   page-local spacing lives here. */
 
 .hero{
-  background:white;
-  padding:35px;
-  border-radius:24px;
-  margin-bottom:25px;
-  box-shadow:0 5px 20px rgba(0,0,0,0.05);
+  /* --hc-chamfer is DEFINED as `none` at :root in css/tokens.css, so every
+     `var(--hc-chamfer, <fallback>)` in css/box.css resolves to `none` and the
+     tier classes ship with NO cut (measured: clip-path none). Setting it per
+     element here restores the intended geometry without touching tokens.css
+     (out of scope: PHASE 2 = 1 page). Reported as a PHASE 1 defect.
+
+     FIXED 10px ON BOTH AXES, not the spec's percentage token. The spec's
+     --hc-chamfer-all-sm is `0 8%, 1.7% 0, ...`, tuned on the demo's aspect
+     ratio. This banner is 1132x123 (9.2:1), where that token measures
+     19.2px across but only 9.84px down -> a 2:1 slant, not the 45 deg cut the
+     design calls for. Fixed px gives a true 45 deg at any width, the same
+     technique already proven on courses / resources / ai / leaderboard. */
+  --hc-chamfer:polygon(0 10px,10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px));
+  /* Inner hairline cut must be SMALLER than the outer one, or the two cuts
+     are not parallel. The ::before is inset 10px, so a 10px inner cut would
+     sit 10px inside the outer cut line instead of running alongside it.
+     Parallel offset: inner = outer - inset*(2 - sqrt2) = 10 - 10*0.586 = 4.1px.
+     Same formula the merged leaderboard page uses (10px outer, 5px inset,
+     7px inner -> 10 - 5*0.586 = 7.07). */
+  --hc-chamfer-inset:polygon(0 4px,4px 0,calc(100% - 4px) 0,100% 4px,100% calc(100% - 4px),calc(100% - 4px) 100%,4px 100%,0 calc(100% - 4px));
+  background:rgba(255,255,255,.80);
+  padding:var(--hc-space-8) var(--hc-space-9);
+  margin-bottom:var(--hc-space-7);
 }
 
 .hero h1{
-  font-size:34px;
+  font-size:var(--hc-fs-5xl);
+  letter-spacing:var(--hc-ls-tight);
 }
 
 .hero p{
-  margin-top:10px;
-  color:#666;
+  margin-top:var(--hc-space-3);
+  color:var(--hc-text-muted);
 }
 
 /* =========================
-   CARDS
-========================= */
+   CARDS  (TIER B — tab cards)
+   Chamfered on 4 corners, NO brackets (brackets are tier A only).
+   Geometry comes from .hc-box--tab in css/box.css. */
 
 .cards{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:20px;
+  gap:var(--hc-space-6);
 }
 
 .card{
-  background:white;
-  padding:25px;
-  border-radius:22px;
+  /* same fixed-10px 45 deg cut as the banner (see .hero above);
+     inner cut 5px for the default 9px hairline inset (10 - 9*0.586 = 4.7) */
+  --hc-chamfer:polygon(0 10px,10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px));
+  --hc-chamfer-inset:polygon(0 5px,5px 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px));
+  background:rgba(255,255,255,.83);
+  padding:25px 31px 23px;
   cursor:pointer;
-  transition:0.2s;
-  box-shadow:0 5px 20px rgba(0,0,0,0.05);
+  transition:var(--hc-dur-base) var(--hc-ease);
 }
 
 .card:hover{
-  transform:translateY(-5px);
+  transform:translateY(-4px);
+  background:var(--hc-surface);
 }
 
 .card-icon{
-  font-size:34px;
+  font-size:var(--hc-emoji-lg);
+  line-height:1;
 }
 
 .card h3{
-  margin-top:15px;
+  margin-top:var(--hc-space-5);
+  font-size:var(--hc-fs-2xl);
+  letter-spacing:var(--hc-ls-close);
 }
 
 .card p{
-  margin-top:10px;
-  color:#666;
+  margin-top:var(--hc-space-3);
+  color:var(--hc-text-muted);
 }
 
 /* =========================
@@ -155,17 +210,49 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
 }
 
 .loading-box{
-  background:white;
+  background:var(--hc-surface);
   padding:50px;
-  border-radius:24px;
+  border-radius:var(--hc-radius-md);
   text-align:center;
-  color:#666;
+  color:var(--hc-text-muted);
 }
 
+/* TIER A — profile. Chamfer + inner hairline come from .hc-box--hero /
+   .hc-box--hairline in css/box.css.
+   The 4 lime L-brackets are drawn with ::after instead of child <i>
+   elements ON PURPOSE: js/profile.js replaces this element's innerHTML
+   (box.innerHTML = ...), so any static bracket child would be wiped on
+   render. A pseudo-element survives that and needs no JS change.
+   Geometry is identical to .hc-bracket: 22x22px, 2px, lime, inset 9px,
+   opacity .9. */
 #profileCard{
+    /* 3-corner cut (TR + BR + BL) per the spec's --hc-chamfer-three, but at a
+       fixed 10px so the cut stays 45 deg on this 1132x92 surface. */
+    --hc-chamfer:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px));
+    /* inner cut 5px so the hairline runs parallel to the 3 outer cuts
+       (9px inset -> 10 - 9*0.586 = 4.7px) */
+    --hc-chamfer-inset:polygon(0 0,calc(100% - 5px) 0,100% 5px,100% calc(100% - 5px),calc(100% - 5px) 100%,5px 100%,0 calc(100% - 5px));
     position:relative;
     overflow:hidden;
-    transition:background .3s ease;
+    transition:background var(--hc-dur-slow) var(--hc-ease);
+}
+
+#profileCard::after{
+  content:"";
+  position:absolute;
+  inset:9px;
+  pointer-events:none;
+  z-index:3;
+  opacity:.9;
+  background:
+    linear-gradient(var(--hc-accent),var(--hc-accent)) 0 0/22px 2px no-repeat,
+    linear-gradient(var(--hc-accent),var(--hc-accent)) 0 0/2px 22px no-repeat,
+    linear-gradient(var(--hc-accent),var(--hc-accent)) 100% 0/22px 2px no-repeat,
+    linear-gradient(var(--hc-accent),var(--hc-accent)) 100% 0/2px 22px no-repeat,
+    linear-gradient(var(--hc-accent),var(--hc-accent)) 0 100%/22px 2px no-repeat,
+    linear-gradient(var(--hc-accent),var(--hc-accent)) 0 100%/2px 22px no-repeat,
+    linear-gradient(var(--hc-accent),var(--hc-accent)) 100% 100%/22px 2px no-repeat,
+    linear-gradient(var(--hc-accent),var(--hc-accent)) 100% 100%/2px 22px no-repeat;
 }
   
 /* =========================
@@ -197,12 +284,12 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
   }
 
   .logo{
-    font-size:16px;
+    font-size:var(--hc-fs-lg);
     text-align:center;
   }
 
   .menu-item{
-    font-size:12px;
+    font-size:var(--hc-fs-xs);
     text-align:center;
     padding:10px 5px;
   }
@@ -219,6 +306,17 @@ box-shadow:0 10px 20px rgba(0,0,0,.08);
 
   
 </style>
+
+<!-- =========================
+     DESIGN SYSTEM v4  (PHASE 2)
+     tokens.css = the two-layer token set (primitive + semantic).
+     box.css    = the chamfer / bracket / tier container system.
+     Both are pure CSS + custom properties: no framework, no build step.
+     They are loaded BEFORE mobile.css so the mobile layer keeps the last
+     word, exactly as it does today (see the note below).
+========================= -->
+<link rel="stylesheet" href="css/tokens.css">
+<link rel="stylesheet" href="css/box.css">
 
 <!-- MOBILE UI LAYER (additive — desktop unaffected)
      MUST stay AFTER the inline <style> above. mobile.css and the inline
@@ -343,7 +441,7 @@ margin-bottom:12px;
         <span
             id="ethIcon"
             style="
-                font-size:18px;
+                font-size:var(--hc-emoji-sm);
             "
         >
             ⏳
@@ -360,25 +458,24 @@ margin-bottom:12px;
 
   <div id="homeContent">
 <div id="profileCard"
+  class="hc-box hc-box--three hc-box--hairline"
   style="
   background:white;
   padding:35px;
-  border-radius:30px;
   margin-bottom:25px;
   display:flex;
   justify-content:space-between;
   align-items:center;
   flex-wrap:wrap;
   gap:25px;
-
-  box-shadow:
-    0 10px 30px rgba(0,0,0,0.04);
   " 
   >
   ⏳ Loading profile...
 
 </div>
-    <div class="hero">
+    <div class="hero hc-box hc-box--banner hc-box--hairline">
+
+      <i class="hc-bracket tl"></i><i class="hc-bracket tr"></i><i class="hc-bracket bl"></i><i class="hc-bracket br"></i>
 
       <h1>
         👋 Welcome to HackChem
@@ -392,7 +489,7 @@ margin-bottom:12px;
 
     <div class="cards">
 
-      <div class="card"
+      <div class="card hc-box hc-box--tab hc-box--hairline"
            onclick="loadTab('courses')">
 
         <div class="card-icon">📘</div>
@@ -405,7 +502,7 @@ margin-bottom:12px;
 
       </div>
 
-      <div class="card"
+      <div class="card hc-box hc-box--tab hc-box--hairline"
            onclick="loadTab('resources')">
 
         <div class="card-icon">📚</div>
@@ -418,7 +515,7 @@ margin-bottom:12px;
 
       </div>
 
-      <div class="card"
+      <div class="card hc-box hc-box--tab hc-box--hairline"
            onclick="loadTab('leaderboard')">
 
         <div class="card-icon">🏆</div>
@@ -767,14 +864,13 @@ window.addEventListener(
 
       
 if(
-  window.startETHRealtime
+window.startETHRealtime
 ){
   startETHRealtime();
 }
 if(window.initAvatarPicker){
     initAvatarPicker();
 }
-
 if(window.initCoverPicker){
     initCoverPicker();
 }
@@ -805,8 +901,7 @@ if(window.initCoverPicker){
   justify-content:center;
   align-items:center;
   z-index:99999;
-  "
->
+  ">
 
   <div style="
     width:700px;
@@ -876,8 +971,7 @@ if(window.initCoverPicker){
   align-items:center;
 
   z-index:99999;
-  "
->
+  ">
 
  <div style="
     width:700px;
@@ -912,7 +1006,7 @@ if(window.initCoverPicker){
     ">
 
       <div style="
-        font-size:55px;
+        font-size:var(--hc-emoji-lg);
         margin-bottom:10px;
       ">
         🚰
@@ -1086,12 +1180,12 @@ if(window.initCoverPicker){
 
                 <stop
                   offset="0%"
-                  stop-color="#8b5cf6"
+                  stop-color="#a6e522"
                 />
 
                 <stop
                   offset="100%"
-                  stop-color="#6366f1"
+                  stop-color="#4d7c0f"
                 />
 
               </linearGradient>
@@ -1200,7 +1294,7 @@ box-shadow:0 25px 60px rgba(0,0,0,.15);
 ">
 
 <div style="
-font-size:28px;
+font-size:var(--hc-emoji-md);
 font-weight:800;
 margin-bottom:20px;
 ">
@@ -1363,7 +1457,7 @@ transition:.25s;
 "
 onclick="uploadCover()"
 >
-<div style="font-size:42px;">
+<div style="font-size:var(--hc-emoji-lg);">
 📷
 </div>
 <div
