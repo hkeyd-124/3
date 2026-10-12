@@ -1905,6 +1905,20 @@ metadataURI:
 
     );
 
+    /* LEADERBOARD STAGE 1 — mirror the best score into the read-optimised
+       collection leaderboard/{lessonId}/entries/{uid}.
+
+       Deliberately NOT awaited: this runs after the authoritative
+       users/{uid}/lessons/{lessonId} write has already succeeded, and it
+       must never delay or break the lesson save flow. .catch() is attached
+       so a failure cannot become an unhandled promise rejection. */
+    if(window.saveLeaderboardEntry){
+
+      window.saveLeaderboardEntry()
+        .catch(e=>console.error("LB SAVE ERROR", e));
+
+    }
+
   }catch(err){
 
     console.error(
@@ -1930,11 +1944,17 @@ async function(data){
     const ref =
 
       doc(
+
         db,
+
         "users",
+
         uid,
+
         "lessons",
+
         this.lessonId
+
       );
 
     await setDoc(
@@ -2133,7 +2153,6 @@ singleHint:function(q){
   q.opt.forEach((_,i)=>{
 
     if(i !== q.a){
-
       wrongIndexes.push(i);
     }
   });
