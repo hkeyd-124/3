@@ -188,6 +188,13 @@
   cursor:pointer;
 }
 
+/* Cooldown state (STAGE 2.1). Mirrors .lb-view:disabled so the two
+   buttons read as the same control family when inert. */
+:where(.lb-refresh:disabled){
+  opacity:0.45;
+  cursor:not-allowed;
+}
+
 /* The at-rest message. Reuses .lb-loading's box so the card does not
    change height when the student has not chosen anything yet. */
 :where(.lb-prompt){

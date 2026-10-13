@@ -113,6 +113,32 @@ let lbSelectedTopic = "";
 let lbSelectedLesson = "";
 let lbLoading = false;
 
+/* -------------------------------------------------------------------------
+   REFRESH COOLDOWN  (STAGE 2.1)
+   -------------------------------------------------------------------------
+   lbRefreshUntil : epoch ms at which the "Lam moi" button unlocks again.
+                    ONE value for the WHOLE page - deliberately NOT keyed by
+                    lessonId. Refreshing lesson A must also block lesson B,
+                    otherwise a student just hops between lessons to keep
+                    hammering the button.
+   lbRefreshTimer : the 1s countdown interval, or null when idle.
+
+   Why this exists: refreshLeaderboard() deletes the cache entry and then
+   calls fetchAndRender(), so EVERY click is a real 10-11 document read.
+   lbLoading only blocks clicks that land while a request is in flight
+   (it is reset in `finally`), so it is a re-entrancy guard, NOT a rate
+   limit. Without a cooldown a single student can burn ~3,300 reads in
+   five minutes of clicking.
+
+   In-memory only, consistent with lbCache: an F5 resets the cooldown.
+   That is an accepted trade-off - a reload is a deliberate act, not spam.
+   ========================================================================= */
+
+const LB_REFRESH_COOLDOWN_MS = 60000;
+
+let lbRefreshUntil = 0;
+let lbRefreshTimer = null;
+
 /* =========================
    LOAD TOPICS
 ========================= */
@@ -258,6 +284,11 @@ window.loadLessons = function(){
 
   updateViewButton();
 
+  /* Re-apply the cooldown to the freshly rebuilt button. The DOM was
+     destroyed on tab leave, so the countdown has to be re-attached; the
+     remaining time itself lives in module scope and is preserved. */
+  updateRefreshButton();
+
   /* Returning to the tab with a choice already made: re-render from cache
      (0 reads) or fall back to the prompt. Never auto-query. */
   restoreLeaderboardView();
@@ -334,6 +365,80 @@ function(){
   btn.disabled = !(topic && lesson);
 
 }
+
+/* =========================
+   REFRESH BUTTON STATE + COUNTDOWN
+=========================
+   Renders the cooldown onto #refreshLeaderboardBtn: disabled + a live
+   "Lam moi (45s)" label so the student understands WHY the button is
+   inert, instead of assuming it is broken.
+
+   Self-healing interval: router.js replaces #spaContainer on every tab
+   change and exposes no cleanup hook, so the countdown cannot rely on
+   being told the tab is gone. Instead it checks for its own button and
+   clears itself the moment the button no longer exists - no interval
+   outlives the DOM it belongs to.
+*/
+
+function updateRefreshButton(){
+
+  const btn =
+    document.getElementById(
+      "refreshLeaderboardBtn"
+    );
+
+  if(!btn){
+
+    /* Tab left: stop the countdown. lbRefreshUntil is kept, so returning
+       to the tab resumes the remaining time instead of resetting it. */
+    if(lbRefreshTimer){
+      clearInterval(lbRefreshTimer);
+      lbRefreshTimer = null;
+    }
+    return;
+
+  }
+
+  /* Remember the authored label once, so the HTML stays the source of
+     truth for the button text. */
+  if(!btn.dataset.lbLabel){
+    btn.dataset.lbLabel =
+      (btn.textContent || "").trim() || "L\u00e0m m\u1edbi";
+  }
+
+  const label = btn.dataset.lbLabel;
+
+  const remaining =
+    lbRefreshUntil - Date.now();
+
+  if(remaining > 0){
+
+    btn.disabled = true;
+
+    btn.textContent =
+      label + " (" + Math.ceil(remaining / 1000) + "s)";
+
+    if(!lbRefreshTimer){
+      lbRefreshTimer =
+        setInterval(updateRefreshButton, 1000);
+    }
+
+  }else{
+
+    btn.disabled = false;
+
+    btn.textContent = label;
+
+    if(lbRefreshTimer){
+      clearInterval(lbRefreshTimer);
+      lbRefreshTimer = null;
+    }
+
+  }
+
+}
+
+window.updateRefreshButton = updateRefreshButton;
 
 /* =========================
    PROMPT (the brake, at rest)
@@ -596,7 +701,22 @@ async function(){
 
   if(!lesson) return;
 
+  /* A request already in flight: do not start a second one, and do not
+     start the cooldown either (nothing was actually read). */
+  if(lbLoading) return;
+
+  /* GLOBAL cooldown - one timestamp for the whole page, not per lesson. */
+  if(Date.now() < lbRefreshUntil){
+    updateRefreshButton();
+    return;
+  }
+
   lbSelectedLesson = lesson;
+
+  lbRefreshUntil =
+    Date.now() + LB_REFRESH_COOLDOWN_MS;
+
+  updateRefreshButton();
 
   lbCache.delete(lesson);
 
