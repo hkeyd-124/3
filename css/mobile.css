@@ -340,6 +340,14 @@
     width: 100%;
   }
 
+  /* STAGE 2 — the brake controls stack full-width under the two selects
+     (.lb-filters is already flex-direction:column here). */
+  .lb-view,
+  .lb-refresh {
+    width: 100%;
+    min-width: 0;
+  }
+
   .lb-table-header,
   .lb-row {
     min-width: 0 !important;

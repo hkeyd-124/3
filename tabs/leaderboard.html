@@ -16,7 +16,10 @@
                     .lb-rank, .lb-name, .lb-score, .lb-badge,
                     .lb-loading, .lb-separator, .lb-me,
                     .lb-gold, .lb-silver, .lb-bronze
-     JS: UNCHANGED (js/leaderboard.js + js/rankConfig.js not touched).
+     DOM contract: ADDED by STAGE 2 (brake step):
+                    #viewLeaderboardBtn, #refreshLeaderboardBtn,
+                    .lb-view, .lb-refresh, .lb-prompt
+     JS: js/leaderboard.js gained the brake + in-memory cache.
      Ranking logic, scoring, UID identity: UNTOUCHED.
 
      DECISION #6 — leaderboard rows are NAVY-TINTED, not beige.
@@ -141,6 +144,54 @@
   background:var(--hc-surface);
   color:var(--hc-text);
   cursor:pointer;
+}
+
+/* The lesson filter is inert until a topic is chosen. */
+:where(.lb-select:disabled){
+  opacity:0.55;
+  cursor:not-allowed;
+}
+
+/* =========================
+   STAGE 2 — BRAKE CONTROLS
+   ---------------------------------------------------------
+   "Xem" releases the brake (this is the only action that reads
+   Firestore). "Làm mới" forces a fresh read past the cache.
+   Both are TIER C rounded controls, matching .lb-home.
+   ========================= */
+
+:where(.lb-view){
+  min-width:110px;
+  padding:var(--hc-space-2) var(--hc-space-5);
+  border-radius:var(--hc-radius-sm);
+  border:1px solid var(--hc-navy-900);
+  background:var(--hc-navy-900);
+  color:var(--hc-white);
+  font-weight:var(--hc-fw-bold);
+  cursor:pointer;
+  transition:opacity var(--hc-dur-base) var(--hc-ease);
+}
+
+:where(.lb-view:disabled){
+  opacity:0.45;
+  cursor:not-allowed;
+}
+
+:where(.lb-refresh){
+  min-width:110px;
+  padding:var(--hc-space-2) var(--hc-space-5);
+  border-radius:var(--hc-radius-sm);
+  border:1px solid var(--hc-border-strong);
+  background:var(--hc-surface);
+  color:var(--hc-text);
+  font-weight:var(--hc-fw-bold);
+  cursor:pointer;
+}
+
+/* The at-rest message. Reuses .lb-loading's box so the card does not
+   change height when the student has not chosen anything yet. */
+:where(.lb-prompt){
+  font-weight:var(--hc-fw-bold);
 }
 
 /* =========================
@@ -419,13 +470,43 @@
 
   <select id="topicFilter"
           class="lb-select"
-          onchange="loadLessons()">
+          onchange="onTopicChange()">
+
+    <option value="">
+      -- Chọn chủ đề --
+    </option>
+
   </select>
 
   <select id="lessonFilter"
           class="lb-select"
-          onchange="loadLeaderboard()">
+          disabled
+          onchange="onLessonChange()">
+
+    <option value="">
+      -- Chọn bài học --
+    </option>
+
   </select>
+
+  <button id="viewLeaderboardBtn"
+          class="lb-view"
+          type="button"
+          disabled
+          onclick="viewLeaderboard()">
+
+    Xem
+
+  </button>
+
+  <button id="refreshLeaderboardBtn"
+          class="lb-refresh"
+          type="button"
+          onclick="refreshLeaderboard()">
+
+    Làm mới
+
+  </button>
 
 </div>
 
@@ -445,8 +526,8 @@
 
     <div id="leaderboardList">
 
-      <div class="lb-loading">
-        ⏳ Loading leaderboard...
+      <div class="lb-loading lb-prompt">
+        Vui lòng chọn Chủ đề và Bài học muốn xem
       </div>
 
     </div>

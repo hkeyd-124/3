@@ -1095,16 +1095,20 @@ function(){
   ).style.display = "none";
 }
 
-document.addEventListener(
-  "DOMContentLoaded",
-  ()=>{
-    if(
-      window.updateLinkButtons
-    ){
-      updateLinkButtons();
-    }
-  }
-);
+/* =========================
+   LINK BUTTONS — SINGLE CALL SITE
+   ---------------------------------------------------------
+   updateLinkButtons() performs its own getDoc(users/{uid})
+   (js/authLink.js:363). It used to be invoked TWICE per home.html load:
+   once here on DOMContentLoaded and once in the "load" handler below
+   (after the 300ms module wait).
+
+   The "load" call is the one KEPT — it runs after the modules are ready and
+   sits in the same block as loadCurrentUser() / startUserRealtime(), so the
+   buttons are still hidden correctly for an already-linked account. The
+   post-link refresh calls inside js/authLink.js (:159, :334) are untouched,
+   so linking a wallet/email still updates the buttons immediately.
+========================= */
 </script>
 
 <script>
