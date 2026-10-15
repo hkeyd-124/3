@@ -1,6 +1,5 @@
 import {
   doc,
-  getDoc,
   onSnapshot,
   setDoc
 }
@@ -52,7 +51,6 @@ window.getUID = function(){
     localStorage.getItem("wallet")
 
     ||
-
     "guest"
 
   );
@@ -83,99 +81,35 @@ async function(){
     }
 
     /* =========================
-       FIRESTORE
+       NO getDoc() ANY MORE
+
+       This function used to read users/{uid} itself, and then home.html
+       ALSO called startUserRealtime(), which opened an onSnapshot on the
+       very same document. Every home.html load therefore pulled the
+       document twice — 2 reads, and twice the payload (~200 KB each once
+       an avatar is stored inline).
+
+       The document is now read by exactly ONE path: the onSnapshot in
+       startUserRealtime() below. That snapshot fires immediately with the
+       current data, so the UI still populates on first paint, and the ban
+       check still runs (now on every change instead of only once per page
+       load — see that function).
+
+       Contract kept: this still resolves with the user object once the
+       data has been applied, and still resolves with null for a guest or
+       a missing document.
     ========================= */
 
-    const ref =
-      doc(
-        db,
-        "users",
-        uid
-      );
-
-    const snap =
-      await getDoc(ref);
-
-    if(!snap.exists()){
+    if(!startUserRealtime()){
 
       console.warn(
-        "User not found"
+        "Guest mode"
       );
 
       return null;
     }
-/* =========================
-   CHECK BAN
-========================= */
 
-const userData = snap.data();
-
-if(userData.system?.status === "banned"){
-    alert("🚫 Bạn đã bị khóa!");
-    localStorage.clear();
-    window.location.href = "index.html";
-    return null;
-}
-    /* =========================
-       SAVE GLOBAL
-    ========================= */
-
-   window.currentUser = userData;
-
-window.currentUserData = currentUser;
-
-setUserState(
-  currentUser
-);
-
-console.log(
-
-  "CURRENT USER:",
-  currentUser
-
-);
-
-/* =========================
-   UPDATE UI
-========================= */
-
-renderProfileCard();
-
-/* =========================
-   CHECKIN STATE
-========================= */
-
-document.getElementById(
-  "streak"
-).innerText =
-
-  currentUser.streak || 0;
-
-window.currentUserStreak =
-  currentUser.streak || 0;
-
-window.currentLastCheckin =
-  currentUser.lastCheckin || "";
-
-/* REMOVED: renderDashboardPoints() used to be called here. It was the
-   SECOND of two calls per page load — the onSnapshot callback in
-   startUserRealtime() below already re-renders the points whenever
-   users/{uid} changes (including the very first snapshot), so this
-   duplicate only re-ran getTotalLessonScore() and doubled the cost of
-   the lessons query.
-
-   Deliberately NOT replaced with a "skip first snapshot" flag in the
-   callback: that would make the displayed points depend on a race
-   between this fetch and the first snapshot. Dropping the duplicate
-   keeps exactly one render whichever way the race goes. */
-
-if(
-  window.updateCheckinButton
-){
-  updateCheckinButton();
-}
-
-return currentUser;
+    return await realtimeReady;
 
   }catch(err){
 
@@ -197,6 +131,12 @@ function(){
 
   const box =
     document.getElementById("profileCard");
+
+/* The profile card only exists on home.html. lesson.html also loads this
+   module and calls loadCurrentUser(), so bail out instead of throwing on
+   a null #profileCard. */
+if(!box || !currentUser) return;
+
 if(
     currentUser.coverType==="image"
     &&
@@ -610,8 +550,7 @@ gap:10px;
 
       📧
 
-      ${
-        email ||
+      ${ email ||
 
         "Chưa liên kết email"
       }
@@ -747,8 +686,23 @@ window.resetCover = async function () {
     }
 };
 /* =========================
-   REALTIME USER
+   REALTIME USER — SINGLE READ PATH
+
+   This listener is now the ONLY place that reads users/{uid}. It fires
+   immediately with the current data, so loadCurrentUser() can simply
+   await it instead of issuing its own getDoc() on the same document.
 ========================= */
+let realtimeReady = null;
+let realtimeResolve = null;
+let realtimeStarted = false;
+
+function settleRealtime(user){
+  if(realtimeResolve){
+    const resolve = realtimeResolve;
+    realtimeResolve = null;
+    resolve(user || null);
+  }
+}
 
 window.startUserRealtime = function(){
 
@@ -762,7 +716,14 @@ window.startUserRealtime = function(){
       uid === "guest"
     ){
 
-      return;
+      return null;
+    }
+
+    /* loadCurrentUser() and the home.html load handler both call in.
+       Reuse the listener that is already open instead of subscribing to
+       the same document twice. */
+    if(realtimeStarted){
+      return realtimeReady;
     }
 
     const ref =
@@ -772,6 +733,12 @@ window.startUserRealtime = function(){
         uid
       );
 
+    realtimeReady = new Promise((resolve)=>{
+      realtimeResolve = resolve;
+    });
+
+    realtimeStarted = true;
+
     onSnapshot(
 
       ref,
@@ -779,12 +746,15 @@ window.startUserRealtime = function(){
       (snap)=>{
 
         if(!snap.exists()){
+          settleRealtime(null);
           return;
         }
 const data = snap.data();
 
 if(data.system?.status === "banned"){
-    showToast("🚫 Bạn đã bị khóa!");
+    if(typeof showToast === "function"){
+      showToast("🚫 Bạn đã bị khóa!");
+    }
     localStorage.clear();
     window.location.href = "index.html";
     return;
@@ -804,19 +774,30 @@ setUserState(
 
 /* =========================
    UPDATE UI
+
+   Every element touched below is optional on purpose: this module is also
+   loaded by lesson.html, which has no #profileCard / #streak / #pointValue.
+   Without the guards a missing element threw inside the snapshot callback,
+   which also meant settleRealtime() never ran for that page.
 ========================= */
 
-renderProfileCard();
+if(typeof window.renderProfileCard === "function"){
+  renderProfileCard();
+}
 
 /* =========================
    CHECKIN STATE
 ========================= */
 
-document.getElementById(
-  "streak"
-).innerText =
+const streakEl =
+  document.getElementById("streak");
 
-  currentUser.streak || 0;
+if(streakEl){
+
+  streakEl.innerText =
+
+    currentUser.streak || 0;
+}
 
 window.currentUserStreak =
   currentUser.streak || 0;
@@ -824,6 +805,9 @@ window.currentUserStreak =
 window.currentLastCheckin =
   currentUser.lastCheckin || "";
 
+/* Points, the check-in button and the link buttons are refreshed on every
+   snapshot — including the first — so nothing has to be re-rendered by
+   loadCurrentUser() as well. */
 if(
   window.renderDashboardPoints
 ){
@@ -835,6 +819,10 @@ if(
 ){
   updateCheckinButton();
 }
+
+/* Hand the first snapshot to whoever is awaiting loadCurrentUser(). Done
+   LAST so the UI is already populated when the awaiting caller resumes. */
+settleRealtime(currentUser);
 
         console.log(
 
@@ -945,8 +933,21 @@ async function(){
 
 /* =========================
    AVATAR PICKER
+
+   Two separate targets. The avatar is only ever shown inside a 74px
+   circle on the profile card (plus a chip in lesson.html and a row in
+   adminpanel.html), so 256px on the long edge is already generous — and
+   it is the difference between roughly 200 KB and roughly 20 KB of
+   base64 inside users/{uid}. Cover art is painted full-width, so it
+   keeps the original 768px.
+
+   Both used to share a single 768 constant, which meant every avatar
+   was stored at cover resolution.
 ========================= */
-async function compressImage(file) {
+const MAX_SIZE_AVATAR = 256;
+const MAX_SIZE_COVER = 768;
+
+async function compressImage(file, maxSize = MAX_SIZE_AVATAR) {
   return new Promise((resolve, reject) => {
     const img = new Image();
 
@@ -954,7 +955,7 @@ async function compressImage(file) {
       let width = img.width;
       let height = img.height;
 
-      const MAX_SIZE = 768;
+      const MAX_SIZE = maxSize;
 
       if (width > height) {
         if (width > MAX_SIZE) {
@@ -1124,7 +1125,8 @@ document.getElementById("coverInput");
 
      try {
 
-    const base64 = await compressImage(file);
+    /* Cover art is displayed full-width, so it keeps the larger edge. */
+    const base64 = await compressImage(file, MAX_SIZE_COVER);
 
     const uid = getUID();
 
@@ -1201,8 +1203,7 @@ document.addEventListener(
 const modal =
 document.getElementById(
 "changeNameModal"
-);
-if(
+);if(
 !modal ||
 modal.style.display!=="flex"
 )return;
