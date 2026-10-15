@@ -157,11 +157,17 @@ window.currentUserStreak =
 window.currentLastCheckin =
   currentUser.lastCheckin || "";
 
-if(
-  window.renderDashboardPoints
-){
-  renderDashboardPoints();
-}
+/* REMOVED: renderDashboardPoints() used to be called here. It was the
+   SECOND of two calls per page load — the onSnapshot callback in
+   startUserRealtime() below already re-renders the points whenever
+   users/{uid} changes (including the very first snapshot), so this
+   duplicate only re-ran getTotalLessonScore() and doubled the cost of
+   the lessons query.
+
+   Deliberately NOT replaced with a "skip first snapshot" flag in the
+   callback: that would make the displayed points depend on a race
+   between this fetch and the first snapshot. Dropping the duplicate
+   keeps exactly one render whichever way the race goes. */
 
 if(
   window.updateCheckinButton
@@ -417,7 +423,7 @@ gap:10px;
     color:#111;
     line-height:1.2;
     letter-spacing:-0.03em;
-">
+    ">
     ${username}
 </div>
 

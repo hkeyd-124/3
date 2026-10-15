@@ -351,6 +351,20 @@ hideLoading();
    UPDATE LINK BUTTONS
 ========================= */
 
+/* MIRROR DEDUPE
+   ---------------------------------------------------------
+   updateLinkButtons() runs after every auth-state change and after
+   linking a wallet/email. It used to call getDoc(users/{uid}) itself,
+   which read the SAME document loadCurrentUser() had just read (and
+   read it twice per home load before that duplicate call was removed).
+   users/{uid} can be ~200 KiB when avatar/cover are stored inline, so
+   those repeat reads were pure egress waste.
+
+   It now reuses window.currentUserData when that data is already in
+   memory, and only falls back to its own getDoc when it is not (for
+   example when a link succeeded on a page that never ran
+   loadCurrentUser). Behaviour of the buttons is unchanged either way:
+   the same wallet/email fields drive the same display toggles. */
 window.updateLinkButtons =
 async function(){
 
@@ -361,16 +375,26 @@ async function(){
 
     if(!uid) return;
 
-    const userRef =
-      doc(db,"users",uid);
+    let data =
+      window.currentUserData;
 
-    const snap =
-      await getDoc(userRef);
+    if(
+      !data ||
+      data._uid !== uid
+    ){
 
-    if(!snap.exists()) return;
+      const userRef =
+        doc(db,"users",uid);
 
-    const data =
-      snap.data();
+      const snap =
+        await getDoc(userRef);
+
+      if(!snap.exists()) return;
+
+      data = snap.data();
+
+      data._uid = uid;
+    }
 
     /* WALLET */
 

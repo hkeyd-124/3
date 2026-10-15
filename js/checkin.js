@@ -8,7 +8,9 @@ import {
   getDoc,
   setDoc,
   collection,
-  getDocs
+  getDocs,
+  getAggregateFromServer,
+  sum
 
 }
 
@@ -317,21 +319,35 @@ async function(){
         "lessons"
       );
 
-    const snap =
-      await getDocs(
-        lessonsRef
+    /* AGGREGATION instead of downloading every lesson document.
+       ---------------------------------------------------------
+       This used to be an UNBOUNDED getDocs(lessonsRef), so its cost
+       equalled the number of lessons the student had played (2 read per
+       lesson, because renderDashboardPoints() ran twice per home load).
+       In a 15-lesson course that is up to 30 reads just to display one
+       number.
+
+       sum() is computed server-side and billed per 1000 index entries
+       (minimum one read), so it is O(1) in cost AND correct — unlike
+       limit(N), which would have silently truncated the total.
+
+       Value equivalence vs the old loop: the loop added
+       (data.bestScore || 0) per document, i.e. it treated a missing or
+       falsy field as 0. Official docs: for sum() "non-numeric values are
+       ignored" and documents missing the field contribute nothing. Both
+       sides therefore add 0 for those documents. A genuinely
+       string-typed bestScore is the only divergence, and it does not
+       occur in this schema (saveCloudProgress always writes a number). */
+    const agg =
+      await getAggregateFromServer(
+        lessonsRef,
+        {
+          total: sum("bestScore")
+        }
       );
 
-    let total = 0;
-
-    snap.forEach(doc=>{
-
-      const data =
-        doc.data();
-
-      total +=
-        data.bestScore || 0;
-    });
+    const total =
+      Number(agg.data().total) || 0;
 
     return total;
 

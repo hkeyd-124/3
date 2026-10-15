@@ -15,6 +15,9 @@ window.lessonEngine = {
   cloudSaveTimeout:null,
   cloudLoaded:false,
   unsavedChanges:0,
+  // Signature of the last state successfully written by saveCloudProgress().
+  // null on a fresh session => the first call always writes.
+  _lastCloudSnapshot:null,
   bestScore:150,
   firstScore:null,
   completed:false,
@@ -1375,20 +1378,16 @@ this.wrongTimeouts[
 
   this.renderNav();
 
-  // SAVE
-
+  // SAVE (local only)
+  //
+  // The cloud write was REMOVED from here on purpose. It used to fire
+  // every 5 answered questions, so one 15-question lesson cost 3 separate
+  // users/{uid}/lessons/{lessonId} writes (plus 3 leaderboard mirror
+  // writes). saveCloudProgress() is now called on SUBMIT only.
   this.unsavedChanges++;
 
   this.saveProgress();
 
-  if(
-    this.unsavedChanges >= 5
-  ){
-
-    this.saveCloudProgress();
-
-    this.unsavedChanges = 0;
-  }
   await this.checkLessonComplete();
 },
 /* =========================
@@ -1476,22 +1475,11 @@ this.renderQuestion();
 
 this.renderNav();
 
-// SAVE
-
+// SAVE (local only — cloud write moved to SUBMIT, see window.goBack)
 this.unsavedChanges++;
 
 this.saveProgress();
 
-if(
-this.unsavedChanges >= 5
-){
-
-
-this.saveCloudProgress();
-
-this.unsavedChanges = 0;
-
-}
 await this.checkLessonComplete();
 },
 /* =========================
@@ -1850,6 +1838,40 @@ saveCloudProgress:async function(){
 
       );
 
+    /* DEDUPE
+       ---------------------------------------------------------
+       saveCloudProgress() is reached from several places: completion of
+       the last question, the SUBMIT button, the mint flow, and retry.
+       Reaching it twice with identical state would double the write
+       count for a single submit, so build a cheap signature and skip
+       the write when nothing changed since the last successful save.
+
+       _lastCloudSnapshot is null on a fresh session, so the first call
+       always writes. This is what keeps the cost at ONE write per
+       submit instead of two. */
+    const _cloudSnap =
+      JSON.stringify({
+        current: this.current,
+        score: this.score,
+        answers: this.answers,
+        selectedAnswers: this.selectedAnswers,
+        hints: this.hints,
+        hiddenOptions: this.hiddenOptions,
+        trueFalseStates: this.trueFalseStates,
+        trueFalseScored: this.trueFalseScored,
+        bestScore: this.bestScore,
+        firstScore: this.firstScore,
+        completed: this.completed,
+        certificateMinted: this.certificateMinted,
+        mintedTokenId: this.mintedTokenId
+      });
+
+    if(
+      this._lastCloudSnapshot === _cloudSnap
+    ){
+      return;
+    }
+
     await setDoc(
 
       ref,
@@ -1904,6 +1926,10 @@ metadataURI:
       }
 
     );
+
+    // Only after the authoritative write succeeded: remember the state
+    // so a repeat call with the same data costs zero writes.
+    this._lastCloudSnapshot = _cloudSnap;
 
     /* LEADERBOARD STAGE 1 — mirror the best score into the read-optimised
        collection leaderboard/{lessonId}/entries/{uid}.
@@ -2134,15 +2160,6 @@ if(used){
 
     this.saveProgress();
   this.unsavedChanges++;
-
-if(
-  this.unsavedChanges >= 5
-){
-
-  this.saveCloudProgress();
-
-  this.unsavedChanges = 0;
-}
   }
 },
 
