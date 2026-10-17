@@ -132,7 +132,6 @@ console.log(
 
   "CURRENT USER:",
   currentUser
-
 );
 
 /* =========================
@@ -547,9 +546,7 @@ gap:10px;
 
         box-shadow:
           0 8px 20px rgba(250,204,21,0.3);
-        "
-      >
-
+        ">
         ✅ Check-in
 
       </button>
@@ -946,7 +943,16 @@ async function(){
 /* =========================
    AVATAR PICKER
 ========================= */
-async function compressImage(file) {
+
+/* Maximum edge (px) applied before re-encoding.
+   Avatar and cover are deliberately separate: the avatar renders in a small
+   chip but is the single largest field of users/{uid}, so it drives Firestore
+   egress; the cover is only a background layer behind a 70-80% white gradient,
+   so it keeps its previous effective size instead of being shrunk too. */
+const MAX_SIZE_AVATAR = 256;
+const MAX_SIZE_COVER = 512;
+
+async function compressImage(file, maxSize = MAX_SIZE_AVATAR) {
   return new Promise((resolve, reject) => {
     const img = new Image();
 
@@ -954,17 +960,15 @@ async function compressImage(file) {
       let width = img.width;
       let height = img.height;
 
-      const MAX_SIZE = 768;
-
       if (width > height) {
-        if (width > MAX_SIZE) {
-          height = Math.round(height * MAX_SIZE / width);
-          width = MAX_SIZE;
+        if (width > maxSize) {
+          height = Math.round(height * maxSize / width);
+          width = maxSize;
         }
       } else {
-        if (height > MAX_SIZE) {
-          width = Math.round(width * MAX_SIZE / height);
-          height = MAX_SIZE;
+        if (height > maxSize) {
+          width = Math.round(width * maxSize / height);
+          height = maxSize;
         }
       }
 
@@ -1050,7 +1054,10 @@ function(){
 
      try {
 
-    const base64 = await compressImage(file);
+    const base64 = await compressImage(
+      file,
+      MAX_SIZE_AVATAR
+    );
 
     const uid = getUID();
 
@@ -1124,7 +1131,10 @@ document.getElementById("coverInput");
 
      try {
 
-    const base64 = await compressImage(file);
+    const base64 = await compressImage(
+      file,
+      MAX_SIZE_COVER
+    );
 
     const uid = getUID();
 
