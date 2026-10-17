@@ -1098,16 +1098,18 @@ function(){
 /* =========================
    LINK BUTTONS — SINGLE CALL SITE
    ---------------------------------------------------------
-   updateLinkButtons() performs its own getDoc(users/{uid})
-   (js/authLink.js:363). It used to be invoked TWICE per home.html load:
-   once here on DOMContentLoaded and once in the "load" handler below
-   (after the 300ms module wait).
+   updateLinkButtons() only performs its own getDoc(users/{uid})
+   (js/authLink.js:398) when window.currentUserData is not already in
+   memory. It used to be invoked TWICE per home.html load: once here on
+   DOMContentLoaded and once in the "load" handler below (after the 300ms
+   module wait).
 
-   The "load" call is the one KEPT — it runs after the modules are ready and
-   sits in the same block as loadCurrentUser() / startUserRealtime(), so the
-   buttons are still hidden correctly for an already-linked account. The
-   post-link refresh calls inside js/authLink.js (:159, :334) are untouched,
-   so linking a wallet/email still updates the buttons immediately.
+   The "load" call is the one KEPT, and it now runs AFTER
+   loadCurrentUser() so the in-memory guard actually hits and no second
+   read of users/{uid} is issued. The buttons are still hidden correctly
+   for an already-linked account. The post-link refresh calls inside
+   js/authLink.js (:164, :342) are untouched, so linking a wallet/email
+   still updates the buttons immediately.
 ========================= */
 </script>
 
@@ -1134,17 +1136,6 @@ window.addEventListener(
       );
 
       /* =========================
-         LINK BUTTONS
-      ========================= */
-
-      if(
-        window.updateLinkButtons
-      ){
-
-        updateLinkButtons();
-      }
-
-      /* =========================
          USER
       ========================= */
 
@@ -1153,6 +1144,28 @@ window.addEventListener(
       ){
 
         await loadCurrentUser();
+      }
+
+      /* =========================
+         LINK BUTTONS
+         ---------------------------------------------------------
+         Deliberately AFTER loadCurrentUser(). updateLinkButtons()
+         reuses window.currentUserData when it is already in memory
+         (js/authLink.js:398) and only falls back to its own
+         getDoc(users/{uid}) when it is not. Running it first meant
+         currentUserData was still null, so the guard always missed and
+         the document was read a second time on every cold load.
+
+         The buttons themselves are unchanged: the same wallet/email
+         fields drive the same display toggles, and the post-link
+         refresh calls inside js/authLink.js (:164, :342) are untouched.
+      ========================= */
+
+      if(
+        window.updateLinkButtons
+      ){
+
+        updateLinkButtons();
       }
 
       /* =========================
