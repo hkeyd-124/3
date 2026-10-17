@@ -122,10 +122,24 @@ if(userData.system?.status === "banned"){
 
    window.currentUser = userData;
 
-window.currentUserData = currentUser;
+/* NOTE: this used to assign the bare identifier `currentUser`, which is
+   never declared in this module (only `window.currentUser` is). A bare
+   read of an undeclared name resolves through the global object, so it
+   happened to pick up window.currentUser — but only because that line
+   runs immediately after it is set, and it silently breaks the moment
+   the two are reordered. Assigning the local `userData` (the same object
+   already put on window.currentUser) makes the intent explicit and
+   removes the hidden ordering dependency. */
+window.currentUserData = userData;
+
+/* Stamp the uid this snapshot belongs to. updateLinkButtons()
+   (js/authLink.js) uses this marker to decide whether the in-memory
+   copy is still trustworthy, so the marker must be set here — the only
+   place that fills window.currentUserData from a fresh read. */
+window.currentUserData._uid = uid;
 
 setUserState(
-  currentUser
+  userData
 );
 
 console.log(

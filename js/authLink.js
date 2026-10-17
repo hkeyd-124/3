@@ -156,6 +156,11 @@ hideLoading();
       "wallet",
       wallet
     );
+/* Invalidate the cached copy before refreshing the buttons: the wallet
+   was just written, so the in-memory snapshot is stale. Clearing the
+   marker forces updateLinkButtons() to re-read users/{uid} and hide the
+   button immediately, exactly as it did before. */
+if(window.currentUserData) window.currentUserData._uid = null;
 updateLinkButtons();
     hideLoading();
     showToast(
@@ -331,6 +336,9 @@ hideLoading();
     document.getElementById(
       "linkEmailModal"
     ).style.display = "none";
+/* Same invalidation as the wallet path above: the email was just
+   written, so the cached snapshot is stale and must be re-read. */
+if(window.currentUserData) window.currentUserData._uid = null;
 updateLinkButtons();
     hideLoading();
     showToast(
