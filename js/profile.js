@@ -25,6 +25,96 @@ const COVER_GRADIENTS = {
   chemistry: "linear-gradient(135deg,#00c6ff,#0072ff)"
 };
 /* =========================
+   SAME-ORIGIN IMAGE URL GUARD
+
+   Optional companion fields `avatarUrl` / `coverImageUrl` may hold a URL
+   instead of a ~200 KB base64 data URI. They accept SAME-ORIGIN URLs only.
+
+   Why: js/certificateEngine.js draws the avatar onto #certificateCanvas and
+   js/lessonEngine.js then calls canvas.toDataURL(). Drawing a CROSS-ORIGIN
+   image onto a canvas without crossOrigin="anonymous" taints it, and
+   toDataURL() then throws "SecurityError: Tainted canvases may not be
+   exported" — which would break NFT minting. crossOrigin is never set in
+   this repo, so a cross-origin avatarUrl WOULD break minting. A same-origin
+   URL can never taint the canvas, so restricting to same-origin is exactly
+   what makes this safe without touching js/certificate*.js.
+========================= */
+const hcFailedUrls = new Set();
+
+function normalizeSameOriginUrl(raw){
+
+  if(typeof raw !== "string") return "";
+
+  const value = raw.trim();
+
+  if(!value) return "";
+
+  try{
+
+    const parsed = new URL(value, window.location.href);
+
+    if(
+      parsed.protocol !== "http:"
+      &&
+      parsed.protocol !== "https:"
+    ){
+      return "";
+    }
+
+    if(parsed.origin !== window.location.origin) return "";
+
+    return parsed.href;
+
+  }catch(err){
+    return "";
+  }
+}
+
+function pickAvatarSrc(user){
+
+  if(!user) return "";
+
+  const url = normalizeSameOriginUrl(user.avatarUrl);
+
+  if(!url || hcFailedUrls.has(url)) return "";
+
+  return url;
+}
+
+function pickCoverImageSrc(user){
+
+  if(!user) return "";
+
+  const url = normalizeSameOriginUrl(user.coverImageUrl);
+
+  if(!url || hcFailedUrls.has(url)) return "";
+
+  return url;
+}
+
+/* Cover is painted as a CSS background, and CSS has no per-image error
+   event, so probe the URL; on failure mark it and re-render once. */
+function guardCoverImageSrc(url){
+
+  if(!url || hcFailedUrls.has(url)) return;
+
+  const probe = new Image();
+
+  probe.onerror = function(){
+
+    hcFailedUrls.add(url);
+
+    if(typeof window.renderProfileCard === "function"){
+      window.renderProfileCard();
+    }
+  };
+
+  probe.src = url;
+}
+
+window.hcNormalizeSameOriginUrl = normalizeSameOriginUrl;
+
+/* =========================
    FIREBASE
 ========================= */
 
@@ -151,10 +241,23 @@ if(
   !currentUser
 ) return;
 
+/* =========================
+   COVER IMAGE — OPTIONAL URL FIELD
+
+   Uu tien field moi `coverImageUrl` (chi nhan URL cung origin, xem khoi
+   SAME-ORIGIN IMAGE URL GUARD o tren dau file). Neu khong co / URL hong
+   thi quay ve field cu `coverImage` (base64) nhu truoc.
+========================= */
+const coverImageSrc =
+    pickCoverImageSrc(currentUser);
+
+const coverImageFallback =
+    currentUser.coverImage || "";
+
 if(
     currentUser.coverType==="image"
     &&
-    currentUser.coverImage
+    (coverImageSrc || coverImageFallback)
 ){
 
     box.style.background = `
@@ -162,7 +265,7 @@ linear-gradient(
 rgba(255,255,255,.70),
 rgba(255,255,255,.80)
 ),
-url(${currentUser.coverImage})
+url(${coverImageSrc || coverImageFallback})
 `;
 
 }
@@ -199,7 +302,16 @@ box.style.backgroundRepeat="no-repeat";
     ||
 
     "Unnamed";
+/* Optional new field first, legacy base64 second, bundled default last. */
+const avatarUrl =
+
+  pickAvatarSrc(currentUser);
+
 const avatar =
+
+  avatarUrl
+
+  ||
 
   currentUser.avatar
 
@@ -295,6 +407,8 @@ width:100%;
           id="profileAvatar"
 
           src="${avatar}"
+
+          onerror="if(!this.dataset.fb){this.dataset.fb='1';var n=document.getElementById('profileAvatar');if(n){n.onerror=null;}}"
 
           style="
           width:74px;
@@ -621,6 +735,34 @@ box.onmouseleave = ()=>{
     btn.style.opacity="0";
     btn.style.transform="scale(.92)";
 };
+
+/* Neu avatar URL (field moi) load loi thi quay ve avatar base64 cu,
+   roi moi den anh mac dinh. Gan bang JS de khong phai nhung chuoi
+   base64 ~200KB vao attribute onerror cua HTML. */
+const avatarImg =
+  document.getElementById("profileAvatar");
+
+if(avatarImg && avatarUrl){
+
+  avatarImg.onerror = function(){
+
+    avatarImg.onerror = null;
+
+    avatarImg.src =
+      currentUser.avatar
+      ||
+      "assets/images/default-avatar.png";
+  };
+}
+
+/* Cover la CSS background nen khong co su kien loi tung anh —
+   kiem tra bang cach preload, hong thi render lai. */
+if(coverImageSrc){
+
+  guardCoverImageSrc(
+    coverImageSrc
+  );
+}
 }
 
 
@@ -643,7 +785,8 @@ window.selectGradient = async function(name){
             {
                 coverType:"gradient",
                 cover:name,
-                coverImage: null
+                coverImage: null,
+                coverImageUrl: null
             },
             {
                 merge:true
@@ -679,7 +822,8 @@ window.resetCover = async function () {
             {
                 coverType: null,
                 cover: null,
-                coverImage: null
+                coverImage: null,
+                coverImageUrl: null
             },
             {
                 merge: true
@@ -1110,10 +1254,13 @@ function(){
 
     if (!uid) return;
 
+    /* Giu nguyen field cu `avatar` (base64) va xoa field moi `avatarUrl`
+       de mot URL cu khong the de len anh vua chon. */
     await setDoc(
         doc(db, "users", uid),
         {
-            avatar: base64
+            avatar: base64,
+            avatarUrl: null
         },
         {
             merge: true
@@ -1187,11 +1334,14 @@ document.getElementById("coverInput");
 
     if (!uid) return;
 
+    /* Giu nguyen field cu `coverImage` (base64) va xoa field moi
+       `coverImageUrl` de mot URL cu khong the de len anh vua chon. */
     await setDoc(
         doc(db, "users", uid),
         {
             coverType: "image",
             coverImage: base64,
+            coverImageUrl: null,
             cover: null
         },
         {
@@ -1213,10 +1363,67 @@ closeCoverModal();
       console.error(err);
     }
   };
+
+  /* =========================
+     OPTIONAL COVER URL INPUT (field moi `coverImageUrl`)
+
+     Chi chap nhan URL CUNG ORIGIN — xem khoi SAME-ORIGIN IMAGE URL GUARD.
+     Neu #coverUrlInput khong ton tai thi bo qua hoan toan.
+  ========================= */
+  const coverUrlInput =
+    document.getElementById("coverUrlInput");
+
+  if(coverUrlInput){
+
+    coverUrlInput.onchange = async (e)=>{
+
+      const raw =
+        e.target.value || "";
+
+      if(!raw.trim()) return;
+
+      const url =
+        window.hcNormalizeSameOriginUrl
+          ? window.hcNormalizeSameOriginUrl(raw)
+          : "";
+
+      if(!url){
+
+        showToast("Chỉ nhận link cùng tên miền website");
+        e.target.value = "";
+        return;
+      }
+
+      const uid =
+        getUID();
+
+      if(!uid) return;
+
+      try{
+
+        await setDoc(
+          doc(db, "users", uid),
+          {
+            coverType: "image",
+            coverImageUrl: url,
+            cover: null
+          },
+          {
+            merge: true
+          }
+        );
+
+        showToast("Đã cập nhật Cover");
+        closeCoverModal();
+
+      }catch(err){
+
+        console.error(err);
+        showToast("Upload thất bại");
+      }
+    };
+  }
 }
-/* =========================
-   LOGOUT
-========================= */
 
 window.logout =
 async function(){

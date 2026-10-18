@@ -113,6 +113,7 @@ async function fetchUsersFromFirestore() {
             email: data.email || "",
             wallet: data.wallet || "",
             avatar: data.avatar || "",
+            avatarUrl: data.avatarUrl || "",
             points: Number(data.points) || 0,
             streak: Number(data.streak) || 0,
             createdAt: data.createdAt || "",
@@ -204,6 +205,48 @@ function escapeHTML(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+}
+
+
+/* =========================
+   SAME-ORIGIN IMAGE URL
+
+   `avatarUrl` is the optional companion of the legacy base64 `avatar`
+   field. Cross-origin URLs are refused because js/certificateEngine.js
+   draws the avatar onto #certificateCanvas and js/lessonEngine.js calls
+   canvas.toDataURL() afterwards — a cross-origin image without
+   crossOrigin="anonymous" taints the canvas and makes that throw
+   "SecurityError: Tainted canvases may not be exported.". Same-origin
+   only is what keeps the admin panel consistent with the profile page
+   and keeps NFT minting working.
+========================= */
+function sameOriginImageSrc(value) {
+
+    if (typeof value !== "string") return "";
+
+    const raw = value.trim();
+
+    if (!raw) return "";
+
+    try {
+
+        const parsed = new URL(raw, window.location.href);
+
+        if (
+            parsed.protocol !== "http:"
+            &&
+            parsed.protocol !== "https:"
+        ) {
+            return "";
+        }
+
+        if (parsed.origin !== window.location.origin) return "";
+
+        return parsed.href;
+
+    } catch (err) {
+        return "";
+    }
 }
 
 
@@ -366,12 +409,13 @@ function renderUserRow(user) {
             <div class="hc-user-main">
 
                 ${
-                    user.avatar
+                    (sameOriginImageSrc(user.avatarUrl) || user.avatar)
                         ? `
                             <img
                                 class="hc-user-avatar"
-                                src="${escapeHTML(user.avatar)}"
+                                src="${escapeHTML(sameOriginImageSrc(user.avatarUrl) || user.avatar)}"
                                 alt=""
+                                onerror="this.style.visibility='hidden'"
                             >
                         `
                         : `
