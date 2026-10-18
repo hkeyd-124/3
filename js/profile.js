@@ -1,6 +1,5 @@
 import {
   doc,
-  getDoc,
   onSnapshot,
   setDoc
 }
@@ -83,112 +82,42 @@ async function(){
     }
 
     /* =========================
-       FIRESTORE
+       SINGLE READ PATH
+
+       This function used to read users/{uid} itself, and then
+       startUserRealtime() below opened an onSnapshot on the very same
+       document. Every home.html load therefore pulled the document
+       twice — 2 billed reads, and twice the payload (which is large
+       once an avatar is stored inline as base64).
+
+       The document is now read by exactly ONE path: the onSnapshot in
+       startUserRealtime(). A snapshot fires immediately with the current
+       data, so the UI still populates on first paint, and the ban check
+       still runs — now on every change instead of only once per page
+       load. The global state (window.currentUser / currentUserData and
+       the _uid marker that updateLinkButtons() relies on) is filled
+       inside that callback, BEFORE the promise settles, so any caller
+       resuming from `await loadCurrentUser()` sees populated globals.
+
+       Contract kept unchanged: this still resolves with the user object,
+       and still resolves with null for a guest or a missing document.
     ========================= */
 
-    const ref =
-      doc(
-        db,
-        "users",
-        uid
-      );
+    const ready =
+      startUserRealtime();
 
-    const snap =
-      await getDoc(ref);
+    /* null => guest / no uid: no listener opened, nothing to await. */
 
-    if(!snap.exists()){
+    if(!ready){
 
       console.warn(
-        "User not found"
+        "Guest mode"
       );
 
       return null;
     }
-/* =========================
-   CHECK BAN
-========================= */
 
-const userData = snap.data();
-
-if(userData.system?.status === "banned"){
-    alert("🚫 Bạn đã bị khóa!");
-    localStorage.clear();
-    window.location.href = "index.html";
-    return null;
-}
-    /* =========================
-       SAVE GLOBAL
-    ========================= */
-
-   window.currentUser = userData;
-
-/* NOTE: this used to assign the bare identifier `currentUser`, which is
-   never declared in this module (only `window.currentUser` is). A bare
-   read of an undeclared name resolves through the global object, so it
-   happened to pick up window.currentUser — but only because that line
-   runs immediately after it is set, and it silently breaks the moment
-   the two are reordered. Assigning the local `userData` (the same object
-   already put on window.currentUser) makes the intent explicit and
-   removes the hidden ordering dependency. */
-window.currentUserData = userData;
-
-/* Stamp the uid this snapshot belongs to. updateLinkButtons()
-   (js/authLink.js) uses this marker to decide whether the in-memory
-   copy is still trustworthy, so the marker must be set here — the only
-   place that fills window.currentUserData from a fresh read. */
-window.currentUserData._uid = uid;
-
-setUserState(
-  userData
-);
-
-console.log(
-
-  "CURRENT USER:",
-  currentUser
-);
-
-/* =========================
-   UPDATE UI
-========================= */
-
-renderProfileCard();
-
-/* =========================
-   CHECKIN STATE
-========================= */
-
-document.getElementById(
-  "streak"
-).innerText =
-
-  currentUser.streak || 0;
-
-window.currentUserStreak =
-  currentUser.streak || 0;
-
-window.currentLastCheckin =
-  currentUser.lastCheckin || "";
-
-/* REMOVED: renderDashboardPoints() used to be called here. It was the
-   SECOND of two calls per page load — the onSnapshot callback in
-   startUserRealtime() below already re-renders the points whenever
-   users/{uid} changes (including the very first snapshot), so this
-   duplicate only re-ran getTotalLessonScore() and doubled the cost of
-   the lessons query.
-
-   Deliberately NOT replaced with a "skip first snapshot" flag in the
-   callback: that would make the displayed points depend on a race
-   between this fetch and the first snapshot. Dropping the duplicate
-   keeps exactly one render whichever way the race goes. */
-
-if(
-  window.updateCheckinButton
-){
-  updateCheckinButton();
-}
-
-return currentUser;
+    return await ready;
 
   }catch(err){
 
@@ -210,6 +139,18 @@ function(){
 
   const box =
     document.getElementById("profileCard");
+
+/* The profile card only exists on home.html. lesson.html also loads this
+   module (and lessonEngine.js calls loadCurrentUser()), so bail out
+   BEFORE touching box.style — the guard used to sit further down, after
+   the cover writes, so a page without #profileCard threw a TypeError
+   instead of returning. */
+
+if(
+  !box ||
+  !currentUser
+) return;
+
 if(
     currentUser.coverType==="image"
     &&
@@ -250,12 +191,6 @@ ${cover}
 box.style.backgroundSize="cover";
 box.style.backgroundPosition="center";
 box.style.backgroundRepeat="no-repeat";
-
-  
-  if(
-    !box ||
-    !currentUser
-  ) return;
 
   const username =
 
@@ -758,8 +693,33 @@ window.resetCover = async function () {
     }
 };
 /* =========================
-   REALTIME USER
+   REALTIME USER — SINGLE READ PATH
+
+   This listener is now the ONLY place that reads users/{uid}. It fires
+   immediately with the current data, so loadCurrentUser() awaits the
+   first snapshot instead of issuing its own getDoc() on the same
+   document. Fields, ban check and the _uid marker behave exactly as
+   before — only the NUMBER of reads changes (2 -> 1 per page load).
 ========================= */
+
+let realtimeStarted = false;
+let realtimeReady = null;
+let realtimeResolve = null;
+
+/* Hand the data to whoever is awaiting loadCurrentUser(). Resolving from
+   the callback (including the very first snapshot) is what lets the
+   caller resume without a second read. */
+function settleRealtime(user){
+
+  if(realtimeResolve){
+
+    const resolve = realtimeResolve;
+
+    realtimeResolve = null;
+
+    resolve(user || null);
+  }
+}
 
 window.startUserRealtime = function(){
 
@@ -773,7 +733,15 @@ window.startUserRealtime = function(){
       uid === "guest"
     ){
 
-      return;
+      return null;
+    }
+
+    /* loadCurrentUser() and the home.html load handler both call in.
+       Reuse the listener that is already open instead of subscribing to
+       the same document twice. */
+    if(realtimeStarted){
+
+      return realtimeReady;
     }
 
     const ref =
@@ -783,6 +751,16 @@ window.startUserRealtime = function(){
         uid
       );
 
+    realtimeReady =
+      new Promise(
+        resolve=>{
+
+          realtimeResolve = resolve;
+        }
+      );
+
+    realtimeStarted = true;
+
     onSnapshot(
 
       ref,
@@ -790,6 +768,11 @@ window.startUserRealtime = function(){
       (snap)=>{
 
         if(!snap.exists()){
+
+          /* Missing document: resolve with null so loadCurrentUser()
+             returns instead of waiting for a snapshot that never comes. */
+          settleRealtime(null);
+
           return;
         }
 const data = snap.data();
@@ -809,9 +792,21 @@ if(data.system?.status === "banned"){
 window.currentUserData =
   currentUser;
 
-setUserState(
-  currentUser
-);
+/* Stamp the uid this snapshot belongs to. updateLinkButtons()
+   (js/authLink.js) uses this marker to decide whether the in-memory
+   copy is still trustworthy. Without it that guard always misses and
+   authLink.js issues its own getDoc(users/{uid}), undoing the saving. */
+window.currentUserData._uid = uid;
+
+/* state.js is not loaded on lesson.html, so setUserState may not exist
+   there. Inside a snapshot callback a ReferenceError would skip
+   settleRealtime() below and leave loadCurrentUser() awaiting forever. */
+if(typeof setUserState === "function"){
+
+  setUserState(
+    currentUser
+  );
+}
 
 /* =========================
    UPDATE UI
@@ -823,11 +818,18 @@ renderProfileCard();
    CHECKIN STATE
 ========================= */
 
-document.getElementById(
-  "streak"
-).innerText =
+/* lesson.html has no #streak — it loads this module too, so guard the
+   write instead of throwing inside the snapshot callback. */
+const streakEl =
+  document.getElementById(
+    "streak"
+  );
 
-  currentUser.streak || 0;
+if(streakEl){
+
+  streakEl.innerText =
+    currentUser.streak || 0;
+}
 
 window.currentUserStreak =
   currentUser.streak || 0;
@@ -835,16 +837,39 @@ window.currentUserStreak =
 window.currentLastCheckin =
   currentUser.lastCheckin || "";
 
-if(
-  window.renderDashboardPoints
-){
-  renderDashboardPoints();
+/* Each refresh is isolated: a throw in one must not stop
+   settleRealtime() from running, or loadCurrentUser() would never
+   resolve and every await behind it would be blocked. */
+try{
+
+  if(
+    window.renderDashboardPoints
+  ){
+    renderDashboardPoints();
+  }
+
+}catch(err){
+
+  console.error(
+    "DASHBOARD POINTS ERROR:",
+    err
+  );
 }
 
-if(
-  window.updateCheckinButton
-){
-  updateCheckinButton();
+try{
+
+  if(
+    window.updateCheckinButton
+  ){
+    updateCheckinButton();
+  }
+
+}catch(err){
+
+  console.error(
+    "CHECKIN BUTTON ERROR:",
+    err
+  );
 }
 
         console.log(
@@ -853,6 +878,9 @@ if(
           currentUser
 
         );
+
+        /* Last: resume loadCurrentUser() and any other awaiter. */
+        settleRealtime(currentUser);
       }
     );
 
@@ -864,6 +892,11 @@ if(
       err
 
     );
+
+    /* Never leave a caller waiting on a listener that failed to open. */
+    settleRealtime(null);
+
+    return realtimeReady;
   }
 }
 /* =========================
