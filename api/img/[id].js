@@ -32,7 +32,7 @@
    js/users/users.js need to change.
 ========================= */
 
-import { head } from "@vercel/blob";
+import { head, BlobNotFoundError } from "@vercel/blob";
 
 /* Opaque id minted by the upload endpoint. Deliberately excludes "/", "\",
    "." and "%" so path traversal and prefix escapes are impossible by
@@ -143,10 +143,16 @@ export default async function handler(req, res) {
 
   } catch (err) {
 
+    /* @vercel/blob subclasses BlobError without ever setting `.name`, so a
+       missing blob arrives with name === "Error" and no `.status` - testing
+       `err.name === "BlobNotFoundError"` was always false and every missing
+       blob fell through to the generic 502 below, making a plain 404
+       indistinguishable from a real upstream fault. Match on the class
+       itself; `err.status === 404` stays as a defensive fallback. */
     const notFound =
       err
       && (
-        err.name === "BlobNotFoundError"
+        err instanceof BlobNotFoundError
         || err.status === 404
       );
 
