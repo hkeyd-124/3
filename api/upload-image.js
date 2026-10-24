@@ -6,7 +6,7 @@
    Content-Type: application/json
    { "kind": "avatar" | "cover", "imageBase64": "<base64 or data URI>" }
 
-   -> 200 { id, url }
+   -> 200 { id, url, size, contentType, ownerUid }
 
    WHY THIS EXISTS
    ---------------
@@ -48,9 +48,10 @@
 ========================= */
 
 /* Initialise firebase-admin through the project's single source of truth
-   for credentials, then use the default app. Imported for its side effect
-   only - it is what makes `admin.auth()` usable below. */
-import "./firebaseAdmin.js";
+   for credentials, then use the default app. Importing the module is also
+   what makes `admin.auth()` usable below; `db` is used to resolve the
+   app-facing uid. */
+import { db } from "./firebaseAdmin.js";
 
 import admin from "firebase-admin";
 import { put } from "@vercel/blob";
@@ -197,6 +198,71 @@ function normaliseBase64(raw) {
   return body;
 }
 
+/**
+ * Map a Firebase Auth identity onto the app's own `uid_<uuid>`.
+ *
+ * The app keys every document on `users/{uid_<uuid>}`, minted by
+ * `generateUID()` in userService.js. Firebase Auth's `decoded.uid` is a
+ * DIFFERENT value that exists in no Firestore document, so it must never be
+ * used as a document id - writing to `users/{decoded.uid}` would create a
+ * ghost document nobody reads. The only bridge between the two identities
+ * is `email_index/{email}` -> `{ uid }`.
+ *
+ * Returns null for every failure mode (token has no email, no index entry,
+ * network/quota/permission error). An upload must never fail because this
+ * lookup failed: the blob is already useful on its own, and Phase 3 can
+ * still fall back to the client's own `getUID()`.
+ *
+ * @param {unknown} email
+ * @returns {Promise<string|null>}
+ */
+async function resolveOwnerUid(email) {
+
+  if (
+    typeof email !== "string"
+    || email.length === 0
+  ) {
+    return null;
+  }
+
+  try {
+
+    /* `email_index` doc ids are lower-cased by every writer
+       (userService.js, authEmail.js), so match that here. */
+    const snap = await db
+      .collection("email_index")
+      .doc(email.toLowerCase())
+      .get();
+
+    if (!snap.exists) {
+      return null;
+    }
+
+    const data = snap.data();
+
+    const value = data && data.uid;
+
+    return (
+      typeof value === "string"
+      && value.length > 0
+    )
+      ? value
+      : null;
+
+  } catch (err) {
+
+    /* Log the message only - never the email or the token. */
+    console.error(
+      "upload-image owner lookup failed:",
+      err && err.message
+    );
+
+    return null;
+
+  }
+
+}
+
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
@@ -231,17 +297,31 @@ export default async function handler(req, res) {
 
   }
 
-  let uid;
+  /* `firebaseUid` is the Firebase Auth uid. It is NOT a Firestore document
+     id: the app stores users under `users/uid_<uuid>`, so this value matches
+     no document. It exists only to prove who the caller is; anything that
+     needs the app-facing id must use `ownerUid`, resolved on the success
+     path below. */
+  let firebaseUid;
+
+  let email = null;
 
   try {
 
     const decoded = await admin.auth().verifyIdToken(idToken);
 
-    uid = decoded && decoded.uid;
+    firebaseUid = decoded && decoded.uid;
 
-    if (!uid) {
+    if (!firebaseUid) {
       throw new Error("token has no uid");
     }
+
+    email = (
+      decoded
+      && typeof decoded.email === "string"
+    )
+      ? decoded.email
+      : null;
 
   } catch (err) {
 
@@ -379,6 +459,11 @@ export default async function handler(req, res) {
 
   }
 
+  /* Resolve the app-facing uid only now, on the success path: a request that
+     is rejected above must not pay for a Firestore read. `null` is a normal
+     outcome (wallet-only account, missing index) and never fails the upload. */
+  const ownerUid = await resolveOwnerUid(email);
+
   /* The URL points at the same-origin proxy, never at the blob host.
      That is what keeps the canvas un-tainted for NFT minting, and it means
      the public blob hostname can change without touching any client. */
@@ -386,7 +471,8 @@ export default async function handler(req, res) {
     id,
     url: "/api/img/" + id,
     size: buffer.length,
-    contentType
+    contentType,
+    ownerUid
   });
 
 }
