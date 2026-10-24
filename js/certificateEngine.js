@@ -32,16 +32,33 @@ async function(data){
   const template =
     new Image();
 
+  let templateLoaded =
+    false;
+
   template.src =
     templateSrc;
+
+  // Ảnh lỗi (404) chỉ bắn `onerror`, không bắn `onload`. Thiếu `onerror` thì
+  // Promise treo vĩnh viễn và nút mint quay mãi => luôn resolve, rồi bỏ qua
+  // khối vẽ template nếu nó không tải được.
 
   await new Promise(
     resolve=>{
 
       template.onload =
+        ()=>{
+          templateLoaded =
+            true;
+
+          resolve();
+        };
+
+      template.onerror =
         resolve;
     }
   );
+
+  if(templateLoaded){
 
   ctx.drawImage(
 
@@ -56,6 +73,8 @@ async function(data){
     canvas.height
 
   );
+
+  }
 // AVATAR
 
 if(data.avatar){
@@ -63,15 +82,32 @@ if(data.avatar){
   const avatarImg =
     new Image();
 
+  let avatarLoaded =
+    false;
+
   avatarImg.src =
     data.avatar;
 
+  // Cùng lý do như template: avatar 404 (URL hỏng) không bắn `onload`, nên
+  // thiếu `onerror` sẽ treo mint. Resolve rồi bỏ qua khối vẽ avatar.
+
   await new Promise(
     resolve=>{
+
       avatarImg.onload =
+        ()=>{
+          avatarLoaded =
+            true;
+
+          resolve();
+        };
+
+      avatarImg.onerror =
         resolve;
     }
   );
+
+  if(avatarLoaded){
 
   ctx.save();
 
@@ -123,6 +159,8 @@ if(data.avatar){
   );
 
   ctx.restore();
+
+  }
 }
   // NAME
 
