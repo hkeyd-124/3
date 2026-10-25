@@ -1276,6 +1276,45 @@ async function getFirebaseIdToken(){
   }
 }
 
+/* =========================
+   FIREBASE SESSION GATE (Phase 3e)
+========================= */
+
+/* User dang nhap bang vi (index.html:777-778 chi ghi localStorage
+   "wallet"/"uid", KHONG tao phien Firebase Auth) nen getFirebaseIdToken()
+   luon tra "" va upload se am tham ghi base64 vao Firestore. Ham nay cho
+   biet co phien Firebase Auth hay khong, de chan upload truoc khi ghi.
+
+   Tra ve false khi import loi hoac khong co user: ca hai truong hop deu
+   khong the lay duoc ID token, nen deu phai chan. */
+window.hcHasFirebaseSession =
+async function(){
+
+  try{
+
+    const firebase = await import("../firebase.js");
+
+    const authMod = await import(
+      "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
+    );
+
+    const auth = authMod.getAuth(firebase.app);
+
+    await auth.authStateReady();
+
+    return !!auth.currentUser;
+
+  }catch(err){
+
+    console.error(
+      "Khong kiem tra duoc phien Firebase:",
+      err && err.message
+    );
+
+    return false;
+  }
+}
+
 /* Tra ve URL cung origin, hoac "" khi that bai (moi truong hop). */
 async function uploadImageToBlob(base64, kind){
 
@@ -1374,34 +1413,48 @@ function(){
 
     if (!uid) return;
 
+    /* Phase 3e: khong co phien Firebase Auth (user vi) thi KHONG duoc ghi
+       base64 vao Firestore nua. Truoc day nhanh nay am tham ghi base64
+       ~200 KB roi van hien toast thanh cong, nen nguoi dung tuong da doi
+       anh trong khi Firestore phinh to. Bao loi ro rang va dung han. */
+    if(!(await window.hcHasFirebaseSession())){
+
+      showToast(
+        "Bạn đăng nhập bằng ví nên chưa đổi được ảnh. Hãy đăng nhập bằng email.",
+        "error"
+      );
+
+      return;
+    }
+
     /* Phase 3: day bytes ra Blob truoc, chi giu URL ngan trong Firestore. */
     const blobUrl = await uploadImageToBlob(
       base64,
       "avatar"
     );
 
-    /* Thanh cong: ghi CUNG mot chuoi vao ca `avatar` lan `avatarUrl`.
+    /* Chi con mot nhanh: co phien Firebase Auth thi uploadImageToBlob phai
+       tra URL. Neu van tra "" (API loi, blob store chua bat, mang loi) thi
+       bao loi va KHONG ghi gi ca - khong con duong nao ghi base64 vao
+       Firestore tu day.
 
        `avatar` KHONG duoc dat null va KHONG duoc bo di: ca
        js/lessonEngine.js:403 va js/certificateEngine.js:80 deu doc
        `avatar` lam img.src, va hai file do deu bi khoa. Mot URL cung
-       origin lam img.src tot y nhu base64, lai khong lam taint canvas.
+       origin lam img.src tot y nhu base64, lai khong lam taint canvas. */
+    if(!blobUrl){
 
-       That bai: giu nguyen luong base64 cu, va xoa `avatarUrl` de mot
-       URL cu khong the de len anh vua chon. */
-    const payload = blobUrl
-      ? {
-          avatar: blobUrl,
-          avatarUrl: blobUrl
-        }
-      : {
-          avatar: base64,
-          avatarUrl: null
-        };
+      showToast("Upload thất bại", "error");
+
+      return;
+    }
 
     await setDoc(
         doc(db, "users", uid),
-        payload,
+        {
+          avatar: blobUrl,
+          avatarUrl: blobUrl
+        },
         {
             merge: true
         }
@@ -1474,36 +1527,46 @@ document.getElementById("coverInput");
 
     if (!uid) return;
 
+    /* Phase 3e: giong nhanh avatar - user vi khong co phien Firebase Auth
+       thi khong duoc ghi base64 vao Firestore, phai bao loi ro rang. */
+    if(!(await window.hcHasFirebaseSession())){
+
+      showToast(
+        "Bạn đăng nhập bằng ví nên chưa đổi được ảnh. Hãy đăng nhập bằng email.",
+        "error"
+      );
+
+      return;
+    }
+
     /* Phase 3: day bytes ra Blob truoc, chi giu URL ngan trong Firestore. */
     const blobUrl = await uploadImageToBlob(
       base64,
       "cover"
     );
 
-    /* Thanh cong: ghi CUNG mot chuoi vao ca `coverImage` lan
-       `coverImageUrl`. Cover duoc ve bang CSS background nen khong co
-       van de canvas taint, nhung van phai cung origin vi
-       normalizeSameOriginUrl la hang rao duy nhat cua ca hai field.
+    /* Chi con mot nhanh: co phien Firebase Auth thi uploadImageToBlob phai
+       tra URL. Neu van tra "" thi bao loi va KHONG ghi gi ca.
 
-       That bai: giu nguyen luong base64 cu, va xoa `coverImageUrl` de
-       mot URL cu khong the de len anh vua chon. */
-    const payload = blobUrl
-      ? {
+       `coverImage` giu nguyen ten field va van duoc ghi cung
+       `coverImageUrl`; cover duoc ve bang CSS background nen khong co van
+       de canvas taint, nhung van phai cung origin vi
+       normalizeSameOriginUrl la hang rao duy nhat cua ca hai field. */
+    if(!blobUrl){
+
+      showToast("Upload thất bại", "error");
+
+      return;
+    }
+
+    await setDoc(
+        doc(db, "users", uid),
+        {
           coverType: "image",
           coverImage: blobUrl,
           coverImageUrl: blobUrl,
           cover: null
-        }
-      : {
-          coverType: "image",
-          coverImage: base64,
-          coverImageUrl: null,
-          cover: null
-        };
-
-    await setDoc(
-        doc(db, "users", uid),
-        payload,
+        },
         {
             merge: true
         }
