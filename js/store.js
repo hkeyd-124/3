@@ -84,22 +84,6 @@ window.getWallet = function(){
   );
 }
 
-/* =========================
-   GET USERNAME
-========================= */
-
-window.getUsername = function(){
-
-  return (
-
-    window.appState.username ||
-
-    localStorage.getItem("username") ||
-
-    "Guest"
-
-  );
-}
 
 /* =========================
    INIT
