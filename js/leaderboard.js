@@ -899,6 +899,46 @@ async function fetchAndRender(lesson){
    previous implementation so the DOM contract and the CSS are untouched.
    ========================================================================= */
 
+/* =========================================================================
+   HTML ESCAPE (XSS GUARD)
+
+   WHY
+     Leaderboard rows are built with innerHTML += `...`, and the fields
+     interpolated into them come straight out of Firestore:
+       - user.name / me.name  <- users/{uid}.name, free text typed by the
+         student in the "Doi ten" modal (js/profile.js:saveChangeName,
+         validated only for length 1-30, no character filtering)
+       - it is mirrored into leaderboard/{lessonId}/entries/{uid}.name by
+         window.saveLeaderboardEntry()
+
+     A student who names themselves `<img src=x onerror=...>` therefore
+     stores markup that every OTHER viewer's browser executes on render.
+     That is stored XSS, not self-XSS: one attacker, many victims.
+
+   WHY A LOCAL COPY INSTEAD OF IMPORTING
+     js/users/users.js:200 already defines escapeHTML(), but this file is a
+     plain <script> (not a module, no exports) and users.js is an ES module
+     loaded only on adminpanel.html. Importing across that boundary would
+     mean re-declaring this file as a module and changing how home.html and
+     lesson.html load it - a bigger blast radius than the bug. The helper is
+     therefore duplicated locally, byte-for-byte identical to the users.js
+     one, so the two cannot drift in behaviour.
+
+   SCOPE
+     Escaping is applied to the STRING fields only (name). rank / score are
+     emitted by Number() coercions upstream and stay numeric.
+========================================================================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 function renderLeaderboard(top10, me, uid){
 
   const container =
@@ -942,7 +982,7 @@ function renderLeaderboard(top10, me, uid){
         </div>
 
         <div class="lb-name">
-          ${user.name}
+          ${escapeHTML(user.name)}
         </div>
 
         <div class="lb-score">
@@ -974,7 +1014,7 @@ function renderLeaderboard(top10, me, uid){
       ${me.rank}
     </div>
     <div class="lb-name">
-      ${me.name}
+      ${escapeHTML(me.name)}
     </div>
     <div class="lb-score">
       ${me.score}
