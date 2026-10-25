@@ -242,7 +242,24 @@ function sameOriginImageSrc(value) {
 
         if (parsed.origin !== window.location.origin) return "";
 
-        return parsed.href;
+        /* Tra ve PATH TUONG DOI ("/api/img/<id>"), KHONG phai parsed.href.
+
+           Dong bo voi normalizeSameOriginUrl() trong js/profile.js (PR #36).
+           URL tuyet doi dong cung origin vao Firestore thi khi doi domain
+           (vd. sang hackchem.vn) hoac khi upload tu mot Vercel preview
+           deployment (xxx-git-branch.vercel.app) thi anh tro ve origin cu
+           va 404. Path tuong doi luon duoc trinh duyet resolve theo origin
+           dang phuc vu trang, nen anh khong bao gio gay vi ly do domain.
+
+           An toan canvas (mint NFT): path tuong doi resolve thanh CUNG
+           origin voi trang, nen js/certificateEngine.js ve avatar len
+           #certificateCanvas roi canvas.toDataURL() van khong bi taint.
+
+           parsed.pathname giu nguyen percent-encoding goc; id cua
+           /api/img/<id> chi gom [A-Za-z0-9_-] nen khong co truong hop phai
+           giai ma. Query va hash bi bo vi id la bat bien, khong bao gio
+           mang theo. */
+        return parsed.pathname;
 
     } catch (err) {
         return "";
