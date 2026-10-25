@@ -1245,6 +1245,14 @@ async function getFirebaseIdToken(){
 
     const auth = authMod.getAuth(firebase.app);
 
+    /* Cho Firebase doc xong phien dang nhap da luu (IndexedDB) truoc khi
+       doc currentUser. Lan dau mo trang, getAuth() tra ve mot instance ma
+       currentUser con null trong khi SDK con dang doc persistence; doc ngay
+       se thay null va am tham roi ve base64. authStateReady() resolve ngay
+       khi currentUser san sang, va resolve lap tuc neu da co user, nen
+       khong lam cham luong binh thuong. */
+    await auth.authStateReady();
+
     const user = auth.currentUser;
 
     /* User dang nhap bang vi khong co phien Firebase Auth => null, va
