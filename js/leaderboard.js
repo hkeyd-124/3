@@ -8,7 +8,8 @@ import {
   getDocs,
   getCountFromServer,
   setDoc,
-  serverTimestamp
+  serverTimestamp,
+  deleteField
 }
 from
 "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
@@ -468,9 +469,12 @@ function(){
    STAGE-1 HELPERS
    ========================================================================= */
 
-/* Name/avatar are DENORMALISED into the mirror document so that rendering
-   the leaderboard never has to read users/{uid} again (that per-user read
-   was the N+1 half of the old 2 x N cost). */
+/* The NAME is DENORMALISED into the mirror document so that rendering the
+   leaderboard never has to read users/{uid} again (that per-user read was
+   the N+1 half of the old 2 x N cost).
+
+   THE AVATAR IS NO LONGER MIRRORED - see the write in
+   saveLeaderboardEntry() below for the measurements and the reasoning. */
 function resolveMyName(){
   try{
     const ud =
@@ -583,14 +587,40 @@ window.saveLeaderboardEntry = async function(){
   }catch(e){ /* ignore */ }
 
   const name = resolveMyName();
-  const avatar = resolveMyAvatar();
 
+  /* NO BASE64 AVATAR IN THIS PAYLOAD - and `deleteField()` actively removes
+     one that is already there.
+
+     WHY NOT WRITE IT
+     `users/{uid}.avatar` is a base64 data URI (measured: up to ~200 KB) and
+     this mirror document is rewritten once PER LESSON. A student with 10
+     lessons was therefore carrying ~2 MB of duplicated avatar bytes in the
+     leaderboard, plus the copy in users/{uid}.
+
+     WHY IT IS SAFE TO DELETE
+     Nothing renders it. renderLeaderboard() builds the row from
+     rank / name / score / badge only, and tabs/leaderboard.html contains no
+     avatar markup at all (grep "avatar" -> 0 hits). The `avatar` key is
+     still read into the top10/me objects above purely as dead data carried
+     over from the pre-mirror implementation - it is never put in the DOM.
+
+     WHY deleteField() AND NOT JUST OMITTING THE KEY
+     `merge: true` only touches the fields it is given, so simply dropping
+     `avatar` from the payload would FREEZE every existing base64 blob in
+     place forever - the exact bytes we are trying to get rid of. merge + a
+     deleteField() sentinel lets each student purge their OWN old copies the
+     next time they finish that lesson, with no admin credentials, no
+     backfill run and no risk to anyone else's data. Documents that never had
+     an avatar are unaffected: deleting a missing field is a no-op.
+
+     tools/purge-leaderboard-avatar.mjs exists for the one-off sweep of the
+     copies this lazy path can never reach (students who never come back). */
   await setDoc(
     doc(db, "leaderboard", lessonId, "entries", uid),
     {
       uid,
       name,
-      avatar,
+      avatar: deleteField(),
       score,
       updatedAt: serverTimestamp()
     },
