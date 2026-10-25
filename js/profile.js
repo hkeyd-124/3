@@ -1237,7 +1237,11 @@ async function getFirebaseIdToken(){
 
   try{
 
-    const firebase = await import("./firebase.js");
+    /* `../firebase.js`, KHONG phai `./firebase.js`: file nay nam trong
+       js/, con firebase.js nam o goc repo. `./firebase.js` tro toi
+       /js/firebase.js (404) nen import() luon throw, roi vao catch ben
+       duoi va tra "" -> moi lan upload deu am tham roi ve base64. */
+    const firebase = await import("../firebase.js");
 
     const authMod = await import(
       "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
