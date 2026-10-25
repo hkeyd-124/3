@@ -240,6 +240,45 @@ async function(){
    RENDER PROFILE
 ========================= */
 
+/* =========================================================================
+   HTML ESCAPE (XSS GUARD)
+
+   WHY
+     renderProfileCard() writes the student's display name into innerHTML
+     via a template literal:  the username variable.  It comes from
+     users/{uid}.name, which the student types themselves in the "Doi ten"
+     modal (saveChangeName only checks length 1-30, it does not filter
+     characters). A name such as `<img src=x onerror=...>` would therefore
+     execute on render.
+
+     This one is SELF-XSS (the attacker is the only victim) so it is lower
+     severity than the same sink in js/leaderboard.js, which renders OTHER
+     students' names into every viewer's page. Both are fixed the same way
+     for consistency.
+
+   WHY A LOCAL COPY INSTEAD OF IMPORTING
+     This file is an ES module, but js/users/users.js (which already has an
+     identical escapeHTML at :200) is only loaded on adminpanel.html.
+     Importing it here would pull the whole admin user-management module into
+     home.html and lesson.html. Duplicating the 5-line helper keeps the
+     dependency graph unchanged; the implementation is byte-identical.
+
+   SCOPE
+     Only the name is escaped. avatar / cover sources are already passed
+     through normalizeSameOriginUrl(), which refuses anything that is not a
+     same-origin http(s) URL, so they cannot carry a javascript: payload.
+========================================================================= */
+
+function escapeHTML(value){
+
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
 window.renderProfileCard =
 function(){
 
@@ -502,7 +541,7 @@ gap:10px;
     line-height:1.2;
     letter-spacing:-0.03em;
     ">
-    ${username}
+    ${escapeHTML(username)}
 </div>
 
     <div
