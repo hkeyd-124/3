@@ -958,9 +958,11 @@ window.currentUserData =
    authLink.js issues its own getDoc(users/{uid}), undoing the saving. */
 window.currentUserData._uid = uid;
 
-/* state.js is not loaded on lesson.html, so setUserState may not exist
-   there. Inside a snapshot callback a ReferenceError would skip
-   settleRealtime() below and leave loadCurrentUser() awaiting forever. */
+/* js/state.js HAS BEEN REMOVED (dead-code cleanup), so setUserState no
+   longer exists on ANY page - not just lesson.html. The guard is kept
+   deliberately: an unguarded ReferenceError inside a snapshot callback
+   would skip settleRealtime() below and leave loadCurrentUser() awaiting
+   forever, hanging every await behind it. This is now a plain no-op. */
 if(typeof setUserState === "function"){
 
   setUserState(
