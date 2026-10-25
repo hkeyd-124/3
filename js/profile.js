@@ -1202,6 +1202,114 @@ async function compressImage(file, maxSize = MAX_SIZE_AVATAR) {
 
 
 
+/* =========================
+   BLOB UPLOAD (Phase 3)
+
+   Truoc day avatar/cover duoc ghi thang vao Firestore duoi dang base64
+   (~200 KB moi field), va moi lan doc users/{uid} la keo theo ca dong do
+   — day chinh la thu lam no egress quota. Hai ham duoi day day bytes ra
+   Vercel Blob va chi tra ve mot URL ngan.
+
+   VI SAO PHAI LA URL CUNG ORIGIN
+   /api/upload-image tra ve "/api/img/<id>", tuc la di qua proxy cung
+   origin. Khong duoc luu URL blob truc tiep: js/certificateEngine.js ve
+   avatar len #certificateCanvas roi lessonEngine.js goi toDataURL(), va
+   file do khong bao gio set crossOrigin — mot anh khac origin se lam
+   taint canvas va toDataURL() nem SecurityError, vo luon luong mint NFT.
+   normalizeSameOriginUrl() duoi day chinh la hang rao do.
+
+   VI SAO MOI LOI DEU QUAY VE BASE64
+   Khong co phien Firebase (user dang nhap bang vi), API loi, hay mang
+   loi — tat ca deu tra ve "" va luong cu chay tiep. Upload cua nguoi
+   dung khong bao gio duoc phep hong chi vi buoc toi uu nay.
+========================= */
+
+/* Lay Firebase ID token de goi API.
+
+   Dung import dong thay vi import tinh o dau file: neu CDN firebase-auth
+   khong tai duoc thi mot import tinh se lam vo TOAN BO module nay (avatar
+   picker, cover picker, doi ten, logout...), trong khi import dong chi
+   khien buoc upload bi bo qua va quay ve base64.
+
+   getAuth(app) voi dung `app` cua firebase.js de chac chan trung instance
+   voi authEmail.js — neu khong, phien dang nhap email se khong duoc thay. */
+async function getFirebaseIdToken(){
+
+  try{
+
+    const firebase = await import("./firebase.js");
+
+    const authMod = await import(
+      "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"
+    );
+
+    const auth = authMod.getAuth(firebase.app);
+
+    const user = auth.currentUser;
+
+    /* User dang nhap bang vi khong co phien Firebase Auth => null, va
+       luong upload se quay ve base64 nhu truoc. */
+    if(!user) return "";
+
+    return await user.getIdToken();
+
+  }catch(err){
+
+    console.error(
+      "Khong lay duoc ID token:",
+      err && err.message
+    );
+
+    return "";
+  }
+}
+
+/* Tra ve URL cung origin, hoac "" khi that bai (moi truong hop). */
+async function uploadImageToBlob(base64, kind){
+
+  try{
+
+    const token = await getFirebaseIdToken();
+
+    if(!token) return "";
+
+    const res = await fetch(
+      "/api/upload-image",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          kind,
+          imageBase64: base64
+        })
+      }
+    );
+
+    if(!res.ok) return "";
+
+    const data = await res.json();
+
+    /* normalizeSameOriginUrl vua kiem tra cung origin vua chuan hoa, nen
+       mot response bat thuong cung khong the dua URL khac origin vao
+       Firestore. */
+    return normalizeSameOriginUrl(data && data.url);
+
+  }catch(err){
+
+    console.error(
+      "Upload blob that bai:",
+      err && err.message
+    );
+
+    return "";
+  }
+}
+
+
+
 window.initAvatarPicker =
 function(){
 
@@ -1254,14 +1362,34 @@ function(){
 
     if (!uid) return;
 
-    /* Giu nguyen field cu `avatar` (base64) va xoa field moi `avatarUrl`
-       de mot URL cu khong the de len anh vua chon. */
+    /* Phase 3: day bytes ra Blob truoc, chi giu URL ngan trong Firestore. */
+    const blobUrl = await uploadImageToBlob(
+      base64,
+      "avatar"
+    );
+
+    /* Thanh cong: ghi CUNG mot chuoi vao ca `avatar` lan `avatarUrl`.
+
+       `avatar` KHONG duoc dat null va KHONG duoc bo di: ca
+       js/lessonEngine.js:403 va js/certificateEngine.js:80 deu doc
+       `avatar` lam img.src, va hai file do deu bi khoa. Mot URL cung
+       origin lam img.src tot y nhu base64, lai khong lam taint canvas.
+
+       That bai: giu nguyen luong base64 cu, va xoa `avatarUrl` de mot
+       URL cu khong the de len anh vua chon. */
+    const payload = blobUrl
+      ? {
+          avatar: blobUrl,
+          avatarUrl: blobUrl
+        }
+      : {
+          avatar: base64,
+          avatarUrl: null
+        };
+
     await setDoc(
         doc(db, "users", uid),
-        {
-            avatar: base64,
-            avatarUrl: null
-        },
+        payload,
         {
             merge: true
         }
@@ -1334,16 +1462,36 @@ document.getElementById("coverInput");
 
     if (!uid) return;
 
-    /* Giu nguyen field cu `coverImage` (base64) va xoa field moi
-       `coverImageUrl` de mot URL cu khong the de len anh vua chon. */
+    /* Phase 3: day bytes ra Blob truoc, chi giu URL ngan trong Firestore. */
+    const blobUrl = await uploadImageToBlob(
+      base64,
+      "cover"
+    );
+
+    /* Thanh cong: ghi CUNG mot chuoi vao ca `coverImage` lan
+       `coverImageUrl`. Cover duoc ve bang CSS background nen khong co
+       van de canvas taint, nhung van phai cung origin vi
+       normalizeSameOriginUrl la hang rao duy nhat cua ca hai field.
+
+       That bai: giu nguyen luong base64 cu, va xoa `coverImageUrl` de
+       mot URL cu khong the de len anh vua chon. */
+    const payload = blobUrl
+      ? {
+          coverType: "image",
+          coverImage: blobUrl,
+          coverImageUrl: blobUrl,
+          cover: null
+        }
+      : {
+          coverType: "image",
+          coverImage: base64,
+          coverImageUrl: null,
+          cover: null
+        };
+
     await setDoc(
         doc(db, "users", uid),
-        {
-            coverType: "image",
-            coverImage: base64,
-            coverImageUrl: null,
-            cover: null
-        },
+        payload,
         {
             merge: true
         }
