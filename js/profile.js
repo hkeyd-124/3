@@ -1476,12 +1476,22 @@ function(){
        anh trong khi Firestore phinh to. Bao loi ro rang va dung han. */
     if(!(await window.hcHasFirebaseSession())){
 
-      showToast(
-        "Bạn đăng nhập bằng ví nên chưa đổi được ảnh. Hãy đăng nhập bằng email.",
-        "error"
-      );
+      /* Phase 2: user vi chua co phien Firebase Auth. Thu lay phien bang
+         chu ky vi (SIWE) truoc khi bao loi. Flag tat => hcSiweSignIn()
+         tra false ngay, nen hanh vi khong doi. */
+      if(typeof window.hcSiweSignIn === "function"){
+        await window.hcSiweSignIn();
+      }
 
-      return;
+      if(!(await window.hcHasFirebaseSession())){
+
+        showToast(
+          "Bạn đăng nhập bằng ví nên chưa đổi được ảnh. Hãy đăng nhập bằng email.",
+          "error"
+        );
+
+        return;
+      }
     }
 
     /* Phase 3: day bytes ra Blob truoc, chi giu URL ngan trong Firestore. */
@@ -1588,12 +1598,22 @@ document.getElementById("coverInput");
        thi khong duoc ghi base64 vao Firestore, phai bao loi ro rang. */
     if(!(await window.hcHasFirebaseSession())){
 
-      showToast(
-        "Bạn đăng nhập bằng ví nên chưa đổi được ảnh. Hãy đăng nhập bằng email.",
-        "error"
-      );
+      /* Phase 2: user vi chua co phien Firebase Auth. Thu lay phien bang
+         chu ky vi (SIWE) truoc khi bao loi. Flag tat => hcSiweSignIn()
+         tra false ngay, nen hanh vi khong doi. */
+      if(typeof window.hcSiweSignIn === "function"){
+        await window.hcSiweSignIn();
+      }
 
-      return;
+      if(!(await window.hcHasFirebaseSession())){
+
+        showToast(
+          "Bạn đăng nhập bằng ví nên chưa đổi được ảnh. Hãy đăng nhập bằng email.",
+          "error"
+        );
+
+        return;
+      }
     }
 
     /* Phase 3: day bytes ra Blob truoc, chi giu URL ngan trong Firestore. */
