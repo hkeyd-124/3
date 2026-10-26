@@ -49,6 +49,8 @@ import { db } from "../firebaseAdmin.js";
 
 import siwePkg from "siwe";
 
+import { getAddress } from "ethers";
+
 const { generateNonce } = siwePkg;
 
 /* Nonce song 5 phut. Du de user mo vi va ky (co the cham), ngan de cua so
@@ -120,6 +122,30 @@ export default async function handler(req, res) {
 
   }
 
-  return res.status(200).json({ nonce });
+  /* Tra kem dia chi EIP-55 checksum.
+
+     `siwe` 3.x tu choi dia chi chu thuong trong message bang loi
+     "invalid EIP-55 address", va provider KHONG dam bao tra ve dang
+     checksum: MetaMask tra chu thuong. Client vi vay khong the dung
+     accounts[0] de dung message - no se bi /api/siwe/verify tu choi bang
+     400 UNABLE_TO_PARSE. Server chuan hoa san o day va tra kem, de client
+     chi viec dung dung gia tri nay. */
+  let checksummed;
+
+  try {
+
+    checksummed = getAddress(address);
+
+  } catch (err) {
+
+    console.error("siwe checksum failed:", err && err.message);
+
+    return res.status(400).json({
+      error: "address must be a 0x-prefixed 40-hex-char string"
+    });
+
+  }
+
+  return res.status(200).json({ nonce, address: checksummed });
 
 }
