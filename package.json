@@ -5,6 +5,7 @@
   "dependencies": {
     "@vercel/blob": "^2.8.2",
     "ethers": "^6.16.0",
-    "firebase-admin": "^13.4.0"
+    "firebase-admin": "^13.4.0",
+    "siwe": "^3.0.0"
   }
 }
