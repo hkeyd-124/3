@@ -38,8 +38,10 @@ const HC_SIWE_STATEMENT =
    dung dinh dang. Nho vay khong them phu thuoc CDN nao vao trang.
 
    `address` PHAI la dia chi EIP-55 checksum (siwe 3.x nem loi voi dia chi
-   chu thuong). Lay truc tiep tu eth_requestAccounts - MetaMask tra ve
-   dang checksum san.
+   chu thuong). KHONG dung accounts[0] tu eth_requestAccounts: MetaMask tra
+   ve CHU THUONG, nen message se bi /api/siwe/verify tu choi bang 400
+   UNABLE_TO_PARSE. Dung `address` do /api/siwe/nonce tra kem (da chuan hoa
+   bang getAddress() o server).
 ========================= */
 function hcBuildSiweMessage({ domain, address, uri, nonce, issuedAt, expirationTime }) {
 
@@ -115,11 +117,12 @@ window.hcSiweSignIn = async function () {
 
     if (!window.ethereum) return false;
 
-    /* ---- 2. Lay dia chi dang CHECKSUM tu provider. ---------------- */
+    /* ---- 2. Xac nhan vi dang mo dung tai khoan. ------------------- */
 
-    /* eth_requestAccounts tra ve dia chi EIP-55 checksum. Khong dung
-       localStorage.wallet (chu thuong) de tao message: siwe 3.x nem loi
-       "invalid EIP-55 address" voi dia chi chu thuong. */
+    /* Chi dung accounts[0] de DOI CHIEU voi localStorage.wallet. Khong dung
+       no lam dia chi trong message: MetaMask tra ve chu thuong, ma siwe 3.x
+       tu choi dia chi chu thuong bang "invalid EIP-55 address". Dia chi
+       dung de ky lay tu /api/siwe/nonce (buoc 3b). */
     const accounts = await window.ethereum.request({
       method: "eth_requestAccounts"
     });
@@ -151,6 +154,18 @@ window.hcSiweSignIn = async function () {
 
     if (!nonce) return false;
 
+    /* ---- 3b. Lay dia chi EIP-55 do SERVER chuan hoa. -------------- */
+
+    /* Day la gia tri PHAI dung trong message. Server da goi getAddress()
+       tren dia chi lowercase, nen no luon hop le voi siwe 3.x. Van doi
+       chieu lai voi wallet de chac chan nonce thuoc dung tai khoan dang
+       mo. */
+    const signAddress = nonceData.address;
+
+    if (!signAddress) return false;
+
+    if (signAddress.toLowerCase() !== wallet.toLowerCase()) return false;
+
     /* ---- 4. Dung message EIP-4361. ------------------------------- */
 
     const now = Date.now();
@@ -160,7 +175,7 @@ window.hcSiweSignIn = async function () {
       /* domain la HOST, khong kem scheme. */
       domain: window.location.host,
 
-      address,
+      address: signAddress,
 
       uri: window.location.origin,
 
@@ -173,11 +188,13 @@ window.hcSiweSignIn = async function () {
 
     /* ---- 5. Ky. Thu tu [message, address] - giong authLink.js:100. - */
 
+    /* params[1] phai la CUNG dia chi da ghi trong message (signAddress),
+       khong phai accounts[0]: mot so vi doi chieu hai gia tri nay. */
     const signature = await window.ethereum.request({
 
       method: "personal_sign",
 
-      params: [message, address]
+      params: [message, signAddress]
     });
 
     if (!signature) return false;
