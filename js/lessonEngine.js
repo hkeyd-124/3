@@ -400,6 +400,7 @@ const canvas =
 
     avatar:
       this.mintedAvatar
+      || window.currentUserData?.avatarUrl
       || window.currentUserData?.avatar
       || null,
 
@@ -611,6 +612,7 @@ await generateCertificatePreview({
     || "Unknown",
   avatar:
     this.mintedAvatar
+    || window.currentUserData?.avatarUrl
     || window.currentUserData?.avatar
     || null,
   lesson:
@@ -748,7 +750,8 @@ try{
     window.currentUserData?.name
     || null;
   this.mintedAvatar =
-    window.currentUserData?.avatar
+    window.currentUserData?.avatarUrl
+    || window.currentUserData?.avatar
     || null;
   this.mintedTokenId =
     mintResult.tokenId;
