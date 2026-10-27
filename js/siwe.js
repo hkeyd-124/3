@@ -16,10 +16,10 @@
      - Dung window.ethereum truc tiep, giong js/authLink.js:16,46,96
    ========================================================================= */
 
-/* Feature flag. Mac dinh TAT: khi chua bat, hcSiweSignIn() tra false ngay
-   va moi thu trong js/profile.js chay y nhu truoc. Bat bang
-   window.HC_SIWE_ENABLED = true (console hoac mot script nho). */
-window.HC_SIWE_ENABLED = window.HC_SIWE_ENABLED === true;
+/* Feature flag. Mac dinh BAT (Phase 5): user vi can phien Firebase Auth
+   de doi avatar. Tat khan cap: doi dong duoi thanh false kem deploy,
+   hoac window.HC_SIWE_ENABLED = false trong console (chi phien nay). */
+window.HC_SIWE_ENABLED = true;
 
 /* Sepolia - khop index.html:721 (chainId 11155111n). */
 const HC_SIWE_CHAIN_ID = 11155111;
