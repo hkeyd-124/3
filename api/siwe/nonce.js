@@ -5,7 +5,8 @@
    Content-Type: application/json
    { "address": "0x..." }
 
-   -> 200 { nonce }
+   -> 200 { nonce, address }
+   -> 429 { error: "RATE_LIMITED" }   (Phase 6)
 
    WHY THIS EXISTS
    ---------------
@@ -43,6 +44,25 @@
    because this endpoint only records it. The checksum requirement lives in
    the SIWE message itself (see api/siwe/verify.js) - `siwe` rejects a
    lowercase address in the message with "invalid EIP-55 address".
+
+   RATE LIMITING (Phase 6)
+   -----------------------
+   Every POST writes one Firestore document, so an unauthenticated script
+   could burn the project's write quota. A per-IP counter closes that.
+
+   WHY A FIRESTORE COUNTER AND NOT AN IN-MEMORY ONE
+   ------------------------------------------------
+   Same reason the nonce lives in Firestore: Vercel Functions are stateless
+   and horizontally scaled, so a module-level Map would be per-instance and
+   would reset on every cold start - it would not limit anything.
+
+   WHY IT FAILS OPEN
+   -----------------
+   This is abuse mitigation, not authentication. If the IP cannot be
+   determined, or Firestore errors while counting, the request is allowed
+   through. Blocking a real user because of an infrastructure hiccup would
+   break the feature this endpoint exists to support, and the nonce itself
+   is still protected by the signature check in /api/siwe/verify.
 ========================= */
 
 import { db } from "../firebaseAdmin.js";
@@ -50,6 +70,8 @@ import { db } from "../firebaseAdmin.js";
 import siwePkg from "siwe";
 
 import { getAddress } from "ethers";
+
+import crypto from "node:crypto";
 
 const { generateNonce } = siwePkg;
 
@@ -60,6 +82,124 @@ const NONCE_TTL_MS = 5 * 60 * 1000;
 
 const ADDRESS_PATTERN = /^0x[0-9a-fA-F]{40}$/;
 
+/* ---- Rate limit ---------------------------------------------------- */
+
+/* 10 nonce / 10 phut / IP. Mot user that chi can 1 nonce cho moi lan doi
+   avatar, nen 10 la rong rai; mot script spam thi bi chan sau vai giay. */
+const RATE_LIMIT_MAX = 10;
+
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
+
+/* Collection rieng, KHONG dung chung voi siwe_nonces: nonce la du lieu
+   nghiep vu (verify doc no), con day chi la bo dem tam. */
+const RATE_LIMIT_COLLECTION = "siwe_rate_limits";
+
+/* Lay IP that. Vercel dat x-forwarded-for; phan tu DAU TIEN la client that,
+   cac phan tu sau la proxy. Khong tin ca header tho. */
+function getClientIp(req) {
+
+  const headers = (req && req.headers) || {};
+
+  const xff = headers["x-forwarded-for"];
+
+  if (typeof xff === "string" && xff.length) {
+
+    const first = xff.split(",")[0].trim();
+
+    if (first) return first;
+
+  }
+
+  const real = headers["x-real-ip"];
+
+  if (typeof real === "string" && real.trim()) return real.trim();
+
+  return null;
+
+}
+
+/* Khong luu IP tho: hash de khong co du lieu ca nhan nam trong DB, va de
+   document id co do dai co dinh. */
+function rateLimitKey(ip) {
+
+  return crypto.createHash("sha256").update(ip).digest("hex").slice(0, 32);
+
+}
+
+/* Tra { allowed, retryAfterSec }. Moi loi deu fail-open. */
+async function checkRateLimit(ip) {
+
+  if (!ip) return { allowed: true, retryAfterSec: 0 };
+
+  try {
+
+    const ref = db.collection(RATE_LIMIT_COLLECTION).doc(rateLimitKey(ip));
+
+    const now = Date.now();
+
+    /* Transaction de hai request dong thoi khong cung doc count=9 roi cung
+       ghi count=10 (se lot 11 request). */
+    return await db.runTransaction(async (tx) => {
+
+      const snap = await tx.get(ref);
+
+      const data = snap.exists ? snap.data() : null;
+
+      const windowStart =
+        data && data.windowStart && typeof data.windowStart.toMillis === "function"
+          ? data.windowStart.toMillis()
+          : 0;
+
+      const count = data && typeof data.count === "number" ? data.count : 0;
+
+      /* Cua so moi (chua co doc, hoac da qua 10 phut). */
+      if (!windowStart || now - windowStart >= RATE_LIMIT_WINDOW_MS) {
+
+        tx.set(ref, {
+          count: 1,
+          windowStart: new Date(now),
+          /* expiresAt de bat TTL cho collection nay sau; khong bat cung
+             khong sao vi cua so tu reset theo windowStart. */
+          expiresAt: new Date(now + RATE_LIMIT_WINDOW_MS + 60 * 60 * 1000)
+        });
+
+        return { allowed: true, retryAfterSec: 0 };
+
+      }
+
+      if (count >= RATE_LIMIT_MAX) {
+
+        return {
+          allowed: false,
+          retryAfterSec: Math.max(
+            1,
+            Math.ceil((windowStart + RATE_LIMIT_WINDOW_MS - now) / 1000)
+          )
+        };
+
+      }
+
+      tx.set(ref, {
+        count: count + 1,
+        windowStart: new Date(windowStart),
+        expiresAt: new Date(windowStart + RATE_LIMIT_WINDOW_MS + 60 * 60 * 1000)
+      });
+
+      return { allowed: true, retryAfterSec: 0 };
+
+    });
+
+  } catch (err) {
+
+    /* Log message only - never the IP or the hash. */
+    console.error("siwe rate limit check failed (fail-open):", err && err.message);
+
+    return { allowed: true, retryAfterSec: 0 };
+
+  }
+
+}
+
 export default async function handler(req, res) {
 
   if (req.method !== "POST") {
@@ -68,6 +208,20 @@ export default async function handler(req, res) {
 
     return res.status(405).json({
       error: "Method not allowed"
+    });
+
+  }
+
+  /* Rate limit TRUOC khi validate body: request rac cung ton mot write neu
+     no di tiep, nen phai dem ca request sai dinh dang. */
+  const rate = await checkRateLimit(getClientIp(req));
+
+  if (!rate.allowed) {
+
+    res.setHeader("Retry-After", String(rate.retryAfterSec));
+
+    return res.status(429).json({
+      error: "RATE_LIMITED"
     });
 
   }

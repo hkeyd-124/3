@@ -83,7 +83,10 @@ function hcSiweToastForError(code) {
       "Vi khong khop voi phien dang nhap. Hay thu lai.",
 
     WALLET_NOT_REGISTERED:
-      "Vi nay chua duoc dang ky tren HackChem. Hay dang nhap bang vi truoc."
+      "Vi nay chua duoc dang ky tren HackChem. Hay dang nhap bang vi truoc.",
+
+    RATE_LIMITED:
+      "Ban da thu qua nhieu lan. Hay doi vai phut roi thu lai."
   };
 
   const text =
@@ -146,7 +149,15 @@ window.hcSiweSignIn = async function () {
       body: JSON.stringify({ address: wallet })
     });
 
-    if (!nonceRes.ok) return false;
+    if (!nonceRes.ok) {
+
+      /* 429 = bi rate limit. Cac loi khac giu nguyen hanh vi cu (im lang
+         roi ve toast cua gate). */
+      if (nonceRes.status === 429) hcSiweToastForError("RATE_LIMITED");
+
+      return false;
+
+    }
 
     const nonceData = await nonceRes.json();
 
